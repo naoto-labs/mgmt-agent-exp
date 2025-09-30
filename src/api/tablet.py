@@ -3,7 +3,7 @@ from typing import Optional, List, Dict, Any
 import logging
 
 from src.models.product import Product, SAMPLE_PRODUCTS, PRODUCT_CATEGORIES
-from src.agents.customer_agent import customer_agent
+# from src.agents.customer_agent import customer_agent  # 循環インポートを避けるため削除
 from src.services.conversation_service import conversation_service
 from src.analytics.event_tracker import event_tracker, EventType, EventSeverity
 

@@ -13,13 +13,13 @@ from src.services.payment_service import payment_service
 from src.services.inventory_service import inventory_service
 from src.services.conversation_service import conversation_service
 from src.agents.search_agent import search_agent
-from src.agents.customer_agent import customer_agent
+# from src.agents.customer_agent import customer_agent  # 循環インポートを避けるため削除
 from src.accounting.journal_entry import journal_processor
 from src.accounting.management_accounting import management_analyzer
 from src.analytics.event_tracker import event_tracker
-from src.api.vending import router as vending_router
-from src.api.tablet import router as tablet_router
-from src.api.procurement import router as procurement_router
+# from src.api.vending import router as vending_router  # 循環インポートを避けるため削除
+# from src.api.tablet import router as tablet_router    # 循環インポートを避けるため削除
+# from src.api.procurement import router as procurement_router  # 循環インポートを避けるため削除
 
 logger = logging.getLogger(__name__)
 

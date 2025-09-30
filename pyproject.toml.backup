@@ -1,45 +1,41 @@
-[project]
+[tool.poetry]
 name = "mgmt-agent-exp"
 version = "0.1.0"
 description = "Anthropic PJ Vend構成の実験的実装 - AIエージェント自律型自動販売機シミュレーター"
-authors = [
-    {name = "naoto-labs"},
-]
-requires-python = ">=3.9"
-dependencies = [
-    "fastapi>=0.104.0",
-    "uvicorn[standard]>=0.24.0",
-    "pydantic>=2.0.0",
-    "pydantic-settings>=2.11.0",
-    "python-dotenv>=1.0.0",
-    "anthropic>=0.5.0",
-    "openai>=1.0.0",
-    "motor>=3.3.0",
-    "sqlalchemy>=2.0.0",
-    "alembic>=1.12.0",
-    "python-multipart>=0.0.6",
-    "jinja2>=3.1.0",
-    "aiofiles>=23.0.0",
-    "httpx>=0.25.0",
-    "websockets>=12.0",
-    "bcrypt>=4.0.0",
-    "cryptography>=41.0.0",
-]
+authors = ["naoto-labs"]
 
-[tool.rye]
-managed = true
-dev-dependencies = [
-    "pytest>=7.4.0",
-    "pytest-asyncio>=0.21.0",
-    "pytest-cov>=4.0.0",
-    "black>=23.0.0",
-    "flake8>=6.0.0",
-    "isort>=5.12.0",
-    "mypy>=1.5.0",
-]
+[tool.poetry.dependencies]
+python = "^3.9"
+fastapi = "^0.104.0"
+uvicorn = "^0.24.0"
+pydantic = "^2.0.0"
+python-dotenv = "^1.0.0"
+anthropic = "^0.5.0"
+openai = "^1.0.0"
+motor = "^3.3.0"
+sqlalchemy = "^2.0.0"
+alembic = "^1.12.0"
+python-multipart = "^0.0.6"
+jinja2 = "^3.1.0"
+aiofiles = "^23.0.0"
+httpx = "^0.25.0"
+websockets = "^12.0"
+bcrypt = "^4.0.0"
+cryptography = "^41.0.0"
+pytest = "^7.4.0"
+pytest-asyncio = "^0.21.0"
+black = "^23.0.0"
+flake8 = "^6.0.0"
+isort = "^5.12.0"
+mypy = "^1.5.0"
 
-[tool.hatch.build.targets.wheel]
-packages = ["src"]
+[tool.poetry.group.dev.dependencies]
+pytest-cov = "^4.0.0"
+httpx = "^0.25.0"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
 
 [tool.black]
 line-length = 88
@@ -97,7 +93,3 @@ markers = [
     "unit: marks tests as unit tests",
 ]
 asyncio_mode = "auto"
-
-[build-system]
-requires = ["hatchling"]
-build-backend = "hatchling.build"

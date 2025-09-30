@@ -1,4 +1,5 @@
-from pydantic import BaseSettings, validator
+from pydantic_settings import BaseSettings
+from pydantic import validator
 from typing import Optional, List
 from src.config.security import secure_config
 import os
@@ -48,6 +49,7 @@ class VendingMachineSettings(BaseSettings):
     class Config:
         env_file = ".env"
         env_file_encoding = "utf-8"
+        extra = "ignore"  # プロパティフィールドを無視
 
     @validator("ai_safety_threshold")
     def validate_safety_threshold(cls, v):
