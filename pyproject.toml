@@ -1,0 +1,95 @@
+[tool.poetry]
+name = "mgmt-agent-exp"
+version = "0.1.0"
+description = "Anthropic PJ Vend構成の実験的実装 - AIエージェント自律型自動販売機シミュレーター"
+authors = ["naoto-labs"]
+
+[tool.poetry.dependencies]
+python = "^3.9"
+fastapi = "^0.104.0"
+uvicorn = "^0.24.0"
+pydantic = "^2.0.0"
+python-dotenv = "^1.0.0"
+anthropic = "^0.5.0"
+openai = "^1.0.0"
+motor = "^3.3.0"
+sqlalchemy = "^2.0.0"
+alembic = "^1.12.0"
+python-multipart = "^0.0.6"
+jinja2 = "^3.1.0"
+aiofiles = "^23.0.0"
+httpx = "^0.25.0"
+websockets = "^12.0"
+bcrypt = "^4.0.0"
+cryptography = "^41.0.0"
+pytest = "^7.4.0"
+pytest-asyncio = "^0.21.0"
+black = "^23.0.0"
+flake8 = "^6.0.0"
+isort = "^5.12.0"
+mypy = "^1.5.0"
+
+[tool.poetry.group.dev.dependencies]
+pytest-cov = "^4.0.0"
+httpx = "^0.25.0"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
+
+[tool.black]
+line-length = 88
+target-version = ['py39']
+include = '\.pyi?$'
+extend-exclude = '''
+/(
+  # directories
+  \.eggs
+  | \.git
+  | \.hg
+  | \.mypy_cache
+  | \.tox
+  | \.venv
+  | build
+  | dist
+)/
+'''
+
+[tool.isort]
+profile = "black"
+line_length = 88
+multi_line_output = 3
+include_trailing_comma = true
+force_grid_wrap = 0
+use_parentheses = true
+ensure_newline_before_comments = true
+
+[tool.mypy]
+python_version = "3.9"
+warn_return_any = true
+warn_unused_configs = true
+disallow_untyped_defs = true
+disallow_incomplete_defs = true
+check_untyped_defs = true
+disallow_untyped_decorators = true
+no_implicit_optional = true
+warn_redundant_casts = true
+warn_unused_ignores = true
+warn_no_return = true
+warn_unreachable = true
+strict_equality = true
+show_error_codes = true
+
+[tool.pytest.ini_options]
+minversion = "6.0"
+addopts = "-ra -q --strict-markers --strict-config"
+testpaths = ["tests"]
+python_files = ["test_*.py", "*_test.py"]
+python_classes = ["Test*"]
+python_functions = ["test_*"]
+markers = [
+    "slow: marks tests as slow (deselect with '-m \"not slow\"')",
+    "integration: marks tests as integration tests",
+    "unit: marks tests as unit tests",
+]
+asyncio_mode = "auto"
