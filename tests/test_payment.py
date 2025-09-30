@@ -254,6 +254,210 @@ class TestPaymentService:
         assert len(recent) == 3
         assert recent[0]["amount"] == 1400  # 最新のものから
 
+    def test_simulate_realistic_sale(self, payment_service):
+        """現実的な販売シミュレーションテスト"""
+        sale_result = payment_service.simulate_realistic_sale("drink_cola", quantity=2)
+
+        assert "product_id" in sale_result
+        assert "predicted_demand" in sale_result
+        assert "actual_quantity" in sale_result
+        assert "unit_price" in sale_result
+        assert "total_amount" in sale_result
+        assert "customer_satisfaction" in sale_result
+        assert "simulation_model" in sale_result
+
+        # 価格が正の値であることを確認
+        assert sale_result["unit_price"] > 0
+        assert sale_result["total_amount"] > 0
+
+        # 顧客満足度が0-1の範囲であることを確認
+        assert 0 <= sale_result["customer_satisfaction"] <= 1
+
+    def test_get_demand_forecast(self, payment_service):
+        """需要予測テスト"""
+        forecast = payment_service.get_demand_forecast("drink_cola", days=3)
+
+        assert forecast["product_id"] == "drink_cola"
+        assert forecast["forecast_period_days"] == 3
+        assert "forecast_data" in forecast
+        assert "summary" in forecast
+
+        # 予測データが適切な構造であることを確認
+        assert len(forecast["forecast_data"]) == 3
+        assert "predicted_demand" in forecast["forecast_data"][0]
+        assert "expected_sales" in forecast["forecast_data"][0]
+
+        # サマリー統計が計算されていることを確認
+        assert "total_predicted_demand" in forecast["summary"]
+        assert "peak_demand_hour" in forecast["summary"]
+
+    def test_simulate_market_scenario(self, payment_service):
+        """市場シナリオシミュレーションテスト"""
+        scenario_result = payment_service.simulate_market_scenario("economic_boom")
+
+        assert scenario_result["scenario"] == "economic_boom"
+        assert "scenario_parameters" in scenario_result
+        assert "market_trends" in scenario_result
+        assert "scenario_impact" in scenario_result
+        assert "recommendations" in scenario_result
+
+        # シナリオパラメータが適切であることを確認
+        params = scenario_result["scenario_parameters"]
+        assert "demand_change" in params
+        assert "price_sensitivity" in params
+
+        # 市場トレンドが全商品に対して計算されていることを確認
+        trends = scenario_result["market_trends"]
+        expected_products = ["drink_cola", "drink_tea", "snack_chips", "snack_chocolate"]
+        for product in expected_products:
+            assert product in trends
+
+    def test_get_advanced_analytics(self, payment_service):
+        """高度な分析データ取得テスト"""
+        # 取引ログを追加してテストデータを準備
+        payment_service.transaction_log = [
+            {
+                "type": "payment",
+                "amount": 1000,
+                "timestamp": datetime.now()
+            }
+        ]
+
+        analytics = payment_service.get_advanced_analytics()
+
+        assert "hourly_statistics" in analytics
+        assert "product_analytics" in analytics
+        assert "market_trends" in analytics
+        assert "inventory_efficiency" in analytics
+        assert "sales_model_version" in analytics
+
+        # 商品分析が全商品に対して存在することを確認
+        product_analytics = analytics["product_analytics"]
+        expected_products = ["drink_cola", "drink_tea", "snack_chips", "snack_chocolate"]
+        for product in expected_products:
+            assert product in product_analytics
+            assert "popularity_score" in product_analytics[product]
+            assert "optimal_price" in product_analytics[product]
+
+    def test_sales_model_demand_prediction(self, payment_service):
+        """販売モデル需要予測テスト"""
+        # 異なる時間帯での予測をテスト
+        morning_demand = payment_service.sales_model.predict_demand("drink_cola", 8, 1)  # 月曜朝8時
+        afternoon_demand = payment_service.sales_model.predict_demand("drink_cola", 14, 1)  # 月曜午後2時
+
+        # 午後の方が需要が高いはず
+        assert afternoon_demand > morning_demand
+
+        # 需要が適切な範囲内であることを確認
+        assert 0 <= morning_demand <= 2.0
+        assert 0 <= afternoon_demand <= 2.0
+
+    def test_customer_behavior_simulation(self, payment_service):
+        """顧客行動シミュレーションテスト"""
+        behavior = payment_service.sales_model.simulate_customer_behavior("drink_cola")
+
+        required_keys = [
+            "purchase_probability",
+            "satisfaction_score",
+            "repeat_purchase_probability",
+            "price_sensitivity",
+            "promotion_responsiveness"
+        ]
+
+        for key in required_keys:
+            assert key in behavior
+
+        # 確率が適切な範囲内であることを確認
+        assert 0 <= behavior["purchase_probability"] <= 1
+        assert 0 <= behavior["satisfaction_score"] <= 1
+        assert 0 <= behavior["repeat_purchase_probability"] <= 1
+
+    def test_optimal_pricing(self, payment_service):
+        """最適価格計算テスト"""
+        cost_price = 100.0
+        optimal_price = payment_service.sales_model.calculate_optimal_price("drink_cola", cost_price)
+
+        # コスト価格より高い価格が設定されていることを確認（マージン考慮）
+        assert optimal_price > cost_price
+
+        # 価格が現実的な範囲内であることを確認
+        assert optimal_price <= cost_price * 3  # 最大3倍まで
+
+        # 価格が10円単位であることを確認
+        assert optimal_price % 10 == 0
+
+    def test_bulk_purchase_discount(self, payment_service):
+        """まとめ買い割引テスト"""
+        base_price = 150.0
+
+        # 単品購入（割引なし）
+        single_price = payment_service.sales_model.simulate_bulk_purchase_discount(base_price, 1)
+        assert single_price == base_price
+
+        # 3個購入（5%割引）
+        triple_price = payment_service.sales_model.simulate_bulk_purchase_discount(base_price, 3)
+        assert triple_price < base_price
+        assert triple_price == base_price * 0.95  # 5%割引
+
+        # 5個購入（10%割引）
+        bulk_price = payment_service.sales_model.simulate_bulk_purchase_discount(base_price, 5)
+        assert bulk_price == base_price * 0.9  # 10%割引
+
+    def test_inventory_turnover_calculation(self, payment_service):
+        """在庫回転率計算テスト"""
+        turnover_rate = payment_service.sales_model.calculate_inventory_turnover(
+            "drink_cola", 100, 5.0  # 在庫100個、1日平均販売5個
+        )
+
+        # 年間販売量 = 5 * 365 = 1825
+        # 在庫回転率 = 1825 / 100 = 18.25
+        expected_rate = 5.0 * 365 / 100
+        assert abs(turnover_rate - expected_rate) < 0.01
+
+    def test_seasonal_demand_simulation(self, payment_service):
+        """季節需要シミュレーションテスト"""
+        # 夏（7月）と冬（1月）の需要を比較
+        summer_demand = payment_service.sales_model.simulate_seasonal_demand("drink_cola", 7)
+        winter_demand = payment_service.sales_model.simulate_seasonal_demand("drink_cola", 1)
+
+        # 夏の方が需要が高いはず
+        assert summer_demand > winter_demand
+
+        # 需要が適切な範囲内であることを確認
+        assert summer_demand > 0
+        assert winter_demand > 0
+
+    def test_market_scenario_recommendations(self, payment_service):
+        """市場シナリオ推奨事項テスト"""
+        # 好景気シナリオ
+        boom_scenario = payment_service.simulate_market_scenario("economic_boom")
+        boom_recommendations = boom_scenario["recommendations"]
+
+        # 不景気シナリオ
+        recession_scenario = payment_service.simulate_market_scenario("recession")
+        recession_recommendations = recession_scenario["recommendations"]
+
+        # 両方のシナリオで推奨事項が生成されていることを確認
+        assert len(boom_recommendations) > 0
+        assert len(recession_recommendations) > 0
+
+        # シナリオによって推奨事項が異なることを確認
+        assert boom_recommendations != recession_recommendations
+
+    def test_inventory_efficiency_rating(self, payment_service):
+        """在庫効率性評価テスト"""
+        # 高い回転率
+        high_rating = payment_service._rate_inventory_efficiency(15)
+        assert high_rating == "非常に効率的"
+
+        # 標準的な回転率
+        normal_rating = payment_service._rate_inventory_efficiency(6)
+        assert normal_rating == "標準的"
+
+        # 低い回転率
+        low_rating = payment_service._rate_inventory_efficiency(1)
+        assert low_rating == "非常に非効率的"
+
 # パラメータ化テスト
 @pytest.mark.parametrize("payment_method,expected_success", [
     (PaymentMethod.CASH, True),      # 現金は常に成功

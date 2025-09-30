@@ -124,12 +124,220 @@ class PaymentSimulator:
         }
         return messages.get(error, "不明なエラー")
 
+class SalesSimulationModel:
+    """販売シミュレーションモデル"""
+
+    def __init__(self):
+        # 時間帯別需要パターン（24時間）
+        self.time_demand_pattern = self._generate_time_demand_pattern()
+
+        # 商品別人気度（0-1のスケール）
+        self.product_popularity = {
+            "drink_cola": 0.8,
+            "drink_tea": 0.6,
+            "snack_chips": 0.7,
+            "snack_chocolate": 0.5
+        }
+
+        # 曜日別需要変動係数
+        self.day_demand_multiplier = {
+            0: 0.7,  # 月曜日
+            1: 0.8,  # 火曜日
+            2: 0.9,  # 水曜日
+            3: 1.0,  # 木曜日
+            4: 1.2,  # 金曜日
+            5: 1.3,  # 土曜日
+            6: 1.1   # 日曜日
+        }
+
+        # 季節・イベント要因
+        self.seasonal_factors = {
+            "spring": 1.0,
+            "summer": 1.2,
+            "autumn": 0.9,
+            "winter": 0.8
+        }
+
+    def _generate_time_demand_pattern(self) -> List[float]:
+        """時間帯別需要パターンを生成"""
+        pattern = []
+
+        for hour in range(24):
+            if 6 <= hour < 9:  # 朝の通勤・通学時間
+                demand = 0.3 + random.uniform(0.2, 0.4)
+            elif 9 <= hour < 12:  # 午前中
+                demand = 0.6 + random.uniform(0.1, 0.3)
+            elif 12 <= hour < 15:  # お昼時間
+                demand = 1.0 + random.uniform(0.2, 0.5)
+            elif 15 <= hour < 18:  # 午後
+                demand = 0.7 + random.uniform(0.1, 0.3)
+            elif 18 <= hour < 22:  # 夕方・夜
+                demand = 0.9 + random.uniform(0.2, 0.4)
+            else:  # 深夜・早朝
+                demand = 0.1 + random.uniform(0.0, 0.2)
+
+            pattern.append(demand)
+
+        return pattern
+
+    def predict_demand(self, product_id: str, current_hour: int, current_weekday: int) -> float:
+        """商品の需要を予測"""
+        base_demand = self.product_popularity.get(product_id, 0.5)
+
+        # 時間帯要因
+        time_factor = self.time_demand_pattern[current_hour]
+
+        # 曜日要因
+        day_factor = self.day_demand_multiplier.get(current_weekday, 1.0)
+
+        # ランダム要因（実際の予測誤差をシミュレート）
+        random_factor = random.uniform(0.8, 1.2)
+
+        predicted_demand = base_demand * time_factor * day_factor * random_factor
+
+        return min(predicted_demand, 2.0)  # 上限を2.0に制限
+
+    def simulate_customer_behavior(self, product_id: str) -> Dict[str, Any]:
+        """顧客行動をシミュレート"""
+        # 購入確率の計算
+        popularity = self.product_popularity.get(product_id, 0.5)
+        purchase_probability = popularity * random.uniform(0.3, 0.8)
+
+        # 顧客満足度のシミュレーション
+        satisfaction_base = 0.7 + (popularity * 0.2)
+        satisfaction = min(satisfaction_base + random.uniform(-0.1, 0.1), 1.0)
+
+        # リピート購入確率
+        repeat_probability = satisfaction * 0.6 + random.uniform(0.1, 0.3)
+
+        return {
+            "purchase_probability": purchase_probability,
+            "satisfaction_score": satisfaction,
+            "repeat_purchase_probability": repeat_probability,
+            "price_sensitivity": random.uniform(0.3, 0.8),  # 価格感度
+            "promotion_responsiveness": random.uniform(0.4, 0.9)  # プロモーション反応度
+        }
+
+    def calculate_optimal_price(self, product_id: str, cost_price: float) -> float:
+        """最適価格を計算"""
+        popularity = self.product_popularity.get(product_id, 0.5)
+
+        # 需要に基づく価格設定
+        demand_multiplier = 1.0 + (popularity * 0.5)
+
+        # コストベースの価格設定
+        base_price = cost_price * 1.3  # 30%マージン
+
+        # 人気度による調整
+        popularity_adjustment = 1.0 + (popularity * 0.3)
+
+        optimal_price = base_price * demand_multiplier * popularity_adjustment
+
+        # 価格を現実的な範囲に調整
+        return round(optimal_price / 10) * 10  # 10円単位で丸め
+
+    def simulate_market_trends(self) -> Dict[str, float]:
+        """市場トレンドをシミュレート"""
+        trends = {}
+
+        for product_id in self.product_popularity.keys():
+            # トレンドの変動（-0.1〜0.1の範囲）
+            trend_change = random.uniform(-0.1, 0.1)
+
+            # 季節要因の影響
+            seasonal_impact = random.uniform(-0.05, 0.05)
+
+            total_change = trend_change + seasonal_impact
+            trends[product_id] = max(0.1, min(1.0, self.product_popularity[product_id] + total_change))
+
+        # 人気度の更新
+        for product_id, new_popularity in trends.items():
+            self.product_popularity[product_id] = new_popularity
+
+        return trends
+
+    def get_sales_forecast(self, product_id: str, days: int = 7) -> List[Dict[str, Any]]:
+        """販売予測を取得"""
+        forecast = []
+        current_time = datetime.now()
+
+        for day in range(days):
+            forecast_date = current_time + timedelta(days=day)
+            hour = forecast_date.hour
+            weekday = forecast_date.weekday()
+
+            predicted_demand = self.predict_demand(product_id, hour, weekday)
+            customer_behavior = self.simulate_customer_behavior(product_id)
+
+            forecast.append({
+                "date": forecast_date.strftime("%Y-%m-%d"),
+                "hour": hour,
+                "predicted_demand": predicted_demand,
+                "purchase_probability": customer_behavior["purchase_probability"],
+                "expected_sales": predicted_demand * customer_behavior["purchase_probability"]
+            })
+
+        return forecast
+
+    def simulate_bulk_purchase_discount(self, base_price: float, quantity: int) -> float:
+        """まとめ買い割引をシミュレート"""
+        if quantity <= 1:
+            return base_price
+
+        # 数量に応じた割引率
+        if quantity >= 10:
+            discount_rate = 0.15  # 15%割引
+        elif quantity >= 5:
+            discount_rate = 0.10  # 10%割引
+        elif quantity >= 3:
+            discount_rate = 0.05  # 5%割引
+        else:
+            discount_rate = 0.0
+
+        discounted_price = base_price * (1 - discount_rate)
+        return round(discounted_price / 10) * 10
+
+    def calculate_inventory_turnover(self, product_id: str, current_stock: int, avg_daily_sales: float) -> float:
+        """在庫回転率を計算"""
+        if current_stock <= 0:
+            return 0.0
+
+        # 在庫回転率 = 年間販売量 / 平均在庫量
+        annual_sales = avg_daily_sales * 365
+        turnover_rate = annual_sales / current_stock
+
+        return turnover_rate
+
+    def simulate_seasonal_demand(self, product_id: str, current_month: int) -> float:
+        """季節需要をシミュレート"""
+        # 月別の季節要因
+        seasonal_multipliers = {
+            1: 0.8,   # 1月（冬）
+            2: 0.8,   # 2月（冬）
+            3: 0.9,   # 3月（春）
+            4: 1.0,   # 4月（春）
+            5: 1.1,   # 5月（春）
+            6: 1.2,   # 6月（夏）
+            7: 1.3,   # 7月（夏）
+            8: 1.3,   # 8月（夏）
+            9: 1.1,   # 9月（秋）
+            10: 1.0,  # 10月（秋）
+            11: 0.9,  # 11月（秋）
+            12: 0.8   # 12月（冬）
+        }
+
+        base_demand = self.product_popularity.get(product_id, 0.5)
+        seasonal_multiplier = seasonal_multipliers.get(current_month, 1.0)
+
+        return base_demand * seasonal_multiplier
+
 class PaymentService:
-    """決済サービス"""
+    """決済サービス（シミュレーションモデルベース）"""
 
     def __init__(self):
         self.simulator = PaymentSimulator()
         self.transaction_log: List[Dict[str, Any]] = []
+        self.sales_model = SalesSimulationModel()
 
     async def process_payment(self, amount: float, method: PaymentMethod, **kwargs) -> PaymentResult:
         """決済を処理"""
@@ -327,6 +535,236 @@ class PaymentService:
     def get_recent_transactions(self, limit: int = 10) -> List[Dict[str, Any]]:
         """最近の取引を取得"""
         return self.transaction_log[-limit:] if self.transaction_log else []
+
+    def simulate_realistic_sale(self, product_id: str, quantity: int = 1) -> Dict[str, Any]:
+        """現実的な販売をシミュレート"""
+        current_time = datetime.now()
+        current_hour = current_time.hour
+        current_weekday = current_time.weekday()
+        current_month = current_time.month
+
+        # 需要予測
+        predicted_demand = self.sales_model.predict_demand(product_id, current_hour, current_weekday)
+
+        # 顧客行動シミュレーション
+        customer_behavior = self.sales_model.simulate_customer_behavior(product_id)
+
+        # 実際の販売数量を決定（予測需要と顧客行動に基づく）
+        random_factor = random.uniform(0.8, 1.2)
+        actual_quantity = max(0, int(predicted_demand * customer_behavior["purchase_probability"] * random_factor))
+
+        # 価格設定
+        base_price = 150.0  # 基準価格（実際には商品マスタから取得）
+        optimal_price = self.sales_model.calculate_optimal_price(product_id, base_price * 0.7)
+
+        # まとめ買い割引の適用
+        if quantity > 1:
+            unit_price = self.sales_model.simulate_bulk_purchase_discount(optimal_price, quantity)
+        else:
+            unit_price = optimal_price
+
+        total_amount = unit_price * actual_quantity
+
+        # 季節需要の考慮
+        seasonal_demand = self.sales_model.simulate_seasonal_demand(product_id, current_month)
+        seasonal_adjustment = total_amount * (seasonal_demand / self.sales_model.product_popularity.get(product_id, 0.5))
+
+        final_amount = total_amount * (1 + (seasonal_adjustment - total_amount) / total_amount * 0.3)
+
+        return {
+            "product_id": product_id,
+            "predicted_demand": predicted_demand,
+            "actual_quantity": actual_quantity,
+            "unit_price": round(unit_price, 2),
+            "total_amount": round(final_amount, 2),
+            "customer_satisfaction": customer_behavior["satisfaction_score"],
+            "repeat_purchase_probability": customer_behavior["repeat_purchase_probability"],
+            "seasonal_impact": seasonal_demand,
+            "timestamp": current_time.isoformat(),
+            "simulation_model": "advanced_v1.0"
+        }
+
+    def get_demand_forecast(self, product_id: str, days: int = 7) -> Dict[str, Any]:
+        """需要予測を取得"""
+        forecast = self.sales_model.get_sales_forecast(product_id, days)
+
+        # 統計情報の計算
+        total_predicted_demand = sum(item["predicted_demand"] for item in forecast)
+        total_expected_sales = sum(item["expected_sales"] for item in forecast)
+        avg_purchase_probability = sum(item["purchase_probability"] for item in forecast) / len(forecast)
+
+        return {
+            "product_id": product_id,
+            "forecast_period_days": days,
+            "forecast_data": forecast,
+            "summary": {
+                "total_predicted_demand": round(total_predicted_demand, 2),
+                "total_expected_sales": round(total_expected_sales, 2),
+                "average_purchase_probability": round(avg_purchase_probability, 3),
+                "peak_demand_hour": max(forecast, key=lambda x: x["predicted_demand"])["hour"],
+                "lowest_demand_hour": min(forecast, key=lambda x: x["predicted_demand"])["hour"]
+            }
+        }
+
+    def simulate_market_scenario(self, scenario: str = "normal") -> Dict[str, Any]:
+        """市場シナリオをシミュレート"""
+        scenarios = {
+            "normal": {"demand_change": 0.0, "price_sensitivity": 0.5},
+            "economic_boom": {"demand_change": 0.2, "price_sensitivity": 0.3},
+            "recession": {"demand_change": -0.3, "price_sensitivity": 0.8},
+            "competitor_entry": {"demand_change": -0.2, "price_sensitivity": 0.7},
+            "viral_marketing": {"demand_change": 0.5, "price_sensitivity": 0.2},
+            "supply_shortage": {"demand_change": 0.1, "price_sensitivity": 0.6}
+        }
+
+        if scenario not in scenarios:
+            scenario = "normal"
+
+        scenario_params = scenarios[scenario]
+
+        # 市場トレンドのシミュレーション
+        market_trends = self.sales_model.simulate_market_trends()
+
+        # シナリオに基づく影響の計算
+        scenario_impact = {}
+        for product_id, trend in market_trends.items():
+            base_demand = self.sales_model.product_popularity[product_id]
+            demand_impact = scenario_params["demand_change"]
+            price_impact = scenario_params["price_sensitivity"]
+
+            scenario_impact[product_id] = {
+                "base_demand": base_demand,
+                "trend_demand": trend,
+                "scenario_demand": trend * (1 + demand_impact),
+                "price_sensitivity": price_impact,
+                "recommended_action": self._get_recommended_action(trend, demand_impact, price_impact)
+            }
+
+        return {
+            "scenario": scenario,
+            "scenario_parameters": scenario_params,
+            "market_trends": market_trends,
+            "scenario_impact": scenario_impact,
+            "recommendations": self._generate_scenario_recommendations(scenario_impact)
+        }
+
+    def _get_recommended_action(self, trend_demand: float, demand_impact: float, price_sensitivity: float) -> str:
+        """推奨アクションを取得"""
+        final_demand = trend_demand * (1 + demand_impact)
+
+        if final_demand > 0.8:
+            if price_sensitivity < 0.5:
+                return "価格を10-15%値上げし、在庫を増強"
+            else:
+                return "プロモーションを強化し、シェア拡大を狙う"
+        elif final_demand < 0.4:
+            if price_sensitivity > 0.6:
+                return "価格を10-20%値下げし、需要刺激"
+            else:
+                return "在庫を減らし、廃盤検討"
+        else:
+            return "現状維持し、継続観察"
+
+    def _generate_scenario_recommendations(self, scenario_impact: Dict[str, Any]) -> List[str]:
+        """シナリオベースの推奨事項を生成"""
+        recommendations = []
+
+        high_demand_products = [
+            product_id for product_id, impact in scenario_impact.items()
+            if impact["scenario_demand"] > 0.7
+        ]
+
+        low_demand_products = [
+            product_id for product_id, impact in scenario_impact.items()
+            if impact["scenario_demand"] < 0.4
+        ]
+
+        if high_demand_products:
+            recommendations.append(f"高需要商品の在庫増強を優先: {', '.join(high_demand_products)}")
+
+        if low_demand_products:
+            recommendations.append(f"低需要商品の価格戦略見直しを検討: {', '.join(low_demand_products)}")
+
+        if not recommendations:
+            recommendations.append("現在の戦略を維持し、市場動向を継続観察")
+
+        return recommendations
+
+    def get_advanced_analytics(self) -> Dict[str, Any]:
+        """高度な分析データを取得"""
+        if not self.transaction_log:
+            return {"error": "取引データがありません"}
+
+        # 時間帯別分析
+        hourly_stats = {}
+        for hour in range(24):
+            hour_transactions = [
+                log for log in self.transaction_log
+                if log["timestamp"].hour == hour and log["type"] == "payment"
+            ]
+
+            if hour_transactions:
+                total_amount = sum(log["amount"] for log in hour_transactions)
+                avg_amount = total_amount / len(hour_transactions)
+                hourly_stats[hour] = {
+                    "transaction_count": len(hour_transactions),
+                    "total_amount": total_amount,
+                    "average_amount": avg_amount
+                }
+
+        # 商品別分析（シミュレーションモデルベース）
+        product_analytics = {}
+        for product_id in self.sales_model.product_popularity.keys():
+            customer_behavior = self.sales_model.simulate_customer_behavior(product_id)
+            forecast = self.sales_model.get_sales_forecast(product_id, 1)[0]
+
+            product_analytics[product_id] = {
+                "popularity_score": self.sales_model.product_popularity[product_id],
+                "customer_satisfaction": customer_behavior["satisfaction_score"],
+                "repeat_purchase_probability": customer_behavior["repeat_purchase_probability"],
+                "next_hour_forecast": forecast["expected_sales"],
+                "optimal_price": self.sales_model.calculate_optimal_price(product_id, 100.0)
+            }
+
+        return {
+            "hourly_statistics": hourly_stats,
+            "product_analytics": product_analytics,
+            "market_trends": self.sales_model.simulate_market_trends(),
+            "inventory_efficiency": self._calculate_inventory_efficiency(),
+            "sales_model_version": "advanced_v1.0"
+        }
+
+    def _calculate_inventory_efficiency(self) -> Dict[str, float]:
+        """在庫効率性を計算"""
+        efficiency_metrics = {}
+
+        for product_id in self.sales_model.product_popularity.keys():
+            # シミュレーションによる在庫回転率計算
+            current_stock = random.randint(10, 100)  # シミュレーション用
+            avg_daily_sales = self.sales_model.product_popularity[product_id] * random.uniform(5, 20)
+
+            turnover_rate = self.sales_model.calculate_inventory_turnover(product_id, current_stock, avg_daily_sales)
+
+            efficiency_metrics[product_id] = {
+                "turnover_rate": turnover_rate,
+                "days_of_stock": current_stock / max(avg_daily_sales, 0.1),
+                "efficiency_rating": self._rate_inventory_efficiency(turnover_rate)
+            }
+
+        return efficiency_metrics
+
+    def _rate_inventory_efficiency(self, turnover_rate: float) -> str:
+        """在庫効率性を評価"""
+        if turnover_rate >= 12:
+            return "非常に効率的"
+        elif turnover_rate >= 8:
+            return "効率的"
+        elif turnover_rate >= 4:
+            return "標準的"
+        elif turnover_rate >= 2:
+            return "非効率的"
+        else:
+            return "非常に非効率的"
 
 # グローバルインスタンス
 payment_service = PaymentService()
