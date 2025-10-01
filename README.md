@@ -6,6 +6,9 @@ Anthropic PJ Vend構成の実験的実装 - AIエージェントによる完全�
 - Stripeなどの実際の決済サービスを使用せず、現実的な販売モデルをシミュレーション
 - 時間帯・曜日・季節・顧客行動を考慮した高度な需要予測
 - 市場シナリオ分析によるビジネス戦略の検証・分析
+- **✅ 動作確認済み**: ダミー値で正常に起動・動作
+- **✅ Azure OpenAI対応**: 最新のAzure OpenAI APIをサポート
+- **✅ オプション暗号化**: ENCRYPTION_KEY設定不要で動作可能
 
 ### 💡 モデルベースアプローチの利点
 
@@ -211,10 +214,32 @@ asyncio.run(test())
 | 変数名 | 説明 | デフォルト値 |
 |--------|------|-------------|
 | `OPENAI_API_KEY` | OpenAI APIキー | なし |
+| `OPENAI_API_BASE` | Azure OpenAIエンドポイント | なし |
 | `STRIPE_API_KEY` | Stripe決済キー | なし |
 | `DEBUG` | デバッグモード | `False` |
 | `HOST` | サーバーホスト | `0.0.0.0` |
 | `PORT` | サーバーポート | `8000` |
+
+### Azure OpenAI設定例
+
+Azure OpenAIを使用する場合は、以下の環境変数を設定してください：
+
+```bash
+# Azure OpenAI設定
+OPENAI_API_KEY=your_azure_openai_api_key_here
+OPENAI_API_BASE=https://your-resource-name.openai.azure.com/
+```
+
+Azure OpenAIを使用する場合の設定例：
+```bash
+# Azure OpenAI（優先使用）
+OPENAI_API_KEY=1234567890abcdef1234567890abcdef
+OPENAI_API_BASE=https://your-company.openai.azure.com/
+
+# または標準OpenAI
+OPENAI_API_KEY=sk-your-openai-api-key-here
+# OPENAI_API_BASEは設定不要
+```
 
 ### ダミー値でのテスト
 
@@ -223,6 +248,7 @@ asyncio.run(test())
 ```bash
 ANTHROPIC_API_KEY=sk-ant-api03-test-dummy-key-for-development-only
 OPENAI_API_KEY=sk-test-dummy-key-for-development-only
+OPENAI_API_BASE=https://dummy.openai.azure.com/
 ENCRYPTION_KEY=dummy_encryption_key_32_characters_long_123456789012
 ```
 

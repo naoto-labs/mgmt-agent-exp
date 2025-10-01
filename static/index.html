@@ -1,0 +1,491 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI自動販売機シミュレーター</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        .product-card {
+            transition: transform 0.2s;
+            cursor: pointer;
+        }
+        .product-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+        .status-indicator {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            display: inline-block;
+            margin-right: 8px;
+        }
+        .status-healthy {
+            background-color: #28a745;
+        }
+        .status-warning {
+            background-color: #ffc107;
+        }
+        .status-error {
+            background-color: #dc3545;
+        }
+        .chat-message {
+            max-width: 70%;
+            margin-bottom: 10px;
+            padding: 10px 15px;
+            border-radius: 15px;
+        }
+        .chat-user {
+            background-color: #007bff;
+            color: white;
+            margin-left: auto;
+        }
+        .chat-bot {
+            background-color: #f8f9fa;
+            color: #333;
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar navbar-dark bg-dark">
+        <div class="container">
+            <a class="navbar-brand" href="#">
+                <i class="fas fa-robot me-2"></i>
+                AI自動販売機シミュレーター
+            </a>
+            <div class="d-flex align-items-center">
+                <span class="status-indicator status-healthy" id="systemStatus"></span>
+                <span class="text-light me-3">システム状態: 正常</span>
+                <button class="btn btn-outline-light btn-sm" onclick="refreshData()">
+                    <i class="fas fa-sync-alt"></i> 更新
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container mt-4">
+        <!-- システム情報 -->
+        <div class="row mb-4">
+            <div class="col-md-12">
+                <div class="card">
+                    <div class="card-header">
+                        <h5><i class="fas fa-info-circle"></i> システム情報</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-3">
+                                <strong>マシンID:</strong> <span id="machineId">AI_VM001</span>
+                            </div>
+                            <div class="col-md-3">
+                                <strong>バージョン:</strong> <span id="version">1.0.0</span>
+                            </div>
+                            <div class="col-md-3">
+                                <strong>ステータス:</strong> <span id="status">運用中</span>
+                            </div>
+                            <div class="col-md-3">
+                                <strong>デバッグモード:</strong> <span id="debugMode">有効</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- タブメニュー -->
+        <ul class="nav nav-tabs" id="mainTabs" role="tablist">
+            <li class="nav-item" role="presentation">
+                <button class="nav-link active" id="products-tab" data-bs-toggle="tab" data-bs-target="#products" type="button" role="tab">
+                    <i class="fas fa-box"></i> 商品管理
+                </button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="chat-tab" data-bs-toggle="tab" data-bs-target="#chat" type="button" role="tab">
+                    <i class="fas fa-comments"></i> 顧客対応
+                </button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="analytics-tab" data-bs-toggle="tab" data-bs-target="#analytics" type="button" role="tab">
+                    <i class="fas fa-chart-bar"></i> 分析・レポート
+                </button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="settings-tab" data-bs-toggle="tab" data-bs-target="#settings" type="button" role="tab">
+                    <i class="fas fa-cog"></i> 設定
+                </button>
+            </li>
+        </ul>
+
+        <!-- タブコンテンツ -->
+        <div class="tab-content" id="mainTabsContent">
+            <!-- 商品管理タブ -->
+            <div class="tab-pane fade show active" id="products" role="tabpanel">
+                <div class="row mt-3">
+                    <div class="col-md-8">
+                        <h4>商品一覧</h4>
+                        <div id="productsList" class="row">
+                            <!-- 商品カードが動的に挿入される -->
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="card">
+                            <div class="card-header">
+                                <h5><i class="fas fa-shopping-cart"></i> 購入シミュレーション</h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="mb-3">
+                                    <label class="form-label">商品ID</label>
+                                    <input type="text" class="form-control" id="productId" placeholder="例: drink_cola">
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label">数量</label>
+                                    <input type="number" class="form-control" id="quantity" value="1" min="1">
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label">決済方法</label>
+                                    <select class="form-control" id="paymentMethod">
+                                        <option value="cash">現金</option>
+                                        <option value="card">カード</option>
+                                        <option value="coupon">クーポン</option>
+                                    </select>
+                                </div>
+                                <button class="btn btn-primary w-100" onclick="simulatePurchase()">
+                                    <i class="fas fa-credit-card"></i> 購入シミュレーション
+                                </button>
+                                <div id="purchaseResult" class="mt-3" style="display: none;">
+                                    <!-- 購入結果が表示される -->
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 顧客対応タブ -->
+            <div class="tab-pane fade" id="chat" role="tabpanel">
+                <div class="row mt-3">
+                    <div class="col-md-8">
+                        <div class="card">
+                            <div class="card-header">
+                                <h5><i class="fas fa-comments"></i> AI顧客対応</h5>
+                            </div>
+                            <div class="card-body">
+                                <div id="chatMessages" style="height: 400px; overflow-y: auto; border: 1px solid #ddd; padding: 15px; border-radius: 5px;">
+                                    <!-- チャットメッセージが表示される -->
+                                </div>
+                                <div class="mt-3">
+                                    <div class="input-group">
+                                        <input type="text" class="form-control" id="chatInput" placeholder="メッセージを入力してください...">
+                                        <button class="btn btn-primary" onclick="sendMessage()">
+                                            <i class="fas fa-paper-plane"></i> 送信
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="card">
+                            <div class="card-header">
+                                <h5><i class="fas fa-info-circle"></i> 対応情報</h5>
+                            </div>
+                            <div class="card-body">
+                                <div id="chatInfo">
+                                    <p>AIアシスタントとのチャットが可能です。</p>
+                                    <p>商品のおすすめ、購入相談などをお試しください。</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 分析・レポートタブ -->
+            <div class="tab-pane fade" id="analytics" role="tabpanel">
+                <div class="row mt-3">
+                    <div class="col-md-6">
+                        <div class="card">
+                            <div class="card-header">
+                                <h5><i class="fas fa-chart-line"></i> 販売分析</h5>
+                            </div>
+                            <div class="card-body">
+                                <canvas id="salesChart" width="400" height="200"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="card">
+                            <div class="card-header">
+                                <h5><i class="fas fa-boxes"></i> 在庫状況</h5>
+                            </div>
+                            <div class="card-body">
+                                <div id="inventoryStatus">
+                                    <!-- 在庫情報が表示される -->
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 設定タブ -->
+            <div class="tab-pane fade" id="settings" role="tabpanel">
+                <div class="row mt-3">
+                    <div class="col-md-6">
+                        <div class="card">
+                            <div class="card-header">
+                                <h5><i class="fas fa-cog"></i> システム設定</h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="mb-3">
+                                    <label class="form-label">デバッグモード</label>
+                                    <div class="form-check form-switch">
+                                        <input class="form-check-input" type="checkbox" id="debugModeToggle" checked>
+                                        <label class="form-check-label" for="debugModeToggle">有効</label>
+                                    </div>
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label">AI安全性閾値</label>
+                                    <input type="range" class="form-range" id="safetyThreshold" min="0.8" max="1.0" step="0.01" value="0.95">
+                                    <div class="d-flex justify-content-between">
+                                        <small>0.8</small>
+                                        <small id="thresholdValue">0.95</small>
+                                        <small>1.0</small>
+                                    </div>
+                                </div>
+                                <button class="btn btn-primary" onclick="updateSettings()">
+                                    <i class="fas fa-save"></i> 設定を更新
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="card">
+                            <div class="card-header">
+                                <h5><i class="fas fa-shield-alt"></i> セキュリティ設定</h5>
+                            </div>
+                            <div class="card-body">
+                                <div id="securityStatus">
+                                    <!-- セキュリティ情報が表示される -->
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 購入結果モーダル -->
+    <div class="modal fade" id="purchaseModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">購入結果</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body" id="purchaseModalBody">
+                    <!-- 購入結果が表示される -->
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">閉じる</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        // API基底URL
+        const API_BASE = 'http://localhost:8000';
+
+        // システム情報を取得
+        async function loadSystemInfo() {
+            try {
+                const response = await fetch(`${API_BASE}/health`);
+                const data = await response.json();
+
+                document.getElementById('machineId').textContent = data.machine_id || 'AI_VM001';
+                document.getElementById('version').textContent = '1.0.0';
+                document.getElementById('status').textContent = data.status === 'healthy' ? '正常' : '異常';
+                document.getElementById('debugMode').textContent = '有効';
+
+                // ステータスインジケーターの更新
+                const statusIndicator = document.getElementById('systemStatus');
+                statusIndicator.className = `status-indicator status-${data.status === 'healthy' ? 'healthy' : 'error'}`;
+
+            } catch (error) {
+                console.error('システム情報の取得に失敗しました:', error);
+            }
+        }
+
+        // 商品一覧を取得
+        async function loadProducts() {
+            try {
+                const response = await fetch(`${API_BASE}/api/v1/vending/products`);
+                const products = await response.json();
+
+                const productsList = document.getElementById('productsList');
+                productsList.innerHTML = '';
+
+                products.forEach(product => {
+                    const productCard = createProductCard(product);
+                    productsList.appendChild(productCard);
+                });
+
+            } catch (error) {
+                console.error('商品一覧の取得に失敗しました:', error);
+                document.getElementById('productsList').innerHTML =
+                    '<div class="col-12"><div class="alert alert-danger">商品情報の取得に失敗しました</div></div>';
+            }
+        }
+
+        // 商品カードを作成
+        function createProductCard(product) {
+            const col = document.createElement('div');
+            col.className = 'col-md-4 mb-3';
+
+            col.innerHTML = `
+                <div class="card product-card" onclick="selectProduct('${product.product_id}')">
+                    <div class="card-body text-center">
+                        <h6 class="card-title">${product.name}</h6>
+                        <p class="card-text text-muted">${product.description || ''}</p>
+                        <div class="fw-bold text-primary">¥${product.price}</div>
+                        <div class="mt-2">
+                            <span class="badge bg-${product.stock_quantity > 0 ? 'success' : 'danger'}">
+                                在庫: ${product.stock_quantity || 0}
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            `;
+
+            return col;
+        }
+
+        // 商品を選択
+        function selectProduct(productId) {
+            document.getElementById('productId').value = productId;
+        }
+
+        // 購入シミュレーション
+        async function simulatePurchase() {
+            const productId = document.getElementById('productId').value;
+            const quantity = parseInt(document.getElementById('quantity').value);
+            const paymentMethod = document.getElementById('paymentMethod').value;
+
+            if (!productId) {
+                alert('商品を選択してください');
+                return;
+            }
+
+            try {
+                const response = await fetch(`${API_BASE}/api/v1/vending/payment`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        amount: 150 * quantity, // 仮の金額
+                        payment_method: paymentMethod,
+                        product_ids: [productId]
+                    })
+                });
+
+                const result = await response.json();
+
+                // 結果を表示
+                const modalBody = document.getElementById('purchaseModalBody');
+                modalBody.innerHTML = `
+                    <div class="text-center">
+                        <h5>購入結果</h5>
+                        <div class="mt-3">
+                            <div class="alert alert-${result.success ? 'success' : 'danger'}">
+                                ${result.success ? '✅ 購入成功' : '❌ 購入失敗'}
+                            </div>
+                            ${result.payment_id ? `<p>決済ID: ${result.payment_id}</p>` : ''}
+                            ${result.error_message ? `<p>エラー: ${result.error_message}</p>` : ''}
+                        </div>
+                    </div>
+                `;
+
+                new bootstrap.Modal(document.getElementById('purchaseModal')).show();
+
+            } catch (error) {
+                console.error('購入シミュレーションエラー:', error);
+                alert('購入シミュレーションに失敗しました');
+            }
+        }
+
+        // チャットメッセージ送信
+        async function sendMessage() {
+            const message = document.getElementById('chatInput').value.trim();
+            if (!message) return;
+
+            // ユーザーメッセージを表示
+            addChatMessage('user', message);
+            document.getElementById('chatInput').value = '';
+
+            try {
+                // チャット開始
+                const startResponse = await fetch(`${API_BASE}/api/v1/tablet/chat/start`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        customer_id: 'user_001',
+                        initial_message: message
+                    })
+                });
+
+                const startResult = await startResponse.json();
+
+                // AI応答を表示
+                addChatMessage('bot', startResult.message || 'AI応答を受信しました');
+
+            } catch (error) {
+                console.error('チャットエラー:', error);
+                addChatMessage('bot', '申し訳ありませんが、エラーが発生しました。');
+            }
+        }
+
+        // チャットメッセージを追加
+        function addChatMessage(sender, message) {
+            const chatMessages = document.getElementById('chatMessages');
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `chat-message chat-${sender}`;
+            messageDiv.textContent = message;
+
+            chatMessages.appendChild(messageDiv);
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        }
+
+        // データ更新
+        function refreshData() {
+            loadSystemInfo();
+            loadProducts();
+        }
+
+        // 設定更新
+        function updateSettings() {
+            alert('設定が更新されました');
+        }
+
+        // 初期化
+        document.addEventListener('DOMContentLoaded', function() {
+            loadSystemInfo();
+            loadProducts();
+
+            // Enterキーでチャット送信
+            document.getElementById('chatInput').addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    sendMessage();
+                }
+            });
+        });
+    </script>
+</body>
+</html>
