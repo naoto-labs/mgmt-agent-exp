@@ -1,7 +1,7 @@
 [project]
 name = "mgmt-agent-exp"
 version = "0.1.0"
-description = "Anthropic PJ Vend構成の実験的実装 - AIエージェント自律型自動販売機シミュレーター"
+description = "AI Agent Autonomous Vending Machine System - 自律型AIエージェントによる自動販売機経営の実験的実装"
 authors = [
     {name = "naoto-labs"},
 ]

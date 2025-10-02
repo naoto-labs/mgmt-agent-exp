@@ -55,11 +55,15 @@ pip install -r requirements.txt
 `.env`ファイルに以下を設定:
 
 ```env
-# Anthropic API (推奨)
+# Azure OpenAI (優先)
+AZURE_OPENAI_ENDPOINT=your_azure_openai_endpoint
+AZURE_OPENAI_API_KEY=your_azure_openai_api_key
+
+# Anthropic (代替)
 ANTHROPIC_API_KEY=your_anthropic_api_key
 
-# OpenAI API (代替)
-OPENAI_API_KEY=your_openai_api_key
+# Tool API
+TAVILY_API_KEY=your_tavily_api_key
 ```
 
 ## 使用方法
@@ -116,6 +120,7 @@ asyncio.run(main())
 ```python
 async def daily_operations():
     agent = SessionBasedManagementAgent(provider="anthropic")
+    
     
     # 朝のルーチン
     morning = await agent.morning_routine()
@@ -230,25 +235,44 @@ pytest tests/ --cov=src/agents --cov-report=html
 └─────────────────────────────────────────┘
 ```
 
-## ツール一覧
+## 店長Agentの専門tool一覧
 
-### システム連携ツール
-- `get_business_data` - ビジネスデータ取得
-- `analyze_financials` - 財務分析
-- `check_inventory` - 在庫確認
-- `update_pricing` - 価格更新
+### 1. 店舗運営・経営判断 tool群
 
-### 人間協働ツール
-- `assign_restocking` - 補充タスク割り当て
-- `request_procurement` - 調達依頼
-- `schedule_maintenance` - メンテナンススケジュール
-- `coordinate_tasks` - タスク調整
+**目的:** 店長Agentとして、店全体の運営方針・売上・価格戦略を自律的に管理する
 
-### 顧客対応ツール
-- `customer_response` - 顧客問い合わせ対応
-- `handle_complaint` - 苦情処理
-- `collect_feedback` - フィードバック収集
-- `create_campaign` - キャンペーン企画
+- `plan_agent_operations()` - Agent運営計画作成（朝/昼/夜の枠で、LLMが優先タスクを判断）
+- `plan_sales_strategy()` - 販売計画作成（売上・商品別戦略）
+- `update_pricing_strategy()` - 価格戦略更新
+- `analyze_financials()` - 財務状況分析
+
+### 2. 在庫・調達管理 tool群
+
+**目的:** 店頭の在庫状況を把握し、必要な補充・発注を自律的に判断する
+
+- `check_inventory_status()` - 在庫確認
+- `analyze_inventory_levels()` - 在庫詳細分析
+- `calculate_optimal_order()` - 最適発注量算出
+- `generate_procurement_request()` - 調達依頼生成
+- `assign_restocking_task()` - 補充タスク割り当て
+
+### 3. 顧客対応・販売支援 tool群
+
+**目的:** 顧客体験を最適化し、販売機会を最大化する
+
+- `respond_customer()` - 顧客問い合わせ対応
+- `collect_customer_feedback()` - フィードバック収集
+- `analyze_customer_sentiment()` - 会話感情分析
+- `recommend_product()` - パーソナライズ推薦
+
+### 4. 市場・競合情報管理 tool群
+
+**目的:** 経営・販売・在庫判断のために必要な外部情報を取得する
+
+- `search_business_data()` - 市場データ検索
+- `search_market_trends()` - 市場トレンド分析
+- `search_competitor_pricing()` - 競合価格情報取得
+- `search_supplier_info()` - 仕入れ先情報検索
 
 ## データモデル
 
