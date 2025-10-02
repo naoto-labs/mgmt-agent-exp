@@ -51,12 +51,24 @@ async def main():
     # 4. AIエージェントテスト
     print("\n🤖 AIエージェントテスト:")
 
-    # 検索エージェントの統計
+    # 検索エージェントの統計と実テスト
     try:
-        search_stats = search_agent.get_search_stats()
-        print(
-            f"   • 検索エージェント: {search_stats.get('total_searches', 0)}回の検索履歴"
+        # 実検索テスト（コカ・コーラ）
+        print("   • 検索エージェント検索テスト（コカ・コーラ）...")
+        search_results = await search_agent.search_products(
+            "コカ・コーラ", max_results=3
         )
+        print(f"     - 検索結果数: {len(search_results)}")
+        if search_results:
+            for i, result in enumerate(search_results[:3], 1):
+                price_str = f"¥{result['price']:.0f}" if result["price"] else "価格不明"
+                print(
+                    f"       {i}. {result['title'][:50]}... - {price_str} - {result['source']}"
+                )
+
+        # 統計表示
+        search_stats = search_agent.get_search_stats()
+        print(f"   • 検索履歴: {search_stats.get('total_searches', 0)}回")
     except Exception as e:
         print(f"   • 検索エージェント: エラー - {e}")
 
@@ -64,6 +76,11 @@ async def main():
     try:
         # 顧客エージェントの基本情報確認
         print("   • 顧客エージェント: AIモデル連携済み")
+        # AIモデル連携テスト
+        from src.ai.model_manager import model_manager
+
+        print(f"     - プライマリモデル: {model_manager.primary_model}")
+        print(f"     - 利用可能モデル数: {len(model_manager.models)}")
     except Exception as e:
         print(f"   • 顧客エージェント: エラー - {e}")
 

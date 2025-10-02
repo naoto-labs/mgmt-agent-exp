@@ -96,7 +96,12 @@
         <!-- タブメニュー -->
         <ul class="nav nav-tabs" id="mainTabs" role="tablist">
             <li class="nav-item" role="presentation">
-                <button class="nav-link active" id="products-tab" data-bs-toggle="tab" data-bs-target="#products" type="button" role="tab">
+                <button class="nav-link active" id="scenarios-tab" data-bs-toggle="tab" data-bs-target="#scenarios" type="button" role="tab">
+                    <i class="fas fa-play-circle"></i> シナリオテスト
+                </button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="products-tab" data-bs-toggle="tab" data-bs-target="#products" type="button" role="tab">
                     <i class="fas fa-box"></i> 商品管理
                 </button>
             </li>
@@ -119,6 +124,87 @@
 
         <!-- タブコンテンツ -->
         <div class="tab-content" id="mainTabsContent">
+            <!-- シナリオテストタブ -->
+            <div class="tab-pane fade show active" id="scenarios" role="tabpanel">
+                <div class="row mt-3">
+                    <div class="col-md-8">
+                        <h4><i class="fas fa-play-circle"></i> シナリオテスト</h4>
+                        <p class="text-muted">エージェントの動作を検証するためのシナリオを選択して実行できます。</p>
+
+                        <!-- シナリオ選択 -->
+                        <div class="card mb-3">
+                            <div class="card-header">
+                                <h5><i class="fas fa-list"></i> シナリオ選択</h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="row" id="scenarioList">
+                                    <!-- シナリオボタンが動的に挿入される -->
+                                </div>
+                                <div class="mt-3">
+                                    <button class="btn btn-success" onclick="runAllScenarios()">
+                                        <i class="fas fa-play"></i> 全シナリオ実行
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 実行結果 -->
+                        <div class="card">
+                            <div class="card-header">
+                                <h5><i class="fas fa-chart-line"></i> 実行結果</h5>
+                            </div>
+                            <div class="card-body">
+                                <div id="scenarioResults" style="max-height: 400px; overflow-y: auto;">
+                                    <!-- シナリオ実行結果が表示される -->
+                                    <div class="text-center text-muted">
+                                        <i class="fas fa-info-circle fa-2x mb-2"></i>
+                                        <p>シナリオを選択して実行してください</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-4">
+                        <!-- シナリオ情報 -->
+                        <div class="card">
+                            <div class="card-header">
+                                <h5><i class="fas fa-info-circle"></i> シナリオ情報</h5>
+                            </div>
+                            <div class="card-body">
+                                <div id="scenarioInfo">
+                                    <p>シナリオを選択すると詳細情報が表示されます。</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 実行コントロール -->
+                        <div class="card mt-3">
+                            <div class="card-header">
+                                <h5><i class="fas fa-cog"></i> 実行オプション</h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" id="autoRefresh" checked>
+                                    <label class="form-check-label" for="autoRefresh">
+                                        自動更新
+                                    </label>
+                                </div>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" id="showDetails" checked>
+                                    <label class="form-check-label" for="showDetails">
+                                        詳細ログ表示
+                                    </label>
+                                </div>
+                                <button class="btn btn-secondary w-100 mt-3" onclick="clearResults()">
+                                    <i class="fas fa-trash"></i> 結果クリア
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
             <!-- 商品管理タブ -->
             <div class="tab-pane fade show active" id="products" role="tabpanel">
                 <div class="row mt-3">
@@ -301,6 +387,10 @@
         // API基底URL
         const API_BASE = 'http://localhost:8000';
 
+        // シナリオ関連の変数
+        let currentScenarioResults = [];
+        let autoRefreshInterval = null;
+
         // システム情報を取得
         async function loadSystemInfo() {
             try {
@@ -474,10 +564,214 @@
             alert('設定が更新されました');
         }
 
+        // シナリオ関連関数
+        async function loadScenarios() {
+            try {
+                const response = await fetch(`${API_BASE}/api/v1/scenarios`);
+                const data = await response.json();
+
+                const scenarioList = document.getElementById('scenarioList');
+                scenarioList.innerHTML = '';
+
+                for (const [key, scenario] of Object.entries(data.scenarios)) {
+                    const col = document.createElement('div');
+                    col.className = 'col-md-6 mb-2';
+
+                    col.innerHTML = `
+                        <div class="card scenario-card" onclick="selectScenario('${key}')">
+                            <div class="card-body">
+                                <h6 class="card-title">${scenario.name}</h6>
+                                <p class="card-text small text-muted">${scenario.description}</p>
+                                <button class="btn btn-primary btn-sm" onclick="runScenario('${key}'); event.stopPropagation();">
+                                    <i class="fas fa-play"></i> 実行
+                                </button>
+                            </div>
+                        </div>
+                    `;
+
+                    scenarioList.appendChild(col);
+                }
+
+            } catch (error) {
+                console.error('シナリオ一覧の取得に失敗しました:', error);
+            }
+        }
+
+        function selectScenario(scenarioKey) {
+            // シナリオを選択（視覚的なフィードバック）
+            document.querySelectorAll('.scenario-card').forEach(card => {
+                card.classList.remove('border-primary');
+            });
+
+            const selectedCard = document.querySelector(`[onclick="selectScenario('${scenarioKey}')"]`).closest('.scenario-card');
+            if (selectedCard) {
+                selectedCard.classList.add('border-primary');
+            }
+
+            // シナリオ情報を表示
+            showScenarioInfo(scenarioKey);
+        }
+
+        async function showScenarioInfo(scenarioKey) {
+            try {
+                const response = await fetch(`${API_BASE}/api/v1/scenarios`);
+                const data = await response.json();
+
+                const scenario = data.scenarios[scenarioKey];
+                if (scenario) {
+                    document.getElementById('scenarioInfo').innerHTML = `
+                        <h6>${scenario.name}</h6>
+                        <p class="small">${scenario.description}</p>
+                        <hr>
+                        <small class="text-muted">クリックして選択、または実行ボタンを押してください</small>
+                    `;
+                }
+            } catch (error) {
+                console.error('シナリオ情報の取得に失敗しました:', error);
+            }
+        }
+
+        async function runScenario(scenarioKey) {
+            try {
+                // 実行ボタンを無効化
+                const button = document.querySelector(`[onclick="runScenario('${scenarioKey}')"]`);
+                const originalText = button.innerHTML;
+                button.innerHTML = '<i class="fas fa-spinner fa-spin"></i> 実行中...';
+                button.disabled = true;
+
+                // シナリオ実行
+                const response = await fetch(`${API_BASE}/api/v1/scenarios/${scenarioKey}/run`, {
+                    method: 'POST'
+                });
+
+                const result = await response.json();
+
+                // 結果を表示
+                displayScenarioResult(result);
+
+                // ボタンを元に戻す
+                button.innerHTML = originalText;
+                button.disabled = false;
+
+            } catch (error) {
+                console.error('シナリオ実行エラー:', error);
+                alert('シナリオの実行に失敗しました');
+
+                // ボタンを元に戻す
+                const button = document.querySelector(`[onclick="runScenario('${scenarioKey}')"]`);
+                if (button) {
+                    button.innerHTML = '<i class="fas fa-play"></i> 実行';
+                    button.disabled = false;
+                }
+            }
+        }
+
+        async function runAllScenarios() {
+            try {
+                // 全実行ボタンを無効化
+                const button = document.querySelector('[onclick="runAllScenarios()"]');
+                const originalText = button.innerHTML;
+                button.innerHTML = '<i class="fas fa-spinner fa-spin"></i> 実行中...';
+                button.disabled = true;
+
+                // 全シナリオ実行
+                const response = await fetch(`${API_BASE}/api/v1/scenarios/run-all`, {
+                    method: 'POST'
+                });
+
+                const result = await response.json();
+
+                // 結果を表示
+                displayScenarioResult(result);
+
+                // ボタンを元に戻す
+                button.innerHTML = originalText;
+                button.disabled = false;
+
+            } catch (error) {
+                console.error('全シナリオ実行エラー:', error);
+                alert('全シナリオの実行に失敗しました');
+
+                // ボタンを元に戻す
+                const button = document.querySelector('[onclick="runAllScenarios()"]');
+                if (button) {
+                    button.innerHTML = '<i class="fas fa-play"></i> 全シナリオ実行';
+                    button.disabled = false;
+                }
+            }
+        }
+
+        function displayScenarioResult(result) {
+            const resultsDiv = document.getElementById('scenarioResults');
+
+            if (result.error) {
+                resultsDiv.innerHTML = `
+                    <div class="alert alert-danger">
+                        <h6>エラー</h6>
+                        <p>${result.error}</p>
+                    </div>
+                `;
+                return;
+            }
+
+            let html = `
+                <div class="alert alert-${result.success ? 'success' : 'danger'}">
+                    <h6>${result.scenario_name || 'シナリオ実行結果'}</h6>
+                    <p>${result.message}</p>
+                    <small>実行時間: ${result.duration_seconds?.toFixed(1)}秒</small>
+                </div>
+            `;
+
+            // 詳細ログ表示が有効な場合
+            if (document.getElementById('showDetails').checked && result.results) {
+                html += '<div class="mt-3"><h6>実行詳細:</h6>';
+                result.results.forEach((step, index) => {
+                    const icon = step.step.includes('成功') ? '✅' :
+                               step.step.includes('失敗') ? '❌' :
+                               step.step.includes('開始') ? '🚀' : '📝';
+
+                    html += `
+                        <div class="border rounded p-2 mb-2">
+                            <small><strong>${icon} ${step.step}</strong></small>
+                            ${step.details ? `<br><small class="text-muted">${JSON.stringify(step.details, null, 2)}</small>` : ''}
+                        </div>
+                    `;
+                });
+                html += '</div>';
+            }
+
+            resultsDiv.innerHTML = html;
+
+            // 自動更新が有効な場合
+            if (document.getElementById('autoRefresh').checked) {
+                if (autoRefreshInterval) {
+                    clearInterval(autoRefreshInterval);
+                }
+                autoRefreshInterval = setInterval(() => {
+                    // 最新の結果を取得（実際の実装では結果取得APIが必要）
+                }, 2000);
+            }
+        }
+
+        function clearResults() {
+            document.getElementById('scenarioResults').innerHTML = `
+                <div class="text-center text-muted">
+                    <i class="fas fa-info-circle fa-2x mb-2"></i>
+                    <p>シナリオを選択して実行してください</p>
+                </div>
+            `;
+
+            if (autoRefreshInterval) {
+                clearInterval(autoRefreshInterval);
+                autoRefreshInterval = null;
+            }
+        }
+
         // 初期化
         document.addEventListener('DOMContentLoaded', function() {
             loadSystemInfo();
             loadProducts();
+            loadScenarios(); // シナリオ一覧を読み込み
 
             // Enterキーでチャット送信
             document.getElementById('chatInput').addEventListener('keypress', function(e) {

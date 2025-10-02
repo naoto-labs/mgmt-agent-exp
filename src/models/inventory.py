@@ -1,11 +1,14 @@
-from pydantic import BaseModel, Field, validator
-from typing import Optional, Dict, Any, List
+import uuid
 from datetime import datetime
 from enum import Enum
-import uuid
+from typing import Any, Dict, List, Optional
+
+from pydantic import BaseModel, Field, validator
+
 
 class InventoryStatus(str, Enum):
     """在庫ステータス"""
+
     NORMAL = "normal"
     LOW_STOCK = "low_stock"
     OUT_OF_STOCK = "out_of_stock"
@@ -13,11 +16,14 @@ class InventoryStatus(str, Enum):
     EXPIRED = "expired"
     DAMAGED = "damaged"
 
+
 class InventoryLocation(str, Enum):
     """在庫場所"""
+
     VENDING_MACHINE = "vending_machine"
     STORAGE = "storage"
     WAREHOUSE = "warehouse"
+
 
 class InventorySlot(BaseModel):
     """在庫スロットモデル"""
@@ -30,6 +36,7 @@ class InventorySlot(BaseModel):
     # 商品情報
     product_id: str = Field(..., min_length=1)
     product_name: str = Field(..., min_length=1)
+    price: float = Field(default=0.0, gt=0)  # 商品価格（円）
 
     # 在庫情報
     current_quantity: int = Field(default=0, ge=0)
@@ -58,15 +65,18 @@ class InventorySlot(BaseModel):
 
     class Config:
         """Pydantic設定"""
+
         use_enum_values = True
-        json_encoders = {
-            datetime: lambda v: v.isoformat()
-        }
+        json_encoders = {datetime: lambda v: v.isoformat()}
 
     @validator("status", always=True)
     def update_status_based_on_quantity(cls, v, values):
         """数量に基づくステータス更新"""
-        if "current_quantity" in values and "min_quantity" in values and "max_quantity" in values:
+        if (
+            "current_quantity" in values
+            and "min_quantity" in values
+            and "max_quantity" in values
+        ):
             current = values["current_quantity"]
             min_qty = values["min_quantity"]
             max_qty = values["max_quantity"]
@@ -84,8 +94,8 @@ class InventorySlot(BaseModel):
     def is_available(self) -> bool:
         """利用可能かチェック"""
         return (
-            self.status not in [InventoryStatus.OUT_OF_STOCK, InventoryStatus.DAMAGED] and
-            self.current_quantity > 0
+            self.status not in [InventoryStatus.OUT_OF_STOCK, InventoryStatus.DAMAGED]
+            and self.current_quantity > 0
         )
 
     def needs_restock(self) -> bool:
@@ -102,7 +112,7 @@ class InventorySlot(BaseModel):
             return 0
         return min(
             self.max_quantity - self.current_quantity,
-            self.max_quantity // 2  # 最大在庫の50%を目安に補充
+            self.max_quantity // 2,  # 最大在庫の50%を目安に補充
         )
 
     def dispense(self, quantity: int = 1) -> bool:
@@ -129,7 +139,9 @@ class InventorySlot(BaseModel):
         self.updated_at = datetime.now()
 
         # 在庫変更ログ（後でログシステムに統合）
-        print(f"在庫補充: {self.product_name} - {old_quantity} -> {self.current_quantity}")
+        print(
+            f"在庫補充: {self.product_name} - {old_quantity} -> {self.current_quantity}"
+        )
         return True
 
     def get_utilization_rate(self) -> float:
@@ -169,21 +181,27 @@ class InventorySlot(BaseModel):
             "expiry_date": self.expiry_date.isoformat() if self.expiry_date else None,
             "created_at": self.created_at.isoformat(),
             "updated_at": self.updated_at.isoformat(),
-            "last_restocked": self.last_restocked.isoformat() if self.last_restocked else None,
+            "last_restocked": self.last_restocked.isoformat()
+            if self.last_restocked
+            else None,
             "total_dispensed": self.total_dispensed,
             "total_restocked": self.total_restocked,
-            "last_dispensed": self.last_dispensed.isoformat() if self.last_dispensed else None,
+            "last_dispensed": self.last_dispensed.isoformat()
+            if self.last_dispensed
+            else None,
             "is_available": self.is_available(),
             "needs_restock": self.needs_restock(),
             "can_restock": self.can_restock(),
             "restock_quantity": self.get_restock_quantity(),
             "utilization_rate": self.get_utilization_rate(),
             "turnover_rate": self.get_turnover_rate(),
-            "is_expired": self.is_expired()
+            "is_expired": self.is_expired(),
         }
+
 
 class InventorySummary(BaseModel):
     """在庫サマリ"""
+
     machine_id: str
     total_slots: int
     active_slots: int
@@ -193,7 +211,9 @@ class InventorySummary(BaseModel):
     last_updated: datetime
 
     @classmethod
-    def from_slots(cls, machine_id: str, slots: List[InventorySlot]) -> "InventorySummary":
+    def from_slots(
+        cls, machine_id: str, slots: List[InventorySlot]
+    ) -> "InventorySummary":
         """スロットリストからサマリを作成"""
         total_value = sum(
             slot.current_quantity * 100  # 仮の単価（後で商品情報から取得）
@@ -204,14 +224,20 @@ class InventorySummary(BaseModel):
             machine_id=machine_id,
             total_slots=len(slots),
             active_slots=len([s for s in slots if s.is_available()]),
-            out_of_stock_slots=len([s for s in slots if s.status == InventoryStatus.OUT_OF_STOCK]),
-            low_stock_slots=len([s for s in slots if s.status == InventoryStatus.LOW_STOCK]),
+            out_of_stock_slots=len(
+                [s for s in slots if s.status == InventoryStatus.OUT_OF_STOCK]
+            ),
+            low_stock_slots=len(
+                [s for s in slots if s.status == InventoryStatus.LOW_STOCK]
+            ),
             total_value=total_value,
-            last_updated=datetime.now()
+            last_updated=datetime.now(),
         )
+
 
 class RestockPlan(BaseModel):
     """補充計画"""
+
     plan_id: str = Field(default_factory=lambda: str(uuid.uuid4()))
     machine_id: str
     created_at: datetime = Field(default_factory=datetime.now)
@@ -228,7 +254,7 @@ class RestockPlan(BaseModel):
                 "product_name": slot.product_name,
                 "current_quantity": slot.current_quantity,
                 "restock_quantity": quantity,
-                "estimated_cost": quantity * 100  # 仮の単価（後で商品情報から取得）
+                "estimated_cost": quantity * 100,  # 仮の単価（後で商品情報から取得）
             }
             self.items.append(item)
             self.total_cost += item["estimated_cost"]
@@ -242,8 +268,9 @@ class RestockPlan(BaseModel):
             "items": self.items,
             "total_cost": self.total_cost,
             "priority": self.priority,
-            "item_count": len(self.items)
+            "item_count": len(self.items),
         }
+
 
 # サンプル在庫データ（開発・テスト用）
 def create_sample_inventory_slots() -> List[InventorySlot]:
@@ -257,12 +284,13 @@ def create_sample_inventory_slots() -> List[InventorySlot]:
             location=InventoryLocation.VENDING_MACHINE,
             product_id=product.product_id,
             product_name=product.name,
+            price=product.price,
             current_quantity=product.stock_quantity,
             max_quantity=product.max_stock_quantity,
             min_quantity=product.min_stock_quantity,
             slot_number=i + 1,
             row_position=1,
-            column_position=i + 1
+            column_position=i + 1,
         )
         slots.append(slot)
 

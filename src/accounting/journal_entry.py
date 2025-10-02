@@ -482,5 +482,34 @@ class JournalEntryProcessor:
 
         return summary
 
+    def add_entry(self, account_number: str, date: date, amount: float, entry_type: str, description: str):
+        """エントリを追加（単一勘定）"""
+        try:
+            debit_amount = amount if entry_type == "debit" else 0.0
+            credit_amount = amount if entry_type == "credit" else 0.0
+
+            entry = AccountingEntry(
+                account_code=account_number,
+                account_name=self.chart_of_accounts.get_account_name(account_number),
+                debit_amount=debit_amount,
+                credit_amount=credit_amount,
+                description=description
+            )
+
+            journal_entry = JournalEntry(
+                entry_id=self._generate_entry_id(),
+                date=date,
+                description=description,
+                entries=[entry],
+                reference_id=None
+            )
+
+            self.journal_entries.append(journal_entry)
+            logger.debug(f"エントリ追加完了: {journal_entry.entry_id}")
+
+        except Exception as e:
+            logger.error(f"エントリ追加エラー: {e}")
+            raise
+
 # グローバルインスタンス
 journal_processor = JournalEntryProcessor()

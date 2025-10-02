@@ -1,18 +1,20 @@
 import asyncio
-import random
 import logging
-from typing import Optional, Dict, Any, List
+import random
 from dataclasses import dataclass
-from datetime import datetime
+from datetime import datetime, timedelta
 from enum import Enum
+from typing import Any, Dict, List, Optional
 
-from src.models.transaction import PaymentMethod, PaymentDetails, Transaction
 from src.config.settings import settings
+from src.models.transaction import PaymentDetails, PaymentMethod, Transaction
 
 logger = logging.getLogger(__name__)
 
+
 class PaymentStatus(str, Enum):
     """決済ステータス"""
+
     PENDING = "pending"
     PROCESSING = "processing"
     COMPLETED = "completed"
@@ -21,8 +23,10 @@ class PaymentStatus(str, Enum):
     REFUNDING = "refunding"
     REFUNDED = "refunded"
 
+
 class PaymentError(str, Enum):
     """決済エラー種別"""
+
     INSUFFICIENT_FUNDS = "insufficient_funds"
     CARD_DECLINED = "card_declined"
     NETWORK_ERROR = "network_error"
@@ -30,9 +34,11 @@ class PaymentError(str, Enum):
     EXPIRED_CARD = "expired_card"
     SYSTEM_ERROR = "system_error"
 
+
 @dataclass
 class PaymentResult:
     """決済結果"""
+
     success: bool
     status: PaymentStatus
     payment_id: Optional[str] = None
@@ -41,13 +47,16 @@ class PaymentResult:
     processed_at: Optional[datetime] = None
     fee: float = 0.0
 
+
 @dataclass
 class RefundResult:
     """返金結果"""
+
     success: bool
     refund_id: Optional[str] = None
     error_message: Optional[str] = None
     processed_at: Optional[datetime] = None
+
 
 class PaymentSimulator:
     """決済シミュレーター"""
@@ -60,7 +69,7 @@ class PaymentSimulator:
             PaymentError.CARD_DECLINED: 0.25,
             PaymentError.NETWORK_ERROR: 0.2,
             PaymentError.INVALID_CARD: 0.15,
-            PaymentError.EXPIRED_CARD: 0.1
+            PaymentError.EXPIRED_CARD: 0.1,
         }
 
     def _generate_payment_id(self) -> str:
@@ -78,7 +87,9 @@ class PaymentSimulator:
         min_delay, max_delay = self.processing_delay
         return random.uniform(min_delay, max_delay)
 
-    async def simulate_payment(self, amount: float, method: PaymentMethod) -> PaymentResult:
+    async def simulate_payment(
+        self, amount: float, method: PaymentMethod
+    ) -> PaymentResult:
         """決済をシミュレート"""
         logger.info(f"決済シミュレーション開始: 金額={amount}, 方法={method}")
 
@@ -96,7 +107,7 @@ class PaymentSimulator:
                 status=PaymentStatus.COMPLETED,
                 payment_id=payment_id,
                 processed_at=datetime.now(),
-                fee=amount * 0.029 + 30  # Stripe手数料をシミュレート（2.9% + 30円）
+                fee=amount * 0.029 + 30,  # Stripe手数料をシミュレート（2.9% + 30円）
             )
             logger.info(f"決済成功: {payment_id}")
         else:
@@ -106,7 +117,7 @@ class PaymentSimulator:
                 status=PaymentStatus.FAILED,
                 error_code=error.value,
                 error_message=self._get_error_message(error, method),
-                processed_at=datetime.now()
+                processed_at=datetime.now(),
             )
             logger.warning(f"決済失敗: {error.value} - {result.error_message}")
 
@@ -120,9 +131,10 @@ class PaymentSimulator:
             PaymentError.NETWORK_ERROR: "ネットワークエラーが発生しました",
             PaymentError.INVALID_CARD: "カード情報が無効です",
             PaymentError.EXPIRED_CARD: "カードの有効期限が切れています",
-            PaymentError.SYSTEM_ERROR: "システムエラーが発生しました"
+            PaymentError.SYSTEM_ERROR: "システムエラーが発生しました",
         }
         return messages.get(error, "不明なエラー")
+
 
 class SalesSimulationModel:
     """販売シミュレーションモデル"""
@@ -136,7 +148,7 @@ class SalesSimulationModel:
             "drink_cola": 0.8,
             "drink_tea": 0.6,
             "snack_chips": 0.7,
-            "snack_chocolate": 0.5
+            "snack_chocolate": 0.5,
         }
 
         # 曜日別需要変動係数
@@ -147,7 +159,7 @@ class SalesSimulationModel:
             3: 1.0,  # 木曜日
             4: 1.2,  # 金曜日
             5: 1.3,  # 土曜日
-            6: 1.1   # 日曜日
+            6: 1.1,  # 日曜日
         }
 
         # 季節・イベント要因
@@ -155,7 +167,7 @@ class SalesSimulationModel:
             "spring": 1.0,
             "summer": 1.2,
             "autumn": 0.9,
-            "winter": 0.8
+            "winter": 0.8,
         }
 
     def _generate_time_demand_pattern(self) -> List[float]:
@@ -180,7 +192,9 @@ class SalesSimulationModel:
 
         return pattern
 
-    def predict_demand(self, product_id: str, current_hour: int, current_weekday: int) -> float:
+    def predict_demand(
+        self, product_id: str, current_hour: int, current_weekday: int
+    ) -> float:
         """商品の需要を予測"""
         base_demand = self.product_popularity.get(product_id, 0.5)
 
@@ -215,7 +229,9 @@ class SalesSimulationModel:
             "satisfaction_score": satisfaction,
             "repeat_purchase_probability": repeat_probability,
             "price_sensitivity": random.uniform(0.3, 0.8),  # 価格感度
-            "promotion_responsiveness": random.uniform(0.4, 0.9)  # プロモーション反応度
+            "promotion_responsiveness": random.uniform(
+                0.4, 0.9
+            ),  # プロモーション反応度
         }
 
     def calculate_optimal_price(self, product_id: str, cost_price: float) -> float:
@@ -248,7 +264,9 @@ class SalesSimulationModel:
             seasonal_impact = random.uniform(-0.05, 0.05)
 
             total_change = trend_change + seasonal_impact
-            trends[product_id] = max(0.1, min(1.0, self.product_popularity[product_id] + total_change))
+            trends[product_id] = max(
+                0.1, min(1.0, self.product_popularity[product_id] + total_change)
+            )
 
         # 人気度の更新
         for product_id, new_popularity in trends.items():
@@ -256,7 +274,9 @@ class SalesSimulationModel:
 
         return trends
 
-    def get_sales_forecast(self, product_id: str, days: int = 7) -> List[Dict[str, Any]]:
+    def get_sales_forecast(
+        self, product_id: str, days: int = 7
+    ) -> List[Dict[str, Any]]:
         """販売予測を取得"""
         forecast = []
         current_time = datetime.now()
@@ -269,17 +289,22 @@ class SalesSimulationModel:
             predicted_demand = self.predict_demand(product_id, hour, weekday)
             customer_behavior = self.simulate_customer_behavior(product_id)
 
-            forecast.append({
-                "date": forecast_date.strftime("%Y-%m-%d"),
-                "hour": hour,
-                "predicted_demand": predicted_demand,
-                "purchase_probability": customer_behavior["purchase_probability"],
-                "expected_sales": predicted_demand * customer_behavior["purchase_probability"]
-            })
+            forecast.append(
+                {
+                    "date": forecast_date.strftime("%Y-%m-%d"),
+                    "hour": hour,
+                    "predicted_demand": predicted_demand,
+                    "purchase_probability": customer_behavior["purchase_probability"],
+                    "expected_sales": predicted_demand
+                    * customer_behavior["purchase_probability"],
+                }
+            )
 
         return forecast
 
-    def simulate_bulk_purchase_discount(self, base_price: float, quantity: int) -> float:
+    def simulate_bulk_purchase_discount(
+        self, base_price: float, quantity: int
+    ) -> float:
         """まとめ買い割引をシミュレート"""
         if quantity <= 1:
             return base_price
@@ -297,7 +322,9 @@ class SalesSimulationModel:
         discounted_price = base_price * (1 - discount_rate)
         return round(discounted_price / 10) * 10
 
-    def calculate_inventory_turnover(self, product_id: str, current_stock: int, avg_daily_sales: float) -> float:
+    def calculate_inventory_turnover(
+        self, product_id: str, current_stock: int, avg_daily_sales: float
+    ) -> float:
         """在庫回転率を計算"""
         if current_stock <= 0:
             return 0.0
@@ -312,24 +339,25 @@ class SalesSimulationModel:
         """季節需要をシミュレート"""
         # 月別の季節要因
         seasonal_multipliers = {
-            1: 0.8,   # 1月（冬）
-            2: 0.8,   # 2月（冬）
-            3: 0.9,   # 3月（春）
-            4: 1.0,   # 4月（春）
-            5: 1.1,   # 5月（春）
-            6: 1.2,   # 6月（夏）
-            7: 1.3,   # 7月（夏）
-            8: 1.3,   # 8月（夏）
-            9: 1.1,   # 9月（秋）
+            1: 0.8,  # 1月（冬）
+            2: 0.8,  # 2月（冬）
+            3: 0.9,  # 3月（春）
+            4: 1.0,  # 4月（春）
+            5: 1.1,  # 5月（春）
+            6: 1.2,  # 6月（夏）
+            7: 1.3,  # 7月（夏）
+            8: 1.3,  # 8月（夏）
+            9: 1.1,  # 9月（秋）
             10: 1.0,  # 10月（秋）
             11: 0.9,  # 11月（秋）
-            12: 0.8   # 12月（冬）
+            12: 0.8,  # 12月（冬）
         }
 
         base_demand = self.product_popularity.get(product_id, 0.5)
         seasonal_multiplier = seasonal_multipliers.get(current_month, 1.0)
 
         return base_demand * seasonal_multiplier
+
 
 class PaymentService:
     """決済サービス（シミュレーションモデルベース）"""
@@ -338,8 +366,14 @@ class PaymentService:
         self.simulator = PaymentSimulator()
         self.transaction_log: List[Dict[str, Any]] = []
         self.sales_model = SalesSimulationModel()
+        self.total_revenue = 0.0
+        self.total_transactions = 0
+        self.recent_transactions = []
+        self.success_rate = 1.0
 
-    async def process_payment(self, amount: float, method: PaymentMethod, **kwargs) -> PaymentResult:
+    async def process_payment(
+        self, amount: float, method: PaymentMethod, **kwargs
+    ) -> PaymentResult:
         """決済を処理"""
         logger.info(f"決済処理開始: 金額={amount}, 方法={method}")
 
@@ -351,26 +385,69 @@ class PaymentService:
             if method not in [PaymentMethod.CARD, PaymentMethod.MOBILE]:
                 # 現金とクーポンは即時成功として処理
                 if method == PaymentMethod.CASH:
-                    return PaymentResult(
+                    result = PaymentResult(
                         success=True,
                         status=PaymentStatus.COMPLETED,
                         payment_id=self.simulator._generate_payment_id(),
-                        processed_at=datetime.now()
+                        processed_at=datetime.now(),
                     )
+                    if result.success:
+                        self.total_revenue += amount
+                        self.total_transactions += 1
+                        logger.info(f"売上累積更新: +{amount}円, 合計:{self.total_revenue:.2f}円")
+                        # Record journal entries
+                        try:
+                            from src.accounting.journal_entry import journal_processor
+                            from datetime import date
+                            journal_processor.add_entry("4001", date.today(), amount, "credit", f"Sales revenue - {method} - {result.payment_id}")
+                            journal_processor.add_entry("1105", date.today(), amount, "debit", f"Cash received - {method} - {result.payment_id}")
+                        except Exception as e:
+                            logger.error(f"Journal entry error: {e}")
+                    return result
                 elif method == PaymentMethod.COUPON:
-                    return await self._process_coupon_payment(amount, **kwargs)
+                    result = await self._process_coupon_payment(amount, **kwargs)
+                    if result.success:
+                        self.total_revenue += amount
+                        self.total_transactions += 1
+                        logger.info(f"クーポン売上累積更新: +{amount}円, 合計:{self.total_revenue:.2f}円")
+                        # Record journal entries
+                        try:
+                            from src.accounting.journal_entry import journal_processor
+                            from datetime import date
+                            journal_processor.add_entry("4001", date.today(), amount, "credit", f"Sales revenue - {method} - {result.payment_id}")
+                            journal_processor.add_entry("1105", date.today(), amount, "debit", f"Cash received - {method} - {result.payment_id}")
+                        except Exception as e:
+                            logger.error(f"Journal entry error: {e}")
+                    return result
 
             # カード/モバイル決済のシミュレーション
             result = await self.simulator.simulate_payment(amount, method)
 
+            # 決済成功時、売上累計に追加
+            if result.success:
+                self.total_revenue += amount
+                self.total_transactions += 1
+                logger.info(f"カード売上累積更新: +{amount}円, 合計:{self.total_revenue:.2f}円")
+
+                # Record journal entries
+                try:
+                    from src.accounting.journal_entry import journal_processor
+                    from datetime import date
+                    journal_processor.add_entry("4001", date.today(), amount, "credit", f"Sales revenue - {method} - {result.payment_id}")
+                    journal_processor.add_entry("1105", date.today(), amount, "debit", f"Cash/Bank received - {method} - {result.payment_id}")
+                except Exception as e:
+                    logger.error(f"Journal entry error: {e}")
+
             # ログ記録
-            self._log_transaction({
-                "type": "payment",
-                "amount": amount,
-                "method": method,
-                "result": result,
-                "timestamp": datetime.now()
-            })
+            self._log_transaction(
+                {
+                    "type": "payment",
+                    "amount": amount,
+                    "method": method,
+                    "result": result,
+                    "timestamp": datetime.now(),
+                }
+            )
 
             return result
 
@@ -380,32 +457,30 @@ class PaymentService:
                 success=False,
                 status=PaymentStatus.FAILED,
                 error_message=str(e),
-                processed_at=datetime.now()
+                processed_at=datetime.now(),
             )
 
-    async def _process_coupon_payment(self, amount: float, coupon_code: str = None) -> PaymentResult:
+    async def _process_coupon_payment(
+        self, amount: float, coupon_code: str = None
+    ) -> PaymentResult:
         """クーポン決済を処理"""
         if not coupon_code:
             return PaymentResult(
                 success=False,
                 status=PaymentStatus.FAILED,
                 error_message="クーポンコードが必要です",
-                processed_at=datetime.now()
+                processed_at=datetime.now(),
             )
 
         # クーポン検証をシミュレート（簡易版）
-        valid_coupons = {
-            "DISCOUNT10": 0.1,
-            "DISCOUNT20": 0.2,
-            "FREE": 1.0
-        }
+        valid_coupons = {"DISCOUNT10": 0.1, "DISCOUNT20": 0.2, "FREE": 1.0}
 
         if coupon_code not in valid_coupons:
             return PaymentResult(
                 success=False,
                 status=PaymentStatus.FAILED,
                 error_message="無効なクーポンコードです",
-                processed_at=datetime.now()
+                processed_at=datetime.now(),
             )
 
         discount_rate = valid_coupons[coupon_code]
@@ -416,10 +491,12 @@ class PaymentService:
             status=PaymentStatus.COMPLETED,
             payment_id=self.simulator._generate_payment_id(),
             processed_at=datetime.now(),
-            fee=0.0  # クーポンは手数料なし
+            fee=0.0,  # クーポンは手数料なし
         )
 
-    async def refund_payment(self, transaction_id: str, amount: Optional[float] = None) -> RefundResult:
+    async def refund_payment(
+        self, transaction_id: str, amount: Optional[float] = None
+    ) -> RefundResult:
         """決済を返金"""
         logger.info(f"返金処理開始: 取引ID={transaction_id}")
 
@@ -430,7 +507,7 @@ class PaymentService:
                 return RefundResult(
                     success=False,
                     error_message="取引が見つかりません",
-                    processed_at=datetime.now()
+                    processed_at=datetime.now(),
                 )
 
             # 返金金額の決定（指定がない場合は全額）
@@ -440,7 +517,7 @@ class PaymentService:
                 return RefundResult(
                     success=False,
                     error_message="返金金額が取引金額を超えています",
-                    processed_at=datetime.now()
+                    processed_at=datetime.now(),
                 )
 
             # 返金処理のシミュレーション
@@ -453,50 +530,50 @@ class PaymentService:
             if success:
                 refund_id = f"refund_{datetime.now().strftime('%Y%m%d_%H%M%S')}_{random.randint(1000, 9999)}"
                 result = RefundResult(
-                    success=True,
-                    refund_id=refund_id,
-                    processed_at=datetime.now()
+                    success=True, refund_id=refund_id, processed_at=datetime.now()
                 )
                 logger.info(f"返金成功: {refund_id}")
             else:
                 result = RefundResult(
                     success=False,
                     error_message="返金処理に失敗しました",
-                    processed_at=datetime.now()
+                    processed_at=datetime.now(),
                 )
                 logger.warning(f"返金失敗: {transaction_id}")
 
             # ログ記録
-            self._log_transaction({
-                "type": "refund",
-                "transaction_id": transaction_id,
-                "refund_amount": refund_amount,
-                "result": result,
-                "timestamp": datetime.now()
-            })
+            self._log_transaction(
+                {
+                    "type": "refund",
+                    "transaction_id": transaction_id,
+                    "refund_amount": refund_amount,
+                    "result": result,
+                    "timestamp": datetime.now(),
+                }
+            )
 
             return result
 
         except Exception as e:
             logger.error(f"返金処理エラー: {e}")
             return RefundResult(
-                success=False,
-                error_message=str(e),
-                processed_at=datetime.now()
+                success=False, error_message=str(e), processed_at=datetime.now()
             )
 
     async def _get_transaction(self, transaction_id: str) -> Optional[Transaction]:
         """取引を取得（実際の実装ではデータベースから）"""
         # 簡易的な実装：ログから検索
         for log_entry in reversed(self.transaction_log):
-            if (log_entry["type"] == "payment" and
-                log_entry.get("payment_id") == transaction_id):
+            if (
+                log_entry["type"] == "payment"
+                and log_entry.get("payment_id") == transaction_id
+            ):
                 return Transaction(
                     transaction_id=transaction_id,
                     machine_id="VM001",
                     items=[],  # 簡易版のため空
                     subtotal=0,
-                    total_amount=log_entry["amount"]
+                    total_amount=log_entry["amount"],
                 )
         return None
 
@@ -528,15 +605,22 @@ class PaymentService:
             "successful_transactions": successful,
             "failed_transactions": total - successful,
             "success_rate": successful / total,
-            "total_amount": sum(log["amount"] for log in payment_logs if log["result"].success),
-            "total_fees": sum(log["result"].fee for log in payment_logs if log["result"].success)
+            "total_amount": sum(
+                log["amount"] for log in payment_logs if log["result"].success
+            ),
+            "total_fees": sum(
+                log["result"].fee for log in payment_logs if log["result"].success
+            ),
+            "total_revenue": self.total_revenue,
         }
 
     def get_recent_transactions(self, limit: int = 10) -> List[Dict[str, Any]]:
         """最近の取引を取得"""
         return self.transaction_log[-limit:] if self.transaction_log else []
 
-    def simulate_realistic_sale(self, product_id: str, quantity: int = 1) -> Dict[str, Any]:
+    def simulate_realistic_sale(
+        self, product_id: str, quantity: int = 1
+    ) -> Dict[str, Any]:
         """現実的な販売をシミュレート"""
         current_time = datetime.now()
         current_hour = current_time.hour
@@ -544,32 +628,51 @@ class PaymentService:
         current_month = current_time.month
 
         # 需要予測
-        predicted_demand = self.sales_model.predict_demand(product_id, current_hour, current_weekday)
+        predicted_demand = self.sales_model.predict_demand(
+            product_id, current_hour, current_weekday
+        )
 
         # 顧客行動シミュレーション
         customer_behavior = self.sales_model.simulate_customer_behavior(product_id)
 
         # 実際の販売数量を決定（予測需要と顧客行動に基づく）
         random_factor = random.uniform(0.8, 1.2)
-        actual_quantity = max(0, int(predicted_demand * customer_behavior["purchase_probability"] * random_factor))
+        actual_quantity = max(
+            0,
+            int(
+                predicted_demand
+                * customer_behavior["purchase_probability"]
+                * random_factor
+            ),
+        )
 
         # 価格設定
         base_price = 150.0  # 基準価格（実際には商品マスタから取得）
-        optimal_price = self.sales_model.calculate_optimal_price(product_id, base_price * 0.7)
+        optimal_price = self.sales_model.calculate_optimal_price(
+            product_id, base_price * 0.7
+        )
 
         # まとめ買い割引の適用
         if quantity > 1:
-            unit_price = self.sales_model.simulate_bulk_purchase_discount(optimal_price, quantity)
+            unit_price = self.sales_model.simulate_bulk_purchase_discount(
+                optimal_price, quantity
+            )
         else:
             unit_price = optimal_price
 
         total_amount = unit_price * actual_quantity
 
         # 季節需要の考慮
-        seasonal_demand = self.sales_model.simulate_seasonal_demand(product_id, current_month)
-        seasonal_adjustment = total_amount * (seasonal_demand / self.sales_model.product_popularity.get(product_id, 0.5))
+        seasonal_demand = self.sales_model.simulate_seasonal_demand(
+            product_id, current_month
+        )
+        seasonal_adjustment = total_amount * (
+            seasonal_demand / self.sales_model.product_popularity.get(product_id, 0.5)
+        )
 
-        final_amount = total_amount * (1 + (seasonal_adjustment - total_amount) / total_amount * 0.3)
+        final_amount = total_amount * (
+            1 + (seasonal_adjustment - total_amount) / total_amount * 0.3
+        )
 
         return {
             "product_id": product_id,
@@ -578,10 +681,12 @@ class PaymentService:
             "unit_price": round(unit_price, 2),
             "total_amount": round(final_amount, 2),
             "customer_satisfaction": customer_behavior["satisfaction_score"],
-            "repeat_purchase_probability": customer_behavior["repeat_purchase_probability"],
+            "repeat_purchase_probability": customer_behavior[
+                "repeat_purchase_probability"
+            ],
             "seasonal_impact": seasonal_demand,
             "timestamp": current_time.isoformat(),
-            "simulation_model": "advanced_v1.0"
+            "simulation_model": "advanced_v1.0",
         }
 
     def get_demand_forecast(self, product_id: str, days: int = 7) -> Dict[str, Any]:
@@ -591,7 +696,9 @@ class PaymentService:
         # 統計情報の計算
         total_predicted_demand = sum(item["predicted_demand"] for item in forecast)
         total_expected_sales = sum(item["expected_sales"] for item in forecast)
-        avg_purchase_probability = sum(item["purchase_probability"] for item in forecast) / len(forecast)
+        avg_purchase_probability = sum(
+            item["purchase_probability"] for item in forecast
+        ) / len(forecast)
 
         return {
             "product_id": product_id,
@@ -601,9 +708,13 @@ class PaymentService:
                 "total_predicted_demand": round(total_predicted_demand, 2),
                 "total_expected_sales": round(total_expected_sales, 2),
                 "average_purchase_probability": round(avg_purchase_probability, 3),
-                "peak_demand_hour": max(forecast, key=lambda x: x["predicted_demand"])["hour"],
-                "lowest_demand_hour": min(forecast, key=lambda x: x["predicted_demand"])["hour"]
-            }
+                "peak_demand_hour": max(forecast, key=lambda x: x["predicted_demand"])[
+                    "hour"
+                ],
+                "lowest_demand_hour": min(
+                    forecast, key=lambda x: x["predicted_demand"]
+                )["hour"],
+            },
         }
 
     def simulate_market_scenario(self, scenario: str = "normal") -> Dict[str, Any]:
@@ -614,7 +725,7 @@ class PaymentService:
             "recession": {"demand_change": -0.3, "price_sensitivity": 0.8},
             "competitor_entry": {"demand_change": -0.2, "price_sensitivity": 0.7},
             "viral_marketing": {"demand_change": 0.5, "price_sensitivity": 0.2},
-            "supply_shortage": {"demand_change": 0.1, "price_sensitivity": 0.6}
+            "supply_shortage": {"demand_change": 0.1, "price_sensitivity": 0.6},
         }
 
         if scenario not in scenarios:
@@ -637,7 +748,9 @@ class PaymentService:
                 "trend_demand": trend,
                 "scenario_demand": trend * (1 + demand_impact),
                 "price_sensitivity": price_impact,
-                "recommended_action": self._get_recommended_action(trend, demand_impact, price_impact)
+                "recommended_action": self._get_recommended_action(
+                    trend, demand_impact, price_impact
+                ),
             }
 
         return {
@@ -645,10 +758,12 @@ class PaymentService:
             "scenario_parameters": scenario_params,
             "market_trends": market_trends,
             "scenario_impact": scenario_impact,
-            "recommendations": self._generate_scenario_recommendations(scenario_impact)
+            "recommendations": self._generate_scenario_recommendations(scenario_impact),
         }
 
-    def _get_recommended_action(self, trend_demand: float, demand_impact: float, price_sensitivity: float) -> str:
+    def _get_recommended_action(
+        self, trend_demand: float, demand_impact: float, price_sensitivity: float
+    ) -> str:
         """推奨アクションを取得"""
         final_demand = trend_demand * (1 + demand_impact)
 
@@ -665,25 +780,33 @@ class PaymentService:
         else:
             return "現状維持し、継続観察"
 
-    def _generate_scenario_recommendations(self, scenario_impact: Dict[str, Any]) -> List[str]:
+    def _generate_scenario_recommendations(
+        self, scenario_impact: Dict[str, Any]
+    ) -> List[str]:
         """シナリオベースの推奨事項を生成"""
         recommendations = []
 
         high_demand_products = [
-            product_id for product_id, impact in scenario_impact.items()
+            product_id
+            for product_id, impact in scenario_impact.items()
             if impact["scenario_demand"] > 0.7
         ]
 
         low_demand_products = [
-            product_id for product_id, impact in scenario_impact.items()
+            product_id
+            for product_id, impact in scenario_impact.items()
             if impact["scenario_demand"] < 0.4
         ]
 
         if high_demand_products:
-            recommendations.append(f"高需要商品の在庫増強を優先: {', '.join(high_demand_products)}")
+            recommendations.append(
+                f"高需要商品の在庫増強を優先: {', '.join(high_demand_products)}"
+            )
 
         if low_demand_products:
-            recommendations.append(f"低需要商品の価格戦略見直しを検討: {', '.join(low_demand_products)}")
+            recommendations.append(
+                f"低需要商品の価格戦略見直しを検討: {', '.join(low_demand_products)}"
+            )
 
         if not recommendations:
             recommendations.append("現在の戦略を維持し、市場動向を継続観察")
@@ -699,7 +822,8 @@ class PaymentService:
         hourly_stats = {}
         for hour in range(24):
             hour_transactions = [
-                log for log in self.transaction_log
+                log
+                for log in self.transaction_log
                 if log["timestamp"].hour == hour and log["type"] == "payment"
             ]
 
@@ -709,7 +833,7 @@ class PaymentService:
                 hourly_stats[hour] = {
                     "transaction_count": len(hour_transactions),
                     "total_amount": total_amount,
-                    "average_amount": avg_amount
+                    "average_amount": avg_amount,
                 }
 
         # 商品別分析（シミュレーションモデルベース）
@@ -721,9 +845,13 @@ class PaymentService:
             product_analytics[product_id] = {
                 "popularity_score": self.sales_model.product_popularity[product_id],
                 "customer_satisfaction": customer_behavior["satisfaction_score"],
-                "repeat_purchase_probability": customer_behavior["repeat_purchase_probability"],
+                "repeat_purchase_probability": customer_behavior[
+                    "repeat_purchase_probability"
+                ],
                 "next_hour_forecast": forecast["expected_sales"],
-                "optimal_price": self.sales_model.calculate_optimal_price(product_id, 100.0)
+                "optimal_price": self.sales_model.calculate_optimal_price(
+                    product_id, 100.0
+                ),
             }
 
         return {
@@ -731,7 +859,7 @@ class PaymentService:
             "product_analytics": product_analytics,
             "market_trends": self.sales_model.simulate_market_trends(),
             "inventory_efficiency": self._calculate_inventory_efficiency(),
-            "sales_model_version": "advanced_v1.0"
+            "sales_model_version": "advanced_v1.0",
         }
 
     def _calculate_inventory_efficiency(self) -> Dict[str, float]:
@@ -741,14 +869,18 @@ class PaymentService:
         for product_id in self.sales_model.product_popularity.keys():
             # シミュレーションによる在庫回転率計算
             current_stock = random.randint(10, 100)  # シミュレーション用
-            avg_daily_sales = self.sales_model.product_popularity[product_id] * random.uniform(5, 20)
+            avg_daily_sales = self.sales_model.product_popularity[
+                product_id
+            ] * random.uniform(5, 20)
 
-            turnover_rate = self.sales_model.calculate_inventory_turnover(product_id, current_stock, avg_daily_sales)
+            turnover_rate = self.sales_model.calculate_inventory_turnover(
+                product_id, current_stock, avg_daily_sales
+            )
 
             efficiency_metrics[product_id] = {
                 "turnover_rate": turnover_rate,
                 "days_of_stock": current_stock / max(avg_daily_sales, 0.1),
-                "efficiency_rating": self._rate_inventory_efficiency(turnover_rate)
+                "efficiency_rating": self._rate_inventory_efficiency(turnover_rate),
             }
 
         return efficiency_metrics
@@ -765,6 +897,7 @@ class PaymentService:
             return "非効率的"
         else:
             return "非常に非効率的"
+
 
 # グローバルインスタンス
 payment_service = PaymentService()

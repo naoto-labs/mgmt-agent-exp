@@ -1,460 +1,183 @@
-# 🤖 AIエージェント自律型自動販売機システム
-
-Anthropic PJ Vend構成の実験的実装 - AIエージェントによる完全自律型の自動販売機ビジネスシミュレーター
-
-**🎯 モデルベース販売シミュレーションシステム**
-- Stripeなどの実際の決済サービスを使用せず、現実的な販売モデルをシミュレーション
-- 時間帯・曜日・季節・顧客行動を考慮した高度な需要予測
-- 市場シナリオ分析によるビジネス戦略の検証・分析
-- **✅ 動作確認済み**: ダミー値で正常に起動・動作
-- **✅ Azure OpenAI対応**: 最新のAzure OpenAI APIをサポート
-- **✅ オプション暗号化**: ENCRYPTION_KEY設定不要で動作可能
-
-### 💡 モデルベースアプローチの利点
-
-#### 現実的なビジネス検証
-- **リスクなしの実験**: 実際の損失リスクなく戦略をテスト
-- **迅速な検証**: 数ヶ月かかる市場テストを数分でシミュレーション
-- **パラメータ調整**: 様々な条件での結果を即座に確認
-- **データ駆動型意思決定**: 客観的な指標に基づく戦略立案
-
-#### 包括的な影響分析
-- **マルチファクター考慮**: 時間・曜日・季節・経済状況の複合影響を分析
-- **顧客行動モデリング**: 心理的・行動経済学的要因を考慮した予測
-- **市場ダイナミクス**: 競合・トレンド・外的要因の相互作用をシミュレーション
-- **戦略的洞察**: 長期的なビジネス影響を予測・評価
-
-#### 実用的ビジネス支援
-- **価格戦略最適化**: 需要弾力性に基づく動的最適価格設定
-- **在庫戦略立案**: 需要予測精度を活かした効率的な在庫管理
-- **マーケティング効果測定**: プロモーションのROIを事前評価
-- **リスク管理**: 様々な市場シナリオでのリスク評価と対策立案
-
-### 🏪 販売シミュレーションモデル特徴
-
-#### 高度な需要予測
-- **時間帯別パターン**: 24時間の需要変動をモデル化（朝・昼・夕・夜のピークタイム）
-- **曜日別変動**: 月曜日〜日曜日の需要パターン（平日・週末の違い）
-- **季節・月別要因**: 夏・冬・春・秋の季節変動と月別トレンド
-- **商品別人気度**: 商品ごとのベース人気度スコア管理
-
-#### 顧客行動シミュレーション
-- **購入確率予測**: 商品・時間帯・顧客属性に基づく購入確率計算
-- **満足度予測**: 商品体験後の顧客満足度シミュレーション
-- **リピート購入率**: 満足度とブランドロイヤルティに基づく再訪予測
-- **価格感度分析**: 顧客の価格に対する反応度評価
-
-#### 市場環境シミュレーション
-- **経済状況**: 好景気・不景気・リセッションの影響シミュレーション
-- **競合状況**: 競合他社の参入・撤退による市場シェア変動
-- **マーケティング効果**: キャンペーン・プロモーションの影響分析
-- **外的要因**: 天候・イベント・社会情勢の影響モデル化
-
-#### ビジネス戦略支援
-- **価格最適化**: コスト・需要・競合を考慮した最適価格算出
-- **在庫管理**: 需要予測に基づく最適在庫量と発注タイミング
-- **プロモーション効果**: 割引・キャンペーンの効果測定とROI分析
-- **リスク評価**: 様々な市場シナリオでのリスクと機会の分析
-
-## 📋 概要
-
-このシステムは、AIエージェントによる自動販売機ビジネスの完全なシミュレーション環境を提供します。複数のAIモデルを統合し、顧客対応、在庫管理、決済処理、財務会計、分析機能を備えた包括的なプラットフォームです。
-
-## ✨ 主な機能
-
-### 🤖 AIエージェントシステム
-- **検索エージェント**: AIによる価格比較と最適仕入れ先選定
-- **顧客エージェント**: 会話履歴を活用したパーソナライズ対応
-- **多モデル対応**: Anthropic Claude + OpenAI GPT統合
-
-### 💰 ビジネスシステム
-- **決済シミュレーター**: 現実的な決済フロー検証
-- **在庫管理**: 自販機・保管庫統合管理システム
-- **財務自動化**: 複式簿記による自動仕訳処理
-- **管理会計**: 収益性・効率性分析・トレンド分析
-
-### 📊 監視・分析システム
-- **リアルタイム監視**: イベント追跡とシステム健全性チェック
-- **統合管理**: オーケストレーターによる全システム統制
-- **RESTful API**: 外部システムとの連携機能
-
-## 🚀 クイックスタート
-
-### 1. 環境設定
-
-```bash
-# リポジトリのクローン
-git clone https://github.com/naoto-labs/mgmt-agent-exp.git
-cd mgmt-agent-exp
-
-# 依存関係のインストール（rye使用）
-rye sync
-```
-
-### 2. 環境変数の設定
-
-```bash
-# .envファイルの作成
-cp .env.example .env
-
-# .envファイルの編集（ダミー値でテスト可能）
-# ANTHROPIC_API_KEY=sk-ant-api03-test-dummy-key-for-development-only
-# ENCRYPTION_KEY=dummy_encryption_key_32_characters_long_123456789012
-```
-
-### 3. システム起動
-
-```bash
-# FastAPIサーバー起動
-rye run uvicorn src.main:app --host 0.0.0.0 --port 8000 --reload
-
-# またはオーケストレーター起動
-rye run python -m src.services.orchestrator
-```
-
-システムが起動すると、以下のURLでアクセス可能になります：
-- **メインアプリケーション**: http://localhost:8000
-- **APIドキュメント**: http://localhost:8000/docs
-- **代替ドキュメント**: http://localhost:8000/redoc
-
-## 📚 システム構成
-
-```
-mgmt-agent-exp/
-├── src/
-│   ├── main.py                 # FastAPIメインアプリケーション
-│   ├── config/                 # 設定・セキュリティ管理
-│   ├── models/                 # データモデル（商品・取引・在庫）
-│   ├── ai/                     # AIモデル管理システム
-│   ├── services/               # ビジネスロジックサービス
-│   ├── agents/                 # AIエージェント（検索・顧客対応）
-│   ├── accounting/             # 会計システム（仕訳・管理会計）
-│   ├── analytics/              # 分析システム（イベント追跡）
-│   └── api/                    # REST APIエンドポイント
-├── tests/                      # 包括的なテストスイート
-├── data/                       # データストレージ
-├── static/                     # Webダッシュボード
-└── doc/                        # ドキュメント
-```
-
-## 🔗 APIエンドポイント
-
-### ヘルスチェック
-```bash
-GET /health
-```
-
-### 商品管理
-```bash
-GET /api/v1/vending/products      # 商品一覧取得
-GET /api/v1/vending/inventory     # 在庫状況確認
-POST /api/v1/vending/payment      # 決済処理
-```
-
-### 顧客対応
-```bash
-POST /api/v1/tablet/chat/start    # 顧客チャット開始
-POST /api/v1/tablet/chat/message  # メッセージ送信
-GET /api/v1/tablet/recommendations/{customer_id}  # パーソナライズ推奨
-```
-
-### 調達・検索
-```bash
-GET /api/v1/procurement/suppliers/search  # 仕入れ先検索
-GET /api/v1/procurement/prices/compare    # 価格比較
-```
-
-### 会計・分析
-```bash
-GET /api/v1/accounting/reports           # 会計レポート
-GET /api/v1/analytics/events             # イベント分析
-GET /api/v1/analytics/system-health      # システム健全性
-```
-
-## 🧪 テスト実行
-
-### ユニットテスト
-```bash
-# 全テスト実行
-rye run pytest tests/ -v
-
-# 特定テスト実行
-rye run pytest tests/test_payment.py -v      # 決済システムテスト
-rye run pytest tests/test_accounting.py -v   # 会計システムテスト
-rye run pytest tests/test_agents.py -v       # AIエージェントテスト
-```
-
-### システムテスト
-```bash
-# システム診断実行
-rye run python -c "
-import asyncio
-from src.services.orchestrator import orchestrator
-
-async def test():
-    await orchestrator.initialize_system()
-    health = await orchestrator.check_system_health()
-    print(f'システム状態: {health.overall_status}')
-
-asyncio.run(test())
-"
-```
-
-## ⚙️ 設定詳細
-
-### 必須環境変数
-
-| 変数名 | 説明 | 例 |
-|--------|------|----|
-| `ANTHROPIC_API_KEY` | Anthropic APIキー | `sk-ant-api03-...` |
-| `ENCRYPTION_KEY` | データ暗号化キー（32文字以上） | `dummy_encryption_key_32_characters_long_...` |
-
-### オプション環境変数
-
-| 変数名 | 説明 | デフォルト値 |
-|--------|------|-------------|
-| `OPENAI_API_KEY` | OpenAI APIキー | なし |
-| `OPENAI_API_BASE` | Azure OpenAIエンドポイント | なし |
-| `STRIPE_API_KEY` | Stripe決済キー | なし |
-| `DEBUG` | デバッグモード | `False` |
-| `HOST` | サーバーホスト | `0.0.0.0` |
-| `PORT` | サーバーポート | `8000` |
-
-### Azure OpenAI設定例
-
-Azure OpenAIを使用する場合は、以下の環境変数を設定してください：
-
-```bash
-# Azure OpenAI設定
-OPENAI_API_KEY=your_azure_openai_api_key_here
-OPENAI_API_BASE=https://your-resource-name.openai.azure.com/
-```
-
-Azure OpenAIを使用する場合の設定例：
-```bash
-# Azure OpenAI（優先使用）
-OPENAI_API_KEY=1234567890abcdef1234567890abcdef
-OPENAI_API_BASE=https://your-company.openai.azure.com/
-
-# または標準OpenAI
-OPENAI_API_KEY=sk-your-openai-api-key-here
-# OPENAI_API_BASEは設定不要
-```
-
-### ダミー値でのテスト
-
-開発環境では以下のダミー値でシステムをテストできます：
-
-```bash
-ANTHROPIC_API_KEY=sk-ant-api03-test-dummy-key-for-development-only
-OPENAI_API_KEY=sk-test-dummy-key-for-development-only
-OPENAI_API_BASE=https://dummy.openai.azure.com/
-ENCRYPTION_KEY=dummy_encryption_key_32_characters_long_123456789012
-```
-
-## 🎯 使用例
-
-### 1. 商品購入シミュレーション
-
-```bash
-# 商品一覧取得
-curl http://localhost:8000/api/v1/vending/products
-
-# 決済処理
-curl -X POST http://localhost:8000/api/v1/vending/payment \
-  -H "Content-Type: application/json" \
-  -d '{
-    "amount": 150,
-    "payment_method": "card",
-    "product_ids": ["prod_001", "prod_002"]
-  }'
-```
-
-### 2. 顧客対応シミュレーション
-
-```bash
-# チャット開始
-curl -X POST http://localhost:8000/api/v1/tablet/chat/start \
-  -H "Content-Type: application/json" \
-  -d '{
-    "customer_id": "customer_123",
-    "initial_message": "おすすめの商品を教えてください"
-  }'
-
-# メッセージ送信
-curl -X POST http://localhost:8000/api/v1/tablet/chat/message \
-  -H "Content-Type: application/json" \
-  -d '{
-    "session_id": "session_123",
-    "message": "ありがとうございます。購入します。"
-  }'
-```
-
-### 3. 仕入れ先検索
-
-```bash
-# 価格比較検索
-curl "http://localhost:8000/api/v1/procurement/suppliers/search?product_name=コーラ&max_price=100"
-```
-
-### 4. 販売シミュレーション（モデルベース）
-
-```python
-# Pythonスクリプトでの販売シミュレーション
-from src.services.payment_service import payment_service
-
-# 現実的な販売シミュレーション
-sale_result = payment_service.simulate_realistic_sale('drink_cola', quantity=2)
-print(f"予測需要: {sale_result['predicted_demand']:.2f}")
-print(f"実際販売数: {sale_result['actual_quantity']}")
-print(f"総売上: ¥{sale_result['total_amount']}")
-
-# 需要予測（7日間）
-forecast = payment_service.get_demand_forecast('drink_cola', days=7)
-print(f"7日間総需要予測: {forecast['summary']['total_predicted_demand']:.2f}")
-
-# 市場シナリオ分析
-scenario = payment_service.simulate_market_scenario('economic_boom')
-print(f"好景気シナリオの推奨事項: {scenario['recommendations'][0]}")
-```
-
-### 5. 高度な分析
-
-```python
-# 高度なビジネス分析
-analytics = payment_service.get_advanced_analytics()
-print(f"在庫効率性評価: {analytics['inventory_efficiency']['drink_cola']['efficiency_rating']}")
-print(f"最適価格: ¥{analytics['product_analytics']['drink_cola']['optimal_price']}")
-```
-
-## 🔧 開発情報
-
-### 技術スタック
-
-- **フレームワーク**: FastAPI (Python 3.9+)
-- **AIモデル**: Anthropic Claude, OpenAI GPT
-- **データベース**: SQLite (開発環境), MongoDB対応
-- **決済**: Stripe, PayPal統合対応
-- **テスト**: pytest, pytest-asyncio
-- **依存関係管理**: rye
-
-### 開発コマンド
-
-```bash
-# 依存関係インストール
-rye sync
-
-# 開発サーバー起動
-rye run uvicorn src.main:app --reload
-
-# テスト実行
-rye run pytest tests/ -v
-
-# コードフォーマット
-rye run black src/ tests/
-rye run isort src/ tests/
-
-# 型チェック
-rye run mypy src/
-```
-
-## 📊 システム機能詳細
-
-### 🤖 AIエージェント機能
-
-#### 検索エージェント
-- 複数ソースからの価格情報収集
-- AIによる最適仕入れ先選定
-- 市場動向分析と予測
-
-#### 顧客エージェント
-- 自然言語による顧客対応
-- 購入履歴に基づくパーソナライズ
-- 満足度分析と改善提案
-
-### 💰 決済・財務機能
-
-#### 決済システム
-- 複数決済方法対応（カード、現金、クーポン）
-- 決済成功率シミュレーション
-- 返金・キャンセル処理
-
-#### 会計システム
-- 自動仕訳生成（複式簿記）
-- 財務諸表自動作成
-- 収益性分析（商品別・期間別）
-
-### 📦 在庫管理機能
-
-#### 在庫最適化
-- 自販機・保管庫統合管理
-- 需要予測による自動発注
-- 在庫回転率分析
-
-#### 補充計画
-- 最適補充タイミング算出
-- コスト効率考慮した発注計画
-- 在庫切れリスク管理
-
-## 🔒 セキュリティ
-
-- **APIキー管理**: 環境変数によるセキュアな設定管理
-- **入力検証**: 全エンドポイントの型安全なデータ検証
-- **ログセキュリティ**: APIキーの自動マスキング
-- **エラーハンドリング**: 包括的な例外処理
-
-## 📈 監視・分析
-
-### リアルタイム監視
-- システム健全性チェック（60秒間隔）
-- イベント追跡とログ記録
-- パフォーマンス指標収集
-
-### 分析機能
-- 売上トレンド分析
-- 顧客行動パターン分析
-- 在庫効率性評価
-
-## 🤝 貢献方法
-
-1. このリポジトリをフォーク
-2. 新しいブランチを作成 (`git checkout -b feature/amazing-feature`)
-3. 変更をコミット (`git commit -m 'Add amazing feature'`)
-4. ブランチをプッシュ (`git push origin feature/amazing-feature`)
-5. Pull Requestを作成
-
-## 📄 ライセンス
-
-このプロジェクトは研究・開発目的で作成されたものです。実際の商用利用には適切な法的確認が必要です。
-
-## 🆘 トラブルシューティング
-
-### よくある問題と解決策
-
-#### Q: 「有効なANTHROPIC_API_KEYが必要です」エラー
-A: `.env`ファイルに適切なAPIキーを設定してください。ダミー値でテストする場合は以下の値を設定：
-```
-ANTHROPIC_API_KEY=sk-ant-api03-test-dummy-key-for-development-only
-```
-
-#### Q: 依存関係のインストールエラー
-A: rye環境が正しく設定されているか確認してください：
-```bash
-rye --version  # バージョン確認
-rye sync       # 依存関係再インストール
-```
-
-#### Q: サーバー起動エラー
-A: ポート8000が使用中の場合は他のポートを指定：
-```bash
-rye run uvicorn src.main:app --port 8001 --reload
-```
-
-## 📞 連絡先
-
-開発者: naoto-labs
-GitHub: https://github.com/naoto-labs/mgmt-agent-exp
+# 🤖 AIマルチエージェント自律型自動販売機システム
+
+**Tavily検索連携＆多シナリオテスト対応の完全自律型AI経営支援システム**
+
+## 🎯 最新機能 - 2025年リリース
+
+### ✅ **Tavily実検索統合** (NEW!)
+- **実Web検索**: DuckDuckGo/Tavily APIによる実際の商品検索
+- **スマートクエリ生成**: 在庫状況から適した検索クエリを自動生成
+- **例**: 売上好調 → "人気飲料 新商品" / 在庫不足 → "供給安定したボトル飲料"
+
+### ✅ **多様なテストシナリオ** (NEW!)
+- **5つのテストモード**: 状況に応じて異なるAI応答テスト
+- **最新のチューニング**: LLMが同じ応答を繰り返さない工夫
+- **インタラクティブ選択**: 起動時にシナリオを選択
+
+### ✅ **Management Agent強化**
+- **データ連動ロジック**: 売上・在庫データを基に戦略意思決定
+- **ログ完全クリーンアップ**: 重要な情報のみ詳細表示
+- **LLMプロンプト最適化**: 初回のみシステムプロンプト表示
+
+### ✅ **システム全体の安定化**
+- **Azure OpenAI統合**: GPT-4o-mini優先使用
+- **エラーハンドリング強化**: 各Agentの堅牢性向上
+- **6種AI Agent協働**: 顧客・検索・経営・分析・記録・調達の連携
 
 ---
 
-**🎉 このシステムはAIエージェントによる完全自律型の自動販売機ビジネスをシミュレートし、研究開発・検証に活用できる包括的なプラットフォームです。**
+## 🚀 クイックスタート
+
+### 1. 環境構築
+```bash
+# リポジトリクローン
+git clone https://github.com/naoto-labs/mgmt-agent-exp.git
+cd mgmt-agent-exp
+
+# 依存関係インストール
+pip install -r requirements.txt
+
+# .envファイル作成（Tavily APIキー設定）
+cp .env.example .env
+# TAVILY_API_KEY=your_api_key_here  # 実検索には設定が必要
+```
+
+### 2. AI Agent協働テスト実行
+```bash
+python multi_agent_simulation.py
+```
+
+**🎯 シナリオ選択例:**
+```
+🎯 テストシナリオを選択してください:
+1. high_sales     - 売上好調シナリオ (拡張戦略テスト)
+2. low_inventory  - 在庫不足集中シナリオ (緊急調達テスト)
+3. price_competition - 価格競争シナリオ (価格戦略テスト)
+4. customer_demand - 顧客需要変動シナリオ (トレンド分析テスト)
+5. default        - 標準シナリオ (現在の動作)
+```
+
+### 3. 各シナリオのAI応答確認
+- **high_sales**: "売上好調のため、新商品飲料を検索" → Tavily検索実行
+- **low_inventory**: カップヌードル補充以外にも多様なアクション
+- **price_competition**: 価格戦略調整などのレスポンス
+- **customer_demand**: 在庫最適化提案など
+
+---
+
+## 📊 テスト結果例
+
+### High Salesシナリオ
+```
+2025-10-02 09:21:54,190 - src.agents.management_agent - INFO - 売上好調のため、新商品飲料を検索
+2025-10-02 09:21:54,190 - src.agents.management_agent - INFO - 生成された検索クエリ: 人気飲料 新商品
+2025-10-02 09:21:56,721 - src.agents.search_agent - INFO - DuckDuckGo実検索完了: 5件の結果
+```
+
+### Logクリーン化
+```
+2025-10-02 09:18:01,037 - src.agents.management_agent - DEBUG - === LLM PROMPT === (初回のみ)
+2025-10-02 09:18:01,037 - src.agents.management_agent - DEBUG - === LLM RESPONSE ===
+2025-10-02 09:20:58,270 - src.agents.management_agent - DEBUG - LLM called with established system prompt (2回目以降)
+```
+
+---
+
+## 🎯 システムアーキテクチャ
+
+```
+🤖 AIマルチエージェントシステム
+├── 🎯 Management Agent (LangChainベース)
+│   ├── 売上・在庫データ分析
+│   ├── 戦略意思決定 (LLMプロンプト生成)
+│   ├── アクション実行 (在庫補充・価格調整)
+│   └── 会計データ連携
+├── 🔍 Search Agent (Tavily/DuckDuckGo)
+│   ├── 商品価格比較検索
+│   ├── 新商品発見・調達提案
+│   └── 在庫状況連動クエリ生成
+├── 👥 Customer Agent
+│   ├── 顧客問い合わせ対応
+│   └── パーソナライズ推薦
+├── 📊 Analytics Agent
+│   └── 営業分析レポート
+├── 🧠 Recorder Agent
+│   └── 学習データ記録
+└── 📦 Procurement Agent
+    └── 発注・調達管理
+```
+
+## ✨ 主要機能
+
+### AI Agentシステム
+- **Management Agent**: ビジネスデータ分析 → LLM意思決定 → アクション実行
+- **Search Agent**: Tavily/DuckDuckGo使用の本物ネットワーク検索
+- **6Agent統合**: 顧客対応・在庫管理・財務会計・分析・記録・調達
+
+### 実ビジネスロジック
+- **在庫最適化**: 需要予測に基づく自動補充
+- **財務自動化**: 複式簿記による自動仕訳
+- **決済シミュレーション**: 複数決済方法対応
+
+### テスト＆検証
+- **5種テストシナリオ**: 異なる状況でのAI応答検証
+- **Tavily実検索**: 本物Web検索結果を使用
+- **ログ完全監視**: Management Agentの思考プロセス追跡
+
+## 📈 進化のポイント
+
+### AI Agentの知性向上
+- **データ連動**: 売上・在庫状況を基にしたスマートな意思決定
+- **検索適応**: ビジネスデータから最適な検索クエリを生成
+- **アクション多様化**: 価格調整・在庫補充・新商品提案
+
+### システム実用性
+- **本物Web統合**: Tavily APIを使用した現実的商品検索
+- **テスト柔軟性**: 5つのシナリオで様々な状況を検証
+- **ログ最適化**: 重要な情報のみをクリーンに表示
+
+## 🎮 使用方法
+
+### 1. テスト実行
+```bash
+python multi_agent_simulation.py
+# ↑シナリオを選択してテスト開始
+```
+
+### 2. 分析確認
+- **LLM応答の変化**: 各シナリオで異なる意思決定を確認
+- **Tavily検索結果**: 実Web検索による新商品/価格情報
+- **アクション実行**: 在庫補充・価格調整・新商品発注
+
+### 3. ログ監視
+- Business Metrics: 売上・在庫・顧客満足度
+- LLM Prompt/Response: AI意思決定プロセス
+- Action Execute: システムアクションの実行結果
+
+## 🔧 設定
+
+### 必須環境変数
+```bash
+TAVILY_API_KEY=your_tavily_api_key  # 実検索使用時に必要
+OPENAI_API_KEY=your_openai_key      # Azure OpenAI対応
+```
+
+### ダミーモード
+Tavily APIキーがない場合もテスト可能（シミュレーション検索にフォールバック）
+
+---
+
+## 🎉 進化の成果
+
+### Before
+- 単一シナリオのみテスト可能
+- シミュレーション検索のみ
+- LLM応答が同じ内容繰り返し
+
+### After
+- **5つの多様なテストシナリオ**
+- **Tavily実Web検索統合**
+- **データ連動型AI意思決定**
+- **ログ完全クリーンアップ**
+
+**これにより、AI Agentシステムの真の実力を様々な状況で検証できるようになりました！ 🚀**

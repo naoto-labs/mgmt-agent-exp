@@ -1,13 +1,16 @@
-import pytest
 import asyncio
-from unittest.mock import AsyncMock, MagicMock, patch
+import random
 from datetime import datetime
+from unittest.mock import AsyncMock, MagicMock, patch
 
-from src.agents.search_agent import SearchAgent, WebSearchService, SearchResult
+import pytest
+
 from src.agents.customer_agent import CustomerAgent
-from src.ai.model_manager import AIMessage, AIResponse, AIModelType
+from src.agents.search_agent import SearchAgent, SearchResult, WebSearchService
+from src.ai.model_manager import AIMessage, AIModelType, AIResponse
 from src.services.conversation_service import ConversationService
 from src.services.inventory_service import InventoryService
+
 
 class TestSearchAgent:
     """検索エージェントのテスト"""
@@ -28,7 +31,7 @@ class TestSearchAgent:
                 snippet="高品質なコカ・コーラをお探しならこちら",
                 price=150.0,
                 availability="在庫あり",
-                relevance_score=0.9
+                relevance_score=0.9,
             ),
             SearchResult(
                 query="コカ・コーラ 価格",
@@ -37,8 +40,8 @@ class TestSearchAgent:
                 snippet="激安コカ・コーラ",
                 price=140.0,
                 availability="在庫あり",
-                relevance_score=0.8
-            )
+                relevance_score=0.8,
+            ),
         ]
 
     def test_search_agent_initialization(self, search_agent):
@@ -50,7 +53,9 @@ class TestSearchAgent:
     @pytest.mark.asyncio
     async def test_find_suppliers_success(self, search_agent, sample_search_results):
         """仕入れ先検索成功テスト"""
-        with patch.object(search_agent.web_search, 'search_products', new_callable=AsyncMock) as mock_search:
+        with patch.object(
+            search_agent.web_search, "search_products", new_callable=AsyncMock
+        ) as mock_search:
             mock_search.return_value = sample_search_results
 
             results = await search_agent.find_suppliers("コカ・コーラ", max_results=5)
@@ -63,7 +68,9 @@ class TestSearchAgent:
     @pytest.mark.asyncio
     async def test_find_suppliers_no_results(self, search_agent):
         """仕入れ先検索結果なしテスト"""
-        with patch.object(search_agent.web_search, 'search_products', new_callable=AsyncMock) as mock_search:
+        with patch.object(
+            search_agent.web_search, "search_products", new_callable=AsyncMock
+        ) as mock_search:
             mock_search.return_value = []
 
             results = await search_agent.find_suppliers("存在しない商品")
@@ -73,7 +80,9 @@ class TestSearchAgent:
     @pytest.mark.asyncio
     async def test_compare_prices(self, search_agent, sample_search_results):
         """価格比較テスト"""
-        with patch.object(search_agent, 'find_suppliers', new_callable=AsyncMock) as mock_find:
+        with patch.object(
+            search_agent, "find_suppliers", new_callable=AsyncMock
+        ) as mock_find:
             mock_find.return_value = sample_search_results
 
             comparison = await search_agent.compare_prices("コカ・コーラ")
@@ -89,13 +98,14 @@ class TestSearchAgent:
         # 検索履歴を追加
         search_agent.search_history = [
             {"product_name": "商品1", "results_count": 5, "timestamp": datetime.now()},
-            {"product_name": "商品2", "results_count": 3, "timestamp": datetime.now()}
+            {"product_name": "商品2", "results_count": 3, "timestamp": datetime.now()},
         ]
 
         stats = search_agent.get_search_stats()
 
         assert stats["total_searches"] == 2
         assert stats["avg_results_per_search"] == 4.0
+
 
 class TestCustomerAgent:
     """顧客エージェントのテスト"""
@@ -119,13 +129,14 @@ class TestCustomerAgent:
         """モック在庫サービスのフィクスチャ"""
         service = MagicMock(spec=InventoryService)
         service.get_inventory_summary.return_value = MagicMock(
-            total_slots=10,
-            out_of_stock_slots=1
+            total_slots=10, out_of_stock_slots=1
         )
         return service
 
     @pytest.mark.asyncio
-    async def test_engage_customer_success(self, customer_agent, mock_conversation_service, mock_inventory_service):
+    async def test_engage_customer_success(
+        self, customer_agent, mock_conversation_service, mock_inventory_service
+    ):
         """顧客エンゲージメント成功テスト"""
         customer_agent.conversation_service = mock_conversation_service
         customer_agent.inventory_service = mock_inventory_service
@@ -136,10 +147,12 @@ class TestCustomerAgent:
             model_used="mock",
             tokens_used=10,
             response_time=0.5,
-            success=True
+            success=True,
         )
 
-        with patch.object(customer_agent.model_manager, 'generate_response', new_callable=AsyncMock) as mock_generate:
+        with patch.object(
+            customer_agent.model_manager, "generate_response", new_callable=AsyncMock
+        ) as mock_generate:
             mock_generate.return_value = mock_response
 
             result = await customer_agent.engage_customer("customer_123", "VM001")
@@ -150,7 +163,9 @@ class TestCustomerAgent:
             mock_conversation_service.create_session.assert_called_once()
 
     @pytest.mark.asyncio
-    async def test_engage_customer_ai_error(self, customer_agent, mock_conversation_service, mock_inventory_service):
+    async def test_engage_customer_ai_error(
+        self, customer_agent, mock_conversation_service, mock_inventory_service
+    ):
         """顧客エンゲージメントAIエラーテスト"""
         customer_agent.conversation_service = mock_conversation_service
         customer_agent.inventory_service = mock_inventory_service
@@ -162,10 +177,12 @@ class TestCustomerAgent:
             tokens_used=0,
             response_time=0.0,
             success=False,
-            error_message="AIエラー"
+            error_message="AIエラー",
         )
 
-        with patch.object(customer_agent.model_manager, 'generate_response', new_callable=AsyncMock) as mock_generate:
+        with patch.object(
+            customer_agent.model_manager, "generate_response", new_callable=AsyncMock
+        ) as mock_generate:
             mock_generate.return_value = mock_response
 
             result = await customer_agent.engage_customer("customer_123", "VM001")
@@ -174,7 +191,9 @@ class TestCustomerAgent:
             assert "message" in result
 
     @pytest.mark.asyncio
-    async def test_handle_customer_message(self, customer_agent, mock_conversation_service):
+    async def test_handle_customer_message(
+        self, customer_agent, mock_conversation_service
+    ):
         """顧客メッセージ処理テスト"""
         customer_agent.conversation_service = mock_conversation_service
 
@@ -183,11 +202,17 @@ class TestCustomerAgent:
             "session_id": "session_123",
             "customer_context": {},
             "message_history": [
-                {"role": "assistant", "content": "こんにちは", "timestamp": datetime.now().isoformat()}
+                {
+                    "role": "assistant",
+                    "content": "こんにちは",
+                    "timestamp": datetime.now().isoformat(),
+                }
             ],
-            "previous_insights": {}
+            "previous_insights": {},
         }
-        mock_conversation_service.get_conversation_for_ai_agent = AsyncMock(return_value=conversation_data)
+        mock_conversation_service.get_conversation_for_ai_agent = AsyncMock(
+            return_value=conversation_data
+        )
 
         # AI応答をモック
         mock_response = AIResponse(
@@ -195,13 +220,17 @@ class TestCustomerAgent:
             model_used="mock",
             tokens_used=15,
             response_time=0.3,
-            success=True
+            success=True,
         )
 
-        with patch.object(customer_agent.model_manager, 'generate_response', new_callable=AsyncMock) as mock_generate:
+        with patch.object(
+            customer_agent.model_manager, "generate_response", new_callable=AsyncMock
+        ) as mock_generate:
             mock_generate.return_value = mock_response
 
-            result = await customer_agent.handle_customer_message("session_123", "こんにちは")
+            result = await customer_agent.handle_customer_message(
+                "session_123", "こんにちは"
+            )
 
             assert result["success"] is True
             assert "お役に立てることはありますか？" in result["message"]
@@ -212,18 +241,19 @@ class TestCustomerAgent:
         history = [
             {
                 "summary": "コーヒーについて質問",
-                "context": {"product_category": "drink"}
+                "context": {"product_category": "drink"},
             },
             {
                 "summary": "スナックについて会話",
-                "context": {"product_category": "snack"}
-            }
+                "context": {"product_category": "snack"},
+            },
         ]
 
         preferences = customer_agent._analyze_customer_preferences(history)
 
         assert "コーヒー" in preferences
         assert "スナック" in preferences
+
 
 class TestWebSearchService:
     """Web検索サービスのテスト"""
@@ -256,14 +286,33 @@ class TestWebSearchService:
     def test_deduplicate_results(self, web_search):
         """検索結果重複除去テスト"""
         results = [
-            SearchResult(query="test", title="タイトル1", url="https://example1.com", snippet="説明1", relevance_score=0.9),
-            SearchResult(query="test", title="タイトル2", url="https://example2.com", snippet="説明2", relevance_score=0.8),
-            SearchResult(query="test", title="タイトル1", url="https://example1.com", snippet="説明1", relevance_score=0.9),  # 重複
+            SearchResult(
+                query="test",
+                title="タイトル1",
+                url="https://example1.com",
+                snippet="説明1",
+                relevance_score=0.9,
+            ),
+            SearchResult(
+                query="test",
+                title="タイトル2",
+                url="https://example2.com",
+                snippet="説明2",
+                relevance_score=0.8,
+            ),
+            SearchResult(
+                query="test",
+                title="タイトル1",
+                url="https://example1.com",
+                snippet="説明1",
+                relevance_score=0.9,
+            ),  # 重複
         ]
 
         unique_results = web_search._deduplicate_results(results)
 
         assert len(unique_results) == 2  # 重複が除去される
+
 
 # パフォーマンステスト
 @pytest.mark.asyncio
@@ -283,6 +332,7 @@ async def test_search_agent_performance():
     # 各検索が1秒以内に完了することを確認
     assert elapsed_time < 3.0
 
+
 # エラーハンドリングテスト
 @pytest.mark.asyncio
 async def test_search_agent_error_handling():
@@ -290,12 +340,15 @@ async def test_search_agent_error_handling():
     agent = SearchAgent()
 
     # Web検索で例外が発生する場合
-    with patch.object(agent.web_search, 'search_products', new_callable=AsyncMock) as mock_search:
+    with patch.object(
+        agent.web_search, "search_products", new_callable=AsyncMock
+    ) as mock_search:
         mock_search.side_effect = Exception("検索エラー")
 
         results = await agent.find_suppliers("エラー商品")
 
         assert results == []  # エラー時は空リストを返す
+
 
 # インテグレーションテスト
 @pytest.mark.asyncio
@@ -308,8 +361,11 @@ async def test_customer_agent_integration():
     assert engagement["success"] is True
 
     if engagement["session_id"]:
-        response = await agent.handle_customer_message(engagement["session_id"], "テストメッセージ")
+        response = await agent.handle_customer_message(
+            engagement["session_id"], "テストメッセージ"
+        )
         assert "success" in response
+
 
 if __name__ == "__main__":
     # テスト実行

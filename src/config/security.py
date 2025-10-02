@@ -1,11 +1,17 @@
+import logging
 import os
 import re
-import logging
-from cryptography.fernet import Fernet
-from typing import Optional, Dict, Any
 from functools import wraps
+from typing import Any, Dict, Optional
+
+from cryptography.fernet import Fernet
+from dotenv import load_dotenv
+
+# .envファイルの読み込み
+load_dotenv()
 
 logger = logging.getLogger(__name__)
+
 
 class SecureConfig:
     """セキュアな設定管理クラス"""
@@ -13,6 +19,7 @@ class SecureConfig:
     def __init__(self):
         self._anthropic_key: Optional[str] = None
         self._openai_key: Optional[str] = None
+        self._tavily_key: Optional[str] = None
         self._stripe_key: Optional[str] = None
         self._encryption_key: Optional[str] = None
         self._fernet: Optional[Fernet] = None
@@ -22,7 +29,15 @@ class SecureConfig:
         """Anthropic APIキーの取得（遅延読み込み）"""
         if not self._anthropic_key:
             key = os.getenv("ANTHROPIC_API_KEY")
-            if not key or (key == "your_anthropic_api_key_here" and len(key) < 20):
+            if not key:
+                raise ValueError("有効なANTHROPIC_API_KEYが必要です")
+            # 開発環境ではダミー値も許可（より柔軟に）
+            if key == "your_anthropic_api_key_here" or (
+                key.startswith("sk-ant-api03-test-dummy") and len(key) > 20
+            ):
+                # ダミー値は許可（開発環境用）
+                pass
+            elif len(key) < 10:
                 raise ValueError("有効なANTHROPIC_API_KEYが必要です")
             self._anthropic_key = key
         return self._anthropic_key
@@ -39,12 +54,30 @@ class SecureConfig:
     @property
     def azure_openai_key(self) -> Optional[str]:
         """Azure OpenAI APIキーの取得（オプション）"""
-        return os.getenv("OPENAI_API_KEY")  # Azure OpenAIも同じ環境変数を使用
+        # Azure OpenAIは同じ環境変数を使用
+        key = os.getenv("OPENAI_API_KEY")
+        if key and key != "your_openai_api_key_here" and len(key) > 20:
+            logger.debug(f"Azure OpenAIキーを取得しました（長さ: {len(key)}）")
+            return key
+        logger.debug(
+            f"Azure OpenAIキーが無効です（key: {bool(key)}, 長さ: {len(key) if key else 0}）"
+        )
+        return None
 
     @property
     def azure_endpoint(self) -> Optional[str]:
         """Azure OpenAIエンドポイントの取得（オプション）"""
         return os.getenv("OPENAI_API_BASE")
+
+    @property
+    def azure_deployment(self) -> Optional[str]:
+        """Azure OpenAIデプロイメント名の取得（オプション）"""
+        return os.getenv("OPENAI_API_DEPLOYMENT")
+
+    @property
+    def azure_api_version(self) -> Optional[str]:
+        """Azure OpenAI APIバージョンの取得（オプション）"""
+        return os.getenv("OPENAI_API_VERSION")
 
     @property
     def stripe_api_key(self) -> Optional[str]:
@@ -56,6 +89,15 @@ class SecureConfig:
         return self._stripe_key
 
     @property
+    def tavily_api_key(self) -> Optional[str]:
+        """Tavily APIキーの取得（オプション）"""
+        if not self._tavily_key:
+            key = os.getenv("TAVILY_API_KEY")
+            if key and key != "your_tavily_api_key_here":
+                self._tavily_key = key
+        return self._tavily_key
+
+    @property
     def encryption_key(self) -> str:
         """暗号化キーの取得（オプション）"""
         if not self._encryption_key:
@@ -63,7 +105,10 @@ class SecureConfig:
             if not key or key == "your_encryption_key_here":
                 # 暗号化キーがない場合はデフォルトキーを生成（開発用）
                 import hashlib
-                key = hashlib.sha256(b"default_encryption_key_for_development").hexdigest()[:32]
+
+                key = hashlib.sha256(
+                    b"default_encryption_key_for_development"
+                ).hexdigest()[:32]
             self._encryption_key = key
         return self._encryption_key
 
@@ -116,7 +161,11 @@ class SecureConfig:
             if not value:
                 missing.append(key)
             # 開発環境ではダミー値も許可（より柔軟に）
-            elif ("your_" in value and len(value) < 20) or ("dummy" in value and len(value) > 20) or ("test-dummy" in value):
+            elif (
+                ("your_" in value and len(value) < 20)
+                or ("dummy" in value and len(value) > 20)
+                or ("test-dummy" in value)
+            ):
                 # ダミー値は許可（開発環境用）
                 pass
             elif len(value) < 10:
@@ -124,6 +173,7 @@ class SecureConfig:
 
         if missing:
             raise ValueError(f"必要な環境変数が設定されていません: {missing}")
+
 
 class SecureFormatter(logging.Formatter):
     """セキュアなログフォーマッタ（APIキーをマスク）"""
@@ -136,15 +186,17 @@ class SecureFormatter(logging.Formatter):
         # APIキーパターンをマスク
         msg = super().format(record)
         # Anthropic APIキー（sk-ant-apiで始まる）
-        msg = re.sub(r'sk-ant-api[0-9a-zA-Z\-_]{40,}', 'sk-ant-api***MASKED***', msg)
+        msg = re.sub(r"sk-ant-api[0-9a-zA-Z\-_]{40,}", "sk-ant-api***MASKED***", msg)
         # OpenAI APIキー（sk-で始まる）
-        msg = re.sub(r'sk-[a-zA-Z0-9]{48}', 'sk-***MASKED***', msg)
+        msg = re.sub(r"sk-[a-zA-Z0-9]{48}", "sk-***MASKED***", msg)
         # Stripe APIキー（sk_test_またはsk_live_で始まる）
-        msg = re.sub(r'sk_(test|live)_[a-zA-Z0-9]{40,}', 'sk_***MASKED***', msg)
+        msg = re.sub(r"sk_(test|live)_[a-zA-Z0-9]{40,}", "sk_***MASKED***", msg)
         return msg
+
 
 def secure_logging(func):
     """セキュアログデコレータ"""
+
     @wraps(func)
     def wrapper(*args, **kwargs):
         # ログレベルをチェックして機密情報をフィルタリング
@@ -158,16 +210,17 @@ def secure_logging(func):
             except Exception as e:
                 logger.error(f"エラー発生: {str(e)}")
                 raise
+
     return wrapper
+
 
 # グローバルインスタンス
 secure_config = SecureConfig()
 
+
 def setup_secure_logging():
     """セキュアログのセットアップ"""
-    formatter = SecureFormatter(
-        '%(asctime)s - %(name)s - %(levelname)s - %(message)s'
-    )
+    formatter = SecureFormatter("%(asctime)s - %(name)s - %(levelname)s - %(message)s")
 
     # ルートロガーにセキュアフォーマッタを設定
     root_logger = logging.getLogger()

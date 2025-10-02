@@ -8,8 +8,12 @@ from fastapi.middleware.trustedhost import TrustedHostMiddleware
 from fastapi.responses import JSONResponse
 from fastapi.staticfiles import StaticFiles
 
+from src.api.procurement import router as procurement_router
+from src.api.tablet import router as tablet_router
+from src.api.vending import router as vending_router
 from src.config.security import secure_config, setup_secure_logging
 from src.config.settings import settings, validate_startup_settings
+from store_simulation_scenarios import scenario_runner
 
 # ロガーのセットアップ
 logging.basicConfig(
@@ -67,6 +71,28 @@ app = FastAPI(
 
 # 静的ファイルのマウント
 app.mount("/", StaticFiles(directory="static", html=True), name="static")
+
+# APIルーターの登録
+app.include_router(
+    vending_router,
+    prefix="/api/v1/vending",
+    tags=["vending"],
+    responses={404: {"description": "Not found"}},
+)
+
+app.include_router(
+    tablet_router,
+    prefix="/api/v1/tablet",
+    tags=["tablet"],
+    responses={404: {"description": "Not found"}},
+)
+
+app.include_router(
+    procurement_router,
+    prefix="/api/v1/procurement",
+    tags=["procurement"],
+    responses={404: {"description": "Not found"}},
+)
 
 # CORS設定
 app.add_middleware(
@@ -160,6 +186,43 @@ async def get_config():
         "allowed_actions": settings.allowed_actions,
         "forbidden_patterns": settings.forbidden_patterns,
     }
+
+
+# シナリオ実行エンドポイント
+@app.get("/api/v1/scenarios")
+async def get_scenarios():
+    """利用可能なシナリオ一覧を取得"""
+    try:
+        scenarios = scenario_runner.get_scenario_info()
+        return {
+            "scenarios": scenarios,
+            "total_count": len(scenarios),
+        }
+    except Exception as e:
+        logger.error(f"シナリオ一覧取得エラー: {e}")
+        raise HTTPException(status_code=500, detail="シナリオ一覧の取得に失敗しました")
+
+
+@app.post("/api/v1/scenarios/{scenario_name}/run")
+async def run_scenario(scenario_name: str):
+    """シナリオを実行"""
+    try:
+        result = await scenario_runner.run_scenario(scenario_name)
+        return result
+    except Exception as e:
+        logger.error(f"シナリオ実行エラー: {e}")
+        raise HTTPException(status_code=500, detail="シナリオの実行に失敗しました")
+
+
+@app.post("/api/v1/scenarios/run-all")
+async def run_all_scenarios():
+    """すべてのシナリオを実行"""
+    try:
+        result = await scenario_runner.run_all_scenarios()
+        return result
+    except Exception as e:
+        logger.error(f"全シナリオ実行エラー: {e}")
+        raise HTTPException(status_code=500, detail="全シナリオの実行に失敗しました")
 
 
 # エラーハンドリング

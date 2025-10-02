@@ -1,24 +1,26 @@
-from fastapi import APIRouter, HTTPException, Depends, Query
-from typing import Optional, List, Dict, Any
-from datetime import date
 import logging
+from datetime import date, datetime
+from typing import Any, Dict, List, Optional
 
-from src.models.product import Product, SAMPLE_PRODUCTS
-from src.models.transaction import Transaction, PaymentMethod, create_sample_transaction
-from src.services.payment_service import payment_service
-from src.services.inventory_service import inventory_service
+from fastapi import APIRouter, Body, Depends, HTTPException, Query
+
 from src.accounting.journal_entry import journal_processor
-from src.analytics.event_tracker import event_tracker, EventType, EventSeverity
+from src.analytics.event_tracker import EventSeverity, EventType, event_tracker
 from src.config.settings import settings
+from src.models.product import SAMPLE_PRODUCTS, Product
+from src.models.transaction import PaymentMethod, Transaction, create_sample_transaction
+from src.services.inventory_service import inventory_service
+from src.services.payment_service import payment_service
 
 logger = logging.getLogger(__name__)
 
 router = APIRouter()
 
+
 @router.get("/products", response_model=List[Dict[str, Any]])
 async def get_products(
     category: Optional[str] = Query(None, description="商品カテゴリでフィルタ"),
-    available_only: bool = Query(True, description="利用可能な商品のみ表示")
+    available_only: bool = Query(True, description="利用可能な商品のみ表示"),
 ):
     """商品一覧を取得"""
     try:
@@ -40,6 +42,7 @@ async def get_products(
         logger.error(f"商品一覧取得エラー: {e}")
         raise HTTPException(status_code=500, detail="商品一覧の取得に失敗しました")
 
+
 @router.get("/products/{product_id}", response_model=Dict[str, Any])
 async def get_product(product_id: str):
     """商品詳細を取得"""
@@ -57,13 +60,37 @@ async def get_product(product_id: str):
         logger.error(f"商品詳細取得エラー: {e}")
         raise HTTPException(status_code=500, detail="商品詳細の取得に失敗しました")
 
+
 @router.post("/purchase", response_model=Dict[str, Any])
 async def purchase_product(
-    product_id: str,
-    quantity: int = Query(1, gt=0),
-    payment_method: PaymentMethod = PaymentMethod.CARD
+    product_id: str = Query(..., description="購入する商品ID"),
+    quantity: int = Query(1, gt=0, description="購入数量"),
+    payment_method: PaymentMethod = Query(PaymentMethod.CARD, description="決済方法"),
 ):
-    """商品を購入"""
+    """商品を購入（クエリパラメータ版）"""
+    return await _purchase_product_logic(product_id, quantity, payment_method)
+
+
+@router.post("/payment", response_model=Dict[str, Any])
+async def process_payment(
+    request: Dict[str, Any] = Body(..., description="決済リクエスト"),
+):
+    """商品を購入（JSONボディ版）"""
+    product_ids = request.get("product_ids", [])
+    payment_method = PaymentMethod(request.get("payment_method", "card"))
+    amount = request.get("amount", 0)
+
+    if not product_ids:
+        raise HTTPException(status_code=400, detail="商品IDが指定されていません")
+
+    # 最初の商品で処理（複数商品対応は後で実装）
+    return await _purchase_product_logic(product_ids[0], 1, payment_method)
+
+
+async def _purchase_product_logic(
+    product_id: str, quantity: int, payment_method: PaymentMethod
+) -> Dict[str, Any]:
+    """商品購入の共通処理ロジック"""
     try:
         # 商品情報を取得
         product = None
@@ -85,7 +112,9 @@ async def purchase_product(
         total_amount = product.price * quantity
 
         # 決済処理
-        payment_result = await payment_service.process_payment(total_amount, payment_method)
+        payment_result = await payment_service.process_payment(
+            total_amount, payment_method
+        )
 
         if not payment_result.success:
             # 決済失敗イベントを記録
@@ -94,9 +123,16 @@ async def purchase_product(
                 "vending_api",
                 f"決済失敗: {payment_result.error_message}",
                 EventSeverity.MEDIUM,
-                {"product_id": product_id, "amount": total_amount, "method": payment_method.value}
+                {
+                    "product_id": product_id,
+                    "amount": total_amount,
+                    "method": payment_method.value,
+                },
             )
-            raise HTTPException(status_code=400, detail=f"決済に失敗しました: {payment_result.error_message}")
+            raise HTTPException(
+                status_code=400,
+                detail=f"決済に失敗しました: {payment_result.error_message}",
+            )
 
         # 在庫から商品を排出
         success, message = inventory_service.dispense_product(product_id, quantity)
@@ -112,7 +148,7 @@ async def purchase_product(
             items=[],  # 簡易版のため空
             subtotal=total_amount,
             total_amount=total_amount,
-            payment_details=None  # 実際にはPaymentDetailsオブジェクト
+            payment_details=None,  # 実際にはPaymentDetailsオブジェクト
         )
 
         # 売上仕訳を記録
@@ -129,8 +165,8 @@ async def purchase_product(
                 "product_name": product.name,
                 "quantity": quantity,
                 "amount": total_amount,
-                "payment_id": payment_result.payment_id
-            }
+                "payment_id": payment_result.payment_id,
+            },
         )
 
         return {
@@ -140,7 +176,7 @@ async def purchase_product(
             "total_amount": total_amount,
             "payment_id": payment_result.payment_id,
             "journal_entry_id": journal_entry.entry_id,
-            "message": f"{product.name}を{quantity}個購入しました"
+            "message": f"{product.name}を{quantity}個購入しました",
         }
 
     except HTTPException:
@@ -148,6 +184,7 @@ async def purchase_product(
     except Exception as e:
         logger.error(f"商品購入エラー: {e}")
         raise HTTPException(status_code=500, detail="購入処理に失敗しました")
+
 
 @router.get("/inventory", response_model=Dict[str, Any])
 async def get_inventory_status():
@@ -164,18 +201,19 @@ async def get_inventory_status():
             ],
             "out_of_stock_products": [
                 slot.product_name for slot in inventory_service.get_out_of_stock_slots()
-            ]
+            ],
         }
 
     except Exception as e:
         logger.error(f"在庫状況取得エラー: {e}")
         raise HTTPException(status_code=500, detail="在庫状況の取得に失敗しました")
 
+
 @router.post("/inventory/restock")
 async def restock_inventory(
     product_id: str,
     quantity: int = Query(..., gt=0),
-    slot_id: Optional[str] = Query(None)
+    slot_id: Optional[str] = Query(None),
 ):
     """在庫を補充"""
     try:
@@ -184,7 +222,9 @@ async def restock_inventory(
             success, message = inventory_service.restock_slot(slot_id, quantity)
         else:
             # 商品の全スロットを補充（簡易版）
-            success, message = inventory_service.transfer_to_vending_machine(product_id, quantity)
+            success, message = inventory_service.transfer_to_vending_machine(
+                product_id, quantity
+            )
 
         if not success:
             raise HTTPException(status_code=400, detail=message)
@@ -195,7 +235,7 @@ async def restock_inventory(
             "vending_api",
             f"在庫補充完了: {product_id} x{quantity}",
             EventSeverity.LOW,
-            {"product_id": product_id, "quantity": quantity, "slot_id": slot_id}
+            {"product_id": product_id, "quantity": quantity, "slot_id": slot_id},
         )
 
         return {"message": message, "success": True}
@@ -206,19 +246,17 @@ async def restock_inventory(
         logger.error(f"在庫補充エラー: {e}")
         raise HTTPException(status_code=500, detail="在庫補充に失敗しました")
 
+
 @router.get("/transactions", response_model=List[Dict[str, Any]])
 async def get_transactions(
     start_date: Optional[date] = Query(None),
     end_date: Optional[date] = Query(None),
-    limit: int = Query(50, le=100)
+    limit: int = Query(50, le=100),
 ):
     """取引履歴を取得"""
     try:
         # 簡易的な実装：イベントから取引情報を抽出
-        sales_events = event_tracker.get_events(
-            EventType.SALE,
-            limit=limit
-        )
+        sales_events = event_tracker.get_events(EventType.SALE, limit=limit)
 
         transactions = []
         for event in sales_events:
@@ -227,14 +265,16 @@ async def get_transactions(
             if end_date and event.timestamp.date() > end_date:
                 continue
 
-            transactions.append({
-                "transaction_id": event.data.get("transaction_id", event.event_id),
-                "product_name": event.data.get("product_name", "不明"),
-                "amount": event.data.get("amount", 0),
-                "quantity": event.data.get("quantity", 1),
-                "timestamp": event.timestamp.isoformat(),
-                "status": "completed"
-            })
+            transactions.append(
+                {
+                    "transaction_id": event.data.get("transaction_id", event.event_id),
+                    "product_name": event.data.get("product_name", "不明"),
+                    "amount": event.data.get("amount", 0),
+                    "quantity": event.data.get("quantity", 1),
+                    "timestamp": event.timestamp.isoformat(),
+                    "status": "completed",
+                }
+            )
 
         return transactions
 
@@ -242,10 +282,9 @@ async def get_transactions(
         logger.error(f"取引履歴取得エラー: {e}")
         raise HTTPException(status_code=500, detail="取引履歴の取得に失敗しました")
 
+
 @router.get("/sales/summary", response_model=Dict[str, Any])
-async def get_sales_summary(
-    days: int = Query(7, ge=1, le=90)
-):
+async def get_sales_summary(days: int = Query(7, ge=1, le=90)):
     """売上サマリを取得"""
     try:
         from datetime import datetime, timedelta
@@ -267,12 +306,13 @@ async def get_sales_summary(
             "total_transactions": total_transactions,
             "average_daily_revenue": avg_daily_revenue,
             "daily_breakdown": daily_sales,
-            "generated_at": end_date.isoformat()
+            "generated_at": end_date.isoformat(),
         }
 
     except Exception as e:
         logger.error(f"売上サマリ取得エラー: {e}")
         raise HTTPException(status_code=500, detail="売上サマリの取得に失敗しました")
+
 
 @router.get("/health/vending", response_model=Dict[str, Any])
 async def get_vending_health():
@@ -295,7 +335,7 @@ async def get_vending_health():
             "inventory_health": inventory_health,
             "inventory_summary": inventory_summary.dict(),
             "alert_count": len(inventory_service.get_alerts()),
-            "last_updated": datetime.now().isoformat()
+            "last_updated": datetime.now().isoformat(),
         }
 
     except Exception as e:

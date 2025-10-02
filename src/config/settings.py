@@ -1,8 +1,11 @@
-from pydantic_settings import BaseSettings
-from pydantic import validator
-from typing import Optional, List
-from src.config.security import secure_config
 import os
+from typing import List, Optional
+
+from pydantic import validator
+from pydantic_settings import BaseSettings
+
+from src.config.security import secure_config
+
 
 class VendingMachineSettings(BaseSettings):
     """自動販売機システム設定"""
@@ -26,14 +29,22 @@ class VendingMachineSettings(BaseSettings):
 
     # 許可されたアクション
     allowed_actions: List[str] = [
-        "select_product", "process_payment", "dispense_product",
-        "check_inventory", "generate_report", "customer_service"
+        "select_product",
+        "process_payment",
+        "dispense_product",
+        "check_inventory",
+        "generate_report",
+        "customer_service",
     ]
 
     # 禁止パターン
     forbidden_patterns: List[str] = [
-        "override_safety", "bypass_payment", "unlimited_dispense",
-        "access_admin", "modify_prices", "delete_data"
+        "override_safety",
+        "bypass_payment",
+        "unlimited_dispense",
+        "access_admin",
+        "modify_prices",
+        "delete_data",
     ]
 
     # 学習設定
@@ -45,6 +56,23 @@ class VendingMachineSettings(BaseSettings):
     data_validation_level: str = "strict"
     log_ai_decisions: bool = True
     use_nosql_for_conversations: bool = True
+
+    # Agent目的設定
+    agent_objectives: dict = {
+        "primary": ["収益最適化", "顧客満足度向上"],
+        "optimization_period": {
+            "short_term": "今月売上最大化",
+            "medium_term": "顧客維持率向上",
+            "long_term": "資産価値増加",
+        },
+        "constraints": ["品質保証", "法令遵守", "リスク管理"],
+        "priority_weight": {"short_term": 0.6, "medium_term": 0.3, "long_term": 0.1},
+    }
+
+    # Search Agent設定
+    real_web_search: bool = True  # True: Tavily実検索, False: シミュレーション
+    search_timeout: int = 30  # seconds
+    search_max_retries: int = 3
 
     class Config:
         env_file = ".env"
@@ -70,7 +98,9 @@ class VendingMachineSettings(BaseSettings):
 
     def validate_payment_keys(self):
         """決済APIキーの検証"""
-        if not any([self.stripe_api_key, self.paypal_client_id, self.square_access_token]):
+        if not any(
+            [self.stripe_api_key, self.paypal_client_id, self.square_access_token]
+        ):
             raise ValueError("少なくとも1つの決済APIキーが必要です")
 
     @property
@@ -106,8 +136,15 @@ class VendingMachineSettings(BaseSettings):
         """メンテナンスAPIキー"""
         return os.getenv("MAINTENANCE_API_KEY")
 
+    @property
+    def tavily_api_key(self) -> Optional[str]:
+        """Tavily検索APIキー"""
+        return secure_config.tavily_api_key
+
+
 # グローバル設定インスタンス
 settings = VendingMachineSettings()
+
 
 # 起動時の設定検証
 def validate_startup_settings():
@@ -117,7 +154,9 @@ def validate_startup_settings():
         try:
             secure_config.validate_all_keys()
         except ValueError as e:
-            print(f"警告: 設定検証で一部の問題がありますが、ダミー値で動作を継続します: {e}")
+            print(
+                f"警告: 設定検証で一部の問題がありますが、ダミー値で動作を継続します: {e}"
+            )
 
         # 決済設定の検証（オプション）
         try:

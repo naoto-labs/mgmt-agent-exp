@@ -1,0 +1,1752 @@
+[
+  {
+    "session_id": "test_session_1759291853",
+    "timestamp": "2025-10-01T13:10:53.409245",
+    "agent_name": "src.ai.model_manager",
+    "action": "log",
+    "status": "info",
+    "details": {
+      "level": "INFO",
+      "function": "_initialize_models",
+      "line": 534,
+      "message": "モデル初期化を開始します...",
+      "formatted_message": "2025-10-01 13:10:53,409 - [src.ai.model_manager] - INFO - _initialize_models:534 - モデル初期化を開始します..."
+    }
+  },
+  {
+    "session_id": "test_session_1759291853",
+    "timestamp": "2025-10-01T13:10:53.409245",
+    "agent_name": "src.config.security",
+    "action": "log",
+    "status": "info",
+    "details": {
+      "level": "DEBUG",
+      "function": "azure_openai_key",
+      "line": 59,
+      "message": "Azure OpenAIキーを取得しました（長さ: 84）",
+      "formatted_message": "2025-10-01 13:10:53,409 - [src.config.security] - DEBUG - azure_openai_key:59 - Azure OpenAIキーを取得しました（長さ: 84）"
+    }
+  },
+  {
+    "session_id": "test_session_1759291853",
+    "timestamp": "2025-10-01T13:10:53.409245",
+    "agent_name": "src.ai.model_manager",
+    "action": "log",
+    "status": "info",
+    "details": {
+      "level": "INFO",
+      "function": "_initialize_models",
+      "line": 542,
+      "message": "Azure設定確認: key=True, endpoint=True, deployment=gpt-4o-mini",
+      "formatted_message": "2025-10-01 13:10:53,409 - [src.ai.model_manager] - INFO - _initialize_models:542 - Azure設定確認: key=True, endpoint=True, deployment=gpt-4o-mini"
+    }
+  },
+  {
+    "session_id": "test_session_1759291853",
+    "timestamp": "2025-10-01T13:10:53.409245",
+    "agent_name": "src.ai.model_manager",
+    "action": "log",
+    "status": "info",
+    "details": {
+      "level": "INFO",
+      "function": "_initialize_models",
+      "line": 547,
+      "message": "Azure OpenAIモデルを初期化します...",
+      "formatted_message": "2025-10-01 13:10:53,409 - [src.ai.model_manager] - INFO - _initialize_models:547 - Azure OpenAIモデルを初期化します..."
+    }
+  },
+  {
+    "session_id": "test_session_1759291854",
+    "timestamp": "2025-10-01T13:10:54.257103",
+    "agent_name": "src.ai.model_manager",
+    "action": "log",
+    "status": "info",
+    "details": {
+      "level": "INFO",
+      "function": "_initialize_client",
+      "line": 369,
+      "message": "Azure OpenAIモデル gpt-4o-mini を初期化しました",
+      "formatted_message": "2025-10-01 13:10:54,256 - [src.ai.model_manager] - INFO - _initialize_client:369 - Azure OpenAIモデル gpt-4o-mini を初期化しました"
+    }
+  },
+  {
+    "session_id": "test_session_1759291854",
+    "timestamp": "2025-10-01T13:10:54.258198",
+    "agent_name": "src.ai.model_manager",
+    "action": "log",
+    "status": "info",
+    "details": {
+      "level": "INFO",
+      "function": "_initialize_models",
+      "line": 558,
+      "message": "✅ Azure OpenAIモデルをプライマリとして設定しました（モデル: gpt-4o-mini）",
+      "formatted_message": "2025-10-01 13:10:54,258 - [src.ai.model_manager] - INFO - _initialize_models:558 - ✅ Azure OpenAIモデルをプライマリとして設定しました（モデル: gpt-4o-mini）"
+    }
+  },
+  {
+    "session_id": "test_session_1759291854",
+    "timestamp": "2025-10-01T13:10:54.259628",
+    "agent_name": "src.ai.model_manager",
+    "action": "log",
+    "status": "info",
+    "details": {
+      "level": "INFO",
+      "function": "_initialize_models",
+      "line": 622,
+      "message": "モデルマネージャーを初期化しました。プライマリ: azure_openai, モデル数: 2",
+      "formatted_message": "2025-10-01 13:10:54,258 - [src.ai.model_manager] - INFO - _initialize_models:622 - モデルマネージャーを初期化しました。プライマリ: azure_openai, モデル数: 2"
+    }
+  },
+  {
+    "session_id": "test_session_1759291854",
+    "timestamp": "2025-10-01T13:10:54.270741",
+    "agent_name": "src.services.conversation_service",
+    "action": "log",
+    "status": "info",
+    "details": {
+      "level": "INFO",
+      "function": "_initialize_nosql",
+      "line": 60,
+      "message": "NoSQL（MongoDB）会話ストレージを初期化しました",
+      "formatted_message": "2025-10-01 13:10:54,269 - [src.services.conversation_service] - INFO - _initialize_nosql:60 - NoSQL（MongoDB）会話ストレージを初期化しました"
+    }
+  },
+  {
+    "session_id": "test_session_1759291854",
+    "timestamp": "2025-10-01T13:10:54.284827",
+    "agent_name": "asyncio",
+    "action": "log",
+    "status": "info",
+    "details": {
+      "level": "DEBUG",
+      "function": "__init__",
+      "line": 633,
+      "message": "Using proactor: IocpProactor",
+      "formatted_message": "2025-10-01 13:10:54,283 - [asyncio] - DEBUG - __init__:633 - Using proactor: IocpProactor"
+    }
+  },
+  {
+    "session_id": "test_session_1759291854",
+    "timestamp": "2025-10-01T13:10:54.286834",
+    "agent_name": "agent_activity",
+    "action": "エージェント統合テスト開始",
+    "status": "info",
+    "details": {
+      "level": "INFO",
+      "function": "test_agents",
+      "line": 154,
+      "message": "=== エージェント統合テスト開始 ===",
+      "formatted_message": "2025-10-01 13:10:54,286 - [agent_activity] - INFO - test_agents:154 - === エージェント統合テスト開始 ==="
+    }
+  },
+  {
+    "session_id": "test_session_1759291854",
+    "timestamp": "2025-10-01T13:10:54.293958",
+    "agent_name": "main",
+    "action": "log",
+    "status": "info",
+    "details": {
+      "level": "INFO",
+      "function": "test_agents",
+      "line": 155,
+      "message": "エージェント統合テストを開始します",
+      "formatted_message": "2025-10-01 13:10:54,293 - [__main__] - INFO - test_agents:155 - エージェント統合テストを開始します"
+    }
+  },
+  {
+    "session_id": "test_session_1759291854",
+    "timestamp": "2025-10-01T13:10:54.295962",
+    "agent_name": "agent_activity",
+    "action": "自動販売機エージェントテスト開始",
+    "status": "info",
+    "details": {
+      "level": "INFO",
+      "function": "test_agents",
+      "line": 161,
+      "message": "=== 自動販売機エージェントテスト開始 ===",
+      "formatted_message": "2025-10-01 13:10:54,294 - [agent_activity] - INFO - test_agents:161 - === 自動販売機エージェントテスト開始 ==="
+    }
+  },
+  {
+    "session_id": "test_session_1759291854",
+    "timestamp": "2025-10-01T13:10:54.299010",
+    "agent_name": "main",
+    "action": "log",
+    "status": "info",
+    "details": {
+      "level": "INFO",
+      "function": "test_agents",
+      "line": 162,
+      "message": "自動販売機エージェントのテストを開始します",
+      "formatted_message": "2025-10-01 13:10:54,298 - [__main__] - INFO - test_agents:162 - 自動販売機エージェントのテストを開始します"
+    }
+  },
+  {
+    "session_id": "test_session_1759291854",
+    "timestamp": "2025-10-01T13:10:54.301513",
+    "agent_name": "agent_activity",
+    "action": "運営状況取得開始",
+    "status": "info",
+    "details": {
+      "level": "INFO",
+      "function": "test_agents",
+      "line": 165,
+      "message": "STEP 1-1: 運営状況取得開始",
+      "formatted_message": "2025-10-01 13:10:54,301 - [agent_activity] - INFO - test_agents:165 - STEP 1-1: 運営状況取得開始"
+    }
+  },
+  {
+    "session_id": "test_session_1759291854",
+    "timestamp": "2025-10-01T13:10:54.303518",
+    "agent_name": "agent_activity",
+    "action": "運営状況取得完了 - モード",
+    "status": "info",
+    "details": {
+      "level": "INFO",
+      "function": "test_agents",
+      "line": 167,
+      "message": "STEP 1-2: 運営状況取得完了 - モード: normal",
+      "formatted_message": "2025-10-01 13:10:54,302 - [agent_activity] - INFO - test_agents:167 - STEP 1-2: 運営状況取得完了 - モード: normal"
+    }
+  },
+  {
+    "session_id": "test_session_1759291854",
+    "timestamp": "2025-10-01T13:10:54.305519",
+    "agent_name": "agent_activity",
+    "action": "log",
+    "status": "info",
+    "details": {
+      "level": "INFO",
+      "function": "test_agents",
+      "line": 174,
+      "message": "運営状況詳細: mode=normal, products=3, health=100.0%, alerts=0",
+      "formatted_message": "2025-10-01 13:10:54,305 - [agent_activity] - INFO - test_agents:174 - 運営状況詳細: mode=normal, products=3, health=100.0%, alerts=0"
+    }
+  },
+  {
+    "session_id": "test_session_1759291854",
+    "timestamp": "2025-10-01T13:10:54.306519",
+    "agent_name": "main",
+    "action": "log",
+    "status": "info",
+    "details": {
+      "level": "INFO",
+      "function": "test_agents",
+      "line": 177,
+      "message": "運営状況: normal, 商品数: 3, 健全性: 100.0%",
+      "formatted_message": "2025-10-01 13:10:54,306 - [__main__] - INFO - test_agents:177 - 運営状況: normal, 商品数: 3, 健全性: 100.0%"
+    }
+  },
+  {
+    "session_id": "test_session_1759291854",
+    "timestamp": "2025-10-01T13:10:54.309519",
+    "agent_name": "agent_activity",
+    "action": "自動販売機エージェントテスト成功",
+    "status": "info",
+    "details": {
+      "level": "INFO",
+      "function": "test_agents",
+      "line": 181,
+      "message": "=== 自動販売機エージェントテスト成功 ===",
+      "formatted_message": "2025-10-01 13:10:54,308 - [agent_activity] - INFO - test_agents:181 - === 自動販売機エージェントテスト成功 ==="
+    }
+  },
+  {
+    "session_id": "test_session_1759291854",
+    "timestamp": "2025-10-01T13:10:54.311518",
+    "agent_name": "agent_activity",
+    "action": "調達エージェントテスト開始",
+    "status": "info",
+    "details": {
+      "level": "INFO",
+      "function": "test_agents",
+      "line": 192,
+      "message": "=== 調達エージェントテスト開始 ===",
+      "formatted_message": "2025-10-01 13:10:54,310 - [agent_activity] - INFO - test_agents:192 - === 調達エージェントテスト開始 ==="
+    }
+  },
+  {
+    "session_id": "test_session_1759291854",
+    "timestamp": "2025-10-01T13:10:54.313519",
+    "agent_name": "main",
+    "action": "log",
+    "status": "info",
+    "details": {
+      "level": "INFO",
+      "function": "test_agents",
+      "line": 193,
+      "message": "調達エージェントのテストを開始します",
+      "formatted_message": "2025-10-01 13:10:54,312 - [__main__] - INFO - test_agents:193 - 調達エージェントのテストを開始します"
+    }
+  },
+  {
+    "session_id": "test_session_1759291854",
+    "timestamp": "2025-10-01T13:10:54.314715",
+    "agent_name": "agent_activity",
+    "action": "調達レポート取得開始",
+    "status": "info",
+    "details": {
+      "level": "INFO",
+      "function": "test_agents",
+      "line": 196,
+      "message": "STEP 2-1: 調達レポート取得開始",
+      "formatted_message": "2025-10-01 13:10:54,313 - [agent_activity] - INFO - test_agents:196 - STEP 2-1: 調達レポート取得開始"
+    }
+  },
+  {
+    "session_id": "test_session_1759291854",
+    "timestamp": "2025-10-01T13:10:54.315721",
+    "agent_name": "agent_activity",
+    "action": "調達レポート取得完了",
+    "status": "info",
+    "details": {
+      "level": "INFO",
+      "function": "test_agents",
+      "line": 198,
+      "message": "STEP 2-2: 調達レポート取得完了",
+      "formatted_message": "2025-10-01 13:10:54,314 - [agent_activity] - INFO - test_agents:198 - STEP 2-2: 調達レポート取得完了"
+    }
+  },
+  {
+    "session_id": "test_session_1759291854",
+    "timestamp": "2025-10-01T13:10:54.316727",
+    "agent_name": "main",
+    "action": "log",
+    "status": "info",
+    "details": {
+      "level": "INFO",
+      "function": "test_agents",
+      "line": 199,
+      "message": "調達レポート応答: {'timestamp': datetime.datetime(2025, 10, 1, 13, 10, 54, 314715), 'inventory_status': {'total_products': 3, 'total_slots': 0, 'active_slots': 0, 'out_of_stock_slots': 0, 'low_stock_products': 0, 'healthy_products': 3, 'product_details': [{'product_id': '2912f6f2-99c7-4b04-a8af-2e9a1ba63465', 'product_name': 'コカ・コーラ', 'current_stock': 20, 'max_capacity': 50, 'stock_level': 0.4, 'status': 'healthy'}, {'product_id': '4e87f69c-251a-4f3c-b40b-5257dd4ca995', 'product_name': 'ポテトチップス うすしお味', 'current_stock': 15, 'max_capacity': 50, 'stock_level': 0.3, 'status': 'healthy'}, {'product_id': 'e698a756-d271-4d1e-b9ff-73fa568e76d8', 'product_name': 'カップヌードル', 'current_stock': 10, 'max_capacity': 50, 'stock_level': 0.2, 'status': 'healthy'}]}, 'order_summary': {'active_orders': 0, 'completed_orders': 0, 'total_cost_this_month': 0}, 'alert_summary': {'total_alerts': 0, 'critical_alerts': 0, 'high_alerts': 0, 'recent_alerts': []}, 'recommendations': []}",
+      "formatted_message": "2025-10-01 13:10:54,316 - [__main__] - INFO - test_agents:199 - 調達レポート応答: {'timestamp': datetime.datetime(2025, 10, 1, 13, 10, 54, 314715), 'inventory_status': {'total_products': 3, 'total_slots': 0, 'active_slots': 0, 'out_of_stock_slots': 0, 'low_stock_products': 0, 'healthy_products': 3, 'product_details': [{'product_id': '2912f6f2-99c7-4b04-a8af-2e9a1ba63465', 'product_name': 'コカ・コーラ', 'current_stock': 20, 'max_capacity': 50, 'stock_level': 0.4, 'status': 'healthy'}, {'product_id': '4e87f69c-251a-4f3c-b40b-5257dd4ca995', 'product_name': 'ポテトチップス うすしお味', 'current_stock': 15, 'max_capacity': 50, 'stock_level': 0.3, 'status': 'healthy'}, {'product_id': 'e698a756-d271-4d1e-b9ff-73fa568e76d8', 'product_name': 'カップヌードル', 'current_stock': 10, 'max_capacity': 50, 'stock_level': 0.2, 'status': 'healthy'}]}, 'order_summary': {'active_orders': 0, 'completed_orders': 0, 'total_cost_this_month': 0}, 'alert_summary': {'total_alerts': 0, 'critical_alerts': 0, 'high_alerts': 0, 'recent_alerts': []}, 'recommendations': []}"
+    }
+  },
+  {
+    "session_id": "test_session_1759291854",
+    "timestamp": "2025-10-01T13:10:54.320726",
+    "agent_name": "agent_activity",
+    "action": "log",
+    "status": "info",
+    "details": {
+      "level": "INFO",
+      "function": "test_agents",
+      "line": 212,
+      "message": "調達レポート詳細: 在庫商品数=3, アクティブ発注=0",
+      "formatted_message": "2025-10-01 13:10:54,320 - [agent_activity] - INFO - test_agents:212 - 調達レポート詳細: 在庫商品数=3, アクティブ発注=0"
+    }
+  },
+  {
+    "session_id": "test_session_1759291854",
+    "timestamp": "2025-10-01T13:10:54.322917",
+    "agent_name": "main",
+    "action": "log",
+    "status": "info",
+    "details": {
+      "level": "INFO",
+      "function": "test_agents",
+      "line": 215,
+      "message": "在庫状況: 3商品, アクティブ発注: 0件",
+      "formatted_message": "2025-10-01 13:10:54,322 - [__main__] - INFO - test_agents:215 - 在庫状況: 3商品, アクティブ発注: 0件"
+    }
+  },
+  {
+    "session_id": "test_session_1759291854",
+    "timestamp": "2025-10-01T13:10:54.326918",
+    "agent_name": "agent_activity",
+    "action": "調達エージェントテスト成功",
+    "status": "info",
+    "details": {
+      "level": "INFO",
+      "function": "test_agents",
+      "line": 219,
+      "message": "=== 調達エージェントテスト成功 ===",
+      "formatted_message": "2025-10-01 13:10:54,325 - [agent_activity] - INFO - test_agents:219 - === 調達エージェントテスト成功 ==="
+    }
+  },
+  {
+    "session_id": "test_session_1759291854",
+    "timestamp": "2025-10-01T13:10:54.328918",
+    "agent_name": "agent_activity",
+    "action": "分析エージェントテスト開始",
+    "status": "info",
+    "details": {
+      "level": "INFO",
+      "function": "test_agents",
+      "line": 235,
+      "message": "=== 分析エージェントテスト開始 ===",
+      "formatted_message": "2025-10-01 13:10:54,328 - [agent_activity] - INFO - test_agents:235 - === 分析エージェントテスト開始 ==="
+    }
+  },
+  {
+    "session_id": "test_session_1759291854",
+    "timestamp": "2025-10-01T13:10:54.330049",
+    "agent_name": "main",
+    "action": "log",
+    "status": "info",
+    "details": {
+      "level": "INFO",
+      "function": "test_agents",
+      "line": 236,
+      "message": "分析エージェントのテストを開始します（LLM応答確認重視）",
+      "formatted_message": "2025-10-01 13:10:54,330 - [__main__] - INFO - test_agents:236 - 分析エージェントのテストを開始します（LLM応答確認重視）"
+    }
+  },
+  {
+    "session_id": "test_session_1759291854",
+    "timestamp": "2025-10-01T13:10:54.332389",
+    "agent_name": "agent_activity",
+    "action": "LLM分析実行開始",
+    "status": "info",
+    "details": {
+      "level": "INFO",
+      "function": "test_agents",
+      "line": 239,
+      "message": "STEP 3-1: LLM分析実行開始",
+      "formatted_message": "2025-10-01 13:10:54,332 - [agent_activity] - INFO - test_agents:239 - STEP 3-1: LLM分析実行開始"
+    }
+  },
+  {
+    "session_id": "test_session_1759291854",
+    "timestamp": "2025-10-01T13:10:54.334391",
+    "agent_name": "src.agents.analytics_agent",
+    "action": "log",
+    "status": "info",
+    "details": {
+      "level": "INFO",
+      "function": "analyze_system_events",
+      "line": 286,
+      "message": "システム事象の包括的分析を実行中...",
+      "formatted_message": "2025-10-01 13:10:54,334 - [src.agents.analytics_agent] - INFO - analyze_system_events:286 - システム事象の包括的分析を実行中..."
+    }
+  },
+  {
+    "session_id": "test_session_1759291854",
+    "timestamp": "2025-10-01T13:10:54.600049",
+    "agent_name": "openai._base_client",
+    "action": "log",
+    "status": "info",
+    "details": {
+      "level": "DEBUG",
+      "function": "_build_request",
+      "line": 482,
+      "message": "Request options: {'method': 'post', 'url': '/deployments/gpt-4o-mini/chat/completions', 'headers': {'api-key': '<redacted>'}, 'files': None, 'idempotency_key': 'stainless-python-retry-c0055e20-14e3-45eb-a8cd-21cf0311dc39', 'json_data': {'messages': [{'role': 'system', 'content': 'あなたはビジネスアナリストです。複数のデータソースから統合的な洞察を生成します。'}, {'role': 'user', 'content': '\\n                個別分析の結果から抽出された洞察:\\n                - 売上パターンが時間帯によって明確な違いが見られます\\n- 在庫切れ率は0.0%です\\n- 粗利益率は0.0%です\\n- システム性能スコアは86.8%です\\n- 売上は安定した推移を示しています\\n\\n                上記の洞察を統合し、全体的なビジネス洞察を生成してください。\\n                '}], 'model': 'gpt-4o-mini', 'max_tokens': 200, 'temperature': 0.7}}",
+      "formatted_message": "2025-10-01 13:10:54,600 - [openai._base_client] - DEBUG - _build_request:482 - Request options: {'method': 'post', 'url': '/deployments/gpt-4o-mini/chat/completions', 'headers': {'api-key': '<redacted>'}, 'files': None, 'idempotency_key': 'stainless-python-retry-c0055e20-14e3-45eb-a8cd-21cf0311dc39', 'json_data': {'messages': [{'role': 'system', 'content': 'あなたはビジネスアナリストです。複数のデータソースから統合的な洞察を生成します。'}, {'role': 'user', 'content': '\\n                個別分析の結果から抽出された洞察:\\n                - 売上パターンが時間帯によって明確な違いが見られます\\n- 在庫切れ率は0.0%です\\n- 粗利益率は0.0%です\\n- システム性能スコアは86.8%です\\n- 売上は安定した推移を示しています\\n\\n                上記の洞察を統合し、全体的なビジネス洞察を生成してください。\\n                '}], 'model': 'gpt-4o-mini', 'max_tokens': 200, 'temperature': 0.7}}"
+    }
+  },
+  {
+    "session_id": "test_session_1759291854",
+    "timestamp": "2025-10-01T13:10:54.695152",
+    "agent_name": "openai._base_client",
+    "action": "log",
+    "status": "info",
+    "details": {
+      "level": "DEBUG",
+      "function": "request",
+      "line": 978,
+      "message": "Sending HTTP Request: POST https://sales-poc-rg-aoai-01.openai.azure.com/openai/deployments/gpt-4o-mini/chat/completions?api-version=2024-12-01-preview",
+      "formatted_message": "2025-10-01 13:10:54,695 - [openai._base_client] - DEBUG - request:978 - Sending HTTP Request: POST https://sales-poc-rg-aoai-01.openai.azure.com/openai/deployments/gpt-4o-mini/chat/completions?api-version=2024-12-01-preview"
+    }
+  },
+  {
+    "session_id": "test_session_1759291854",
+    "timestamp": "2025-10-01T13:10:54.699351",
+    "agent_name": "httpcore.connection",
+    "action": "log",
+    "status": "info",
+    "details": {
+      "level": "DEBUG",
+      "function": "trace",
+      "line": 47,
+      "message": "connect_tcp.started host='sales-poc-rg-aoai-01.openai.azure.com' port=443 local_address=None timeout=5.0 socket_options=None",
+      "formatted_message": "2025-10-01 13:10:54,696 - [httpcore.connection] - DEBUG - trace:47 - connect_tcp.started host='sales-poc-rg-aoai-01.openai.azure.com' port=443 local_address=None timeout=5.0 socket_options=None"
+    }
+  },
+  {
+    "session_id": "test_session_1759291855",
+    "timestamp": "2025-10-01T13:10:55.029112",
+    "agent_name": "httpcore.connection",
+    "action": "log",
+    "status": "info",
+    "details": {
+      "level": "DEBUG",
+      "function": "trace",
+      "line": 47,
+      "message": "connect_tcp.complete return_value=<httpcore._backends.sync.SyncStream object at 0x000001E043318F10>",
+      "formatted_message": "2025-10-01 13:10:55,029 - [httpcore.connection] - DEBUG - trace:47 - connect_tcp.complete return_value=<httpcore._backends.sync.SyncStream object at 0x000001E043318F10>"
+    }
+  },
+  {
+    "session_id": "test_session_1759291855",
+    "timestamp": "2025-10-01T13:10:55.032870",
+    "agent_name": "httpcore.connection",
+    "action": "log",
+    "status": "info",
+    "details": {
+      "level": "DEBUG",
+      "function": "trace",
+      "line": 47,
+      "message": "start_tls.started ssl_context=<ssl.SSLContext object at 0x000001E041DC9E20> server_hostname='sales-poc-rg-aoai-01.openai.azure.com' timeout=5.0",
+      "formatted_message": "2025-10-01 13:10:55,032 - [httpcore.connection] - DEBUG - trace:47 - start_tls.started ssl_context=<ssl.SSLContext object at 0x000001E041DC9E20> server_hostname='sales-poc-rg-aoai-01.openai.azure.com' timeout=5.0"
+    }
+  },
+  {
+    "session_id": "test_session_1759291855",
+    "timestamp": "2025-10-01T13:10:55.422100",
+    "agent_name": "httpcore.connection",
+    "action": "log",
+    "status": "info",
+    "details": {
+      "level": "DEBUG",
+      "function": "trace",
+      "line": 47,
+      "message": "start_tls.complete return_value=<httpcore._backends.sync.SyncStream object at 0x000001E043318D10>",
+      "formatted_message": "2025-10-01 13:10:55,422 - [httpcore.connection] - DEBUG - trace:47 - start_tls.complete return_value=<httpcore._backends.sync.SyncStream object at 0x000001E043318D10>"
+    }
+  },
+  {
+    "session_id": "test_session_1759291855",
+    "timestamp": "2025-10-01T13:10:55.424101",
+    "agent_name": "httpcore.http11",
+    "action": "log",
+    "status": "info",
+    "details": {
+      "level": "DEBUG",
+      "function": "trace",
+      "line": 47,
+      "message": "send_request_headers.started request=<Request [b'POST']>",
+      "formatted_message": "2025-10-01 13:10:55,423 - [httpcore.http11] - DEBUG - trace:47 - send_request_headers.started request=<Request [b'POST']>"
+    }
+  },
+  {
+    "session_id": "test_session_1759291855",
+    "timestamp": "2025-10-01T13:10:55.426358",
+    "agent_name": "httpcore.http11",
+    "action": "log",
+    "status": "info",
+    "details": {
+      "level": "DEBUG",
+      "function": "trace",
+      "line": 47,
+      "message": "send_request_headers.complete",
+      "formatted_message": "2025-10-01 13:10:55,425 - [httpcore.http11] - DEBUG - trace:47 - send_request_headers.complete"
+    }
+  },
+  {
+    "session_id": "test_session_1759291855",
+    "timestamp": "2025-10-01T13:10:55.428358",
+    "agent_name": "httpcore.http11",
+    "action": "log",
+    "status": "info",
+    "details": {
+      "level": "DEBUG",
+      "function": "trace",
+      "line": 47,
+      "message": "send_request_body.started request=<Request [b'POST']>",
+      "formatted_message": "2025-10-01 13:10:55,428 - [httpcore.http11] - DEBUG - trace:47 - send_request_body.started request=<Request [b'POST']>"
+    }
+  },
+  {
+    "session_id": "test_session_1759291855",
+    "timestamp": "2025-10-01T13:10:55.432357",
+    "agent_name": "httpcore.http11",
+    "action": "log",
+    "status": "info",
+    "details": {
+      "level": "DEBUG",
+      "function": "trace",
+      "line": 47,
+      "message": "send_request_body.complete",
+      "formatted_message": "2025-10-01 13:10:55,432 - [httpcore.http11] - DEBUG - trace:47 - send_request_body.complete"
+    }
+  },
+  {
+    "session_id": "test_session_1759291855",
+    "timestamp": "2025-10-01T13:10:55.435357",
+    "agent_name": "httpcore.http11",
+    "action": "log",
+    "status": "info",
+    "details": {
+      "level": "DEBUG",
+      "function": "trace",
+      "line": 47,
+      "message": "receive_response_headers.started request=<Request [b'POST']>",
+      "formatted_message": "2025-10-01 13:10:55,435 - [httpcore.http11] - DEBUG - trace:47 - receive_response_headers.started request=<Request [b'POST']>"
+    }
+  },
+  {
+    "session_id": "test_session_1759291857",
+    "timestamp": "2025-10-01T13:10:57.956467",
+    "agent_name": "httpcore.http11",
+    "action": "log",
+    "status": "info",
+    "details": {
+      "level": "DEBUG",
+      "function": "trace",
+      "line": 47,
+      "message": "receive_response_headers.complete return_value=(b'HTTP/1.1', 200, b'OK', [(b'Content-Length', b'1943'), (b'Content-Type', b'application/json'), (b'apim-request-id', b'364b5364-4e8d-44db-834a-66195dbec2f0'), (b'Strict-Transport-Security', b'max-age=31536000; includeSubDomains; preload'), (b'x-content-type-options', b'nosniff'), (b'x-ms-region', b'East US'), (b'x-ratelimit-remaining-requests', b'1999'), (b'x-ratelimit-limit-requests', b'2000'), (b'x-ratelimit-remaining-tokens', b'199936'), (b'x-ratelimit-limit-tokens', b'200000'), (b'azureml-model-session', b'd068-20250922222629'), (b'x-accel-buffering', b'no'), (b'x-ms-rai-invoked', b'true'), (b'x-request-id', b'e922a49d-8d50-42d2-8e79-d67d158a85e5'), (b'x-ms-deployment-name', b'gpt-4o-mini'), (b'Date', b'Wed, 01 Oct 2025 04:10:55 GMT')])",
+      "formatted_message": "2025-10-01 13:10:57,956 - [httpcore.http11] - DEBUG - trace:47 - receive_response_headers.complete return_value=(b'HTTP/1.1', 200, b'OK', [(b'Content-Length', b'1943'), (b'Content-Type', b'application/json'), (b'apim-request-id', b'364b5364-4e8d-44db-834a-66195dbec2f0'), (b'Strict-Transport-Security', b'max-age=31536000; includeSubDomains; preload'), (b'x-content-type-options', b'nosniff'), (b'x-ms-region', b'East US'), (b'x-ratelimit-remaining-requests', b'1999'), (b'x-ratelimit-limit-requests', b'2000'), (b'x-ratelimit-remaining-tokens', b'199936'), (b'x-ratelimit-limit-tokens', b'200000'), (b'azureml-model-session', b'd068-20250922222629'), (b'x-accel-buffering', b'no'), (b'x-ms-rai-invoked', b'true'), (b'x-request-id', b'e922a49d-8d50-42d2-8e79-d67d158a85e5'), (b'x-ms-deployment-name', b'gpt-4o-mini'), (b'Date', b'Wed, 01 Oct 2025 04:10:55 GMT')])"
+    }
+  },
+  {
+    "session_id": "test_session_1759291857",
+    "timestamp": "2025-10-01T13:10:57.968772",
+    "agent_name": "httpx",
+    "action": "log",
+    "status": "info",
+    "details": {
+      "level": "INFO",
+      "function": "_send_single_request",
+      "line": 1025,
+      "message": "HTTP Request: POST https://sales-poc-rg-aoai-01.openai.azure.com/openai/deployments/gpt-4o-mini/chat/completions?api-version=2024-12-01-preview \"HTTP/1.1 200 OK\"",
+      "formatted_message": "2025-10-01 13:10:57,966 - [httpx] - INFO - _send_single_request:1025 - HTTP Request: POST https://sales-poc-rg-aoai-01.openai.azure.com/openai/deployments/gpt-4o-mini/chat/completions?api-version=2024-12-01-preview \"HTTP/1.1 200 OK\""
+    }
+  },
+  {
+    "session_id": "test_session_1759291857",
+    "timestamp": "2025-10-01T13:10:57.978261",
+    "agent_name": "httpcore.http11",
+    "action": "log",
+    "status": "info",
+    "details": {
+      "level": "DEBUG",
+      "function": "trace",
+      "line": 47,
+      "message": "receive_response_body.started request=<Request [b'POST']>",
+      "formatted_message": "2025-10-01 13:10:57,976 - [httpcore.http11] - DEBUG - trace:47 - receive_response_body.started request=<Request [b'POST']>"
+    }
+  },
+  {
+    "session_id": "test_session_1759291857",
+    "timestamp": "2025-10-01T13:10:57.989590",
+    "agent_name": "httpcore.http11",
+    "action": "log",
+    "status": "info",
+    "details": {
+      "level": "DEBUG",
+      "function": "trace",
+      "line": 47,
+      "message": "receive_response_body.complete",
+      "formatted_message": "2025-10-01 13:10:57,988 - [httpcore.http11] - DEBUG - trace:47 - receive_response_body.complete"
+    }
+  },
+  {
+    "session_id": "test_session_1759291857",
+    "timestamp": "2025-10-01T13:10:57.993208",
+    "agent_name": "httpcore.http11",
+    "action": "log",
+    "status": "info",
+    "details": {
+      "level": "DEBUG",
+      "function": "trace",
+      "line": 47,
+      "message": "response_closed.started",
+      "formatted_message": "2025-10-01 13:10:57,993 - [httpcore.http11] - DEBUG - trace:47 - response_closed.started"
+    }
+  },
+  {
+    "session_id": "test_session_1759291857",
+    "timestamp": "2025-10-01T13:10:57.997330",
+    "agent_name": "httpcore.http11",
+    "action": "log",
+    "status": "info",
+    "details": {
+      "level": "DEBUG",
+      "function": "trace",
+      "line": 47,
+      "message": "response_closed.complete",
+      "formatted_message": "2025-10-01 13:10:57,997 - [httpcore.http11] - DEBUG - trace:47 - response_closed.complete"
+    }
+  },
+  {
+    "session_id": "test_session_1759291858",
+    "timestamp": "2025-10-01T13:10:58.002537",
+    "agent_name": "openai._base_client",
+    "action": "log",
+    "status": "info",
+    "details": {
+      "level": "DEBUG",
+      "function": "request",
+      "line": 1016,
+      "message": "HTTP Response: POST https://sales-poc-rg-aoai-01.openai.azure.com/openai/deployments/gpt-4o-mini/chat/completions?api-version=2024-12-01-preview \"200 OK\" Headers({'content-length': '1943', 'content-type': 'application/json', 'apim-request-id': '364b5364-4e8d-44db-834a-66195dbec2f0', 'strict-transport-security': 'max-age=31536000; includeSubDomains; preload', 'x-content-type-options': 'nosniff', 'x-ms-region': 'East US', 'x-ratelimit-remaining-requests': '1999', 'x-ratelimit-limit-requests': '2000', 'x-ratelimit-remaining-tokens': '199936', 'x-ratelimit-limit-tokens': '200000', 'azureml-model-session': 'd068-20250922222629', 'x-accel-buffering': 'no', 'x-ms-rai-invoked': 'true', 'x-request-id': 'e922a49d-8d50-42d2-8e79-d67d158a85e5', 'x-ms-deployment-name': 'gpt-4o-mini', 'date': 'Wed, 01 Oct 2025 04:10:55 GMT'})",
+      "formatted_message": "2025-10-01 13:10:58,001 - [openai._base_client] - DEBUG - request:1016 - HTTP Response: POST https://sales-poc-rg-aoai-01.openai.azure.com/openai/deployments/gpt-4o-mini/chat/completions?api-version=2024-12-01-preview \"200 OK\" Headers({'content-length': '1943', 'content-type': 'application/json', 'apim-request-id': '364b5364-4e8d-44db-834a-66195dbec2f0', 'strict-transport-security': 'max-age=31536000; includeSubDomains; preload', 'x-content-type-options': 'nosniff', 'x-ms-region': 'East US', 'x-ratelimit-remaining-requests': '1999', 'x-ratelimit-limit-requests': '2000', 'x-ratelimit-remaining-tokens': '199936', 'x-ratelimit-limit-tokens': '200000', 'azureml-model-session': 'd068-20250922222629', 'x-accel-buffering': 'no', 'x-ms-rai-invoked': 'true', 'x-request-id': 'e922a49d-8d50-42d2-8e79-d67d158a85e5', 'x-ms-deployment-name': 'gpt-4o-mini', 'date': 'Wed, 01 Oct 2025 04:10:55 GMT'})"
+    }
+  },
+  {
+    "session_id": "test_session_1759291858",
+    "timestamp": "2025-10-01T13:10:58.005535",
+    "agent_name": "openai._base_client",
+    "action": "log",
+    "status": "info",
+    "details": {
+      "level": "DEBUG",
+      "function": "request",
+      "line": 1024,
+      "message": "request_id: e922a49d-8d50-42d2-8e79-d67d158a85e5",
+      "formatted_message": "2025-10-01 13:10:58,004 - [openai._base_client] - DEBUG - request:1024 - request_id: e922a49d-8d50-42d2-8e79-d67d158a85e5"
+    }
+  },
+  {
+    "session_id": "test_session_1759291858",
+    "timestamp": "2025-10-01T13:10:58.021074",
+    "agent_name": "openai._base_client",
+    "action": "log",
+    "status": "info",
+    "details": {
+      "level": "DEBUG",
+      "function": "_build_request",
+      "line": 482,
+      "message": "Request options: {'method': 'post', 'url': '/deployments/gpt-4o-mini/chat/completions', 'headers': {'api-key': '<redacted>'}, 'files': None, 'idempotency_key': 'stainless-python-retry-47c68e7f-3cf1-4e44-b263-14537efb360a', 'json_data': {'messages': [{'role': 'system', 'content': 'あなたはビジネスコンサルタントです。複数の推奨事項から優先順位を決定します。'}, {'role': 'user', 'content': '\\n                個別分析の結果から抽出された推奨事項:\\n                - ピーク時間帯の在庫確保を優先してください\\n- 在庫切れ商品の優先的な補充を検討してください\\n- 利益率向上のため、コスト管理を強化してください\\n- システム性能が良好です。現在の設定を維持してください\\n- 現在のトレンドを維持するための施策を継続してください\\n\\n                上記の推奨事項を優先順位付けし、最も重要なものから順にリストアップしてください。\\n                '}], 'model': 'gpt-4o-mini', 'max_tokens': 250, 'temperature': 0.7}}",
+      "formatted_message": "2025-10-01 13:10:58,020 - [openai._base_client] - DEBUG - _build_request:482 - Request options: {'method': 'post', 'url': '/deployments/gpt-4o-mini/chat/completions', 'headers': {'api-key': '<redacted>'}, 'files': None, 'idempotency_key': 'stainless-python-retry-47c68e7f-3cf1-4e44-b263-14537efb360a', 'json_data': {'messages': [{'role': 'system', 'content': 'あなたはビジネスコンサルタントです。複数の推奨事項から優先順位を決定します。'}, {'role': 'user', 'content': '\\n                個別分析の結果から抽出された推奨事項:\\n                - ピーク時間帯の在庫確保を優先してください\\n- 在庫切れ商品の優先的な補充を検討してください\\n- 利益率向上のため、コスト管理を強化してください\\n- システム性能が良好です。現在の設定を維持してください\\n- 現在のトレンドを維持するための施策を継続してください\\n\\n                上記の推奨事項を優先順位付けし、最も重要なものから順にリストアップしてください。\\n                '}], 'model': 'gpt-4o-mini', 'max_tokens': 250, 'temperature': 0.7}}"
+    }
+  },
+  {
+    "session_id": "test_session_1759291858",
+    "timestamp": "2025-10-01T13:10:58.024293",
+    "agent_name": "openai._base_client",
+    "action": "log",
+    "status": "info",
+    "details": {
+      "level": "DEBUG",
+      "function": "request",
+      "line": 978,
+      "message": "Sending HTTP Request: POST https://sales-poc-rg-aoai-01.openai.azure.com/openai/deployments/gpt-4o-mini/chat/completions?api-version=2024-12-01-preview",
+      "formatted_message": "2025-10-01 13:10:58,023 - [openai._base_client] - DEBUG - request:978 - Sending HTTP Request: POST https://sales-poc-rg-aoai-01.openai.azure.com/openai/deployments/gpt-4o-mini/chat/completions?api-version=2024-12-01-preview"
+    }
+  },
+  {
+    "session_id": "test_session_1759291858",
+    "timestamp": "2025-10-01T13:10:58.028813",
+    "agent_name": "httpcore.http11",
+    "action": "log",
+    "status": "info",
+    "details": {
+      "level": "DEBUG",
+      "function": "trace",
+      "line": 47,
+      "message": "send_request_headers.started request=<Request [b'POST']>",
+      "formatted_message": "2025-10-01 13:10:58,027 - [httpcore.http11] - DEBUG - trace:47 - send_request_headers.started request=<Request [b'POST']>"
+    }
+  },
+  {
+    "session_id": "test_session_1759291858",
+    "timestamp": "2025-10-01T13:10:58.032039",
+    "agent_name": "httpcore.http11",
+    "action": "log",
+    "status": "info",
+    "details": {
+      "level": "DEBUG",
+      "function": "trace",
+      "line": 47,
+      "message": "send_request_headers.complete",
+      "formatted_message": "2025-10-01 13:10:58,032 - [httpcore.http11] - DEBUG - trace:47 - send_request_headers.complete"
+    }
+  },
+  {
+    "session_id": "test_session_1759291858",
+    "timestamp": "2025-10-01T13:10:58.036157",
+    "agent_name": "httpcore.http11",
+    "action": "log",
+    "status": "info",
+    "details": {
+      "level": "DEBUG",
+      "function": "trace",
+      "line": 47,
+      "message": "send_request_body.started request=<Request [b'POST']>",
+      "formatted_message": "2025-10-01 13:10:58,036 - [httpcore.http11] - DEBUG - trace:47 - send_request_body.started request=<Request [b'POST']>"
+    }
+  },
+  {
+    "session_id": "test_session_1759291858",
+    "timestamp": "2025-10-01T13:10:58.042468",
+    "agent_name": "httpcore.http11",
+    "action": "log",
+    "status": "info",
+    "details": {
+      "level": "DEBUG",
+      "function": "trace",
+      "line": 47,
+      "message": "send_request_body.complete",
+      "formatted_message": "2025-10-01 13:10:58,041 - [httpcore.http11] - DEBUG - trace:47 - send_request_body.complete"
+    }
+  },
+  {
+    "session_id": "test_session_1759291858",
+    "timestamp": "2025-10-01T13:10:58.046463",
+    "agent_name": "httpcore.http11",
+    "action": "log",
+    "status": "info",
+    "details": {
+      "level": "DEBUG",
+      "function": "trace",
+      "line": 47,
+      "message": "receive_response_headers.started request=<Request [b'POST']>",
+      "formatted_message": "2025-10-01 13:10:58,045 - [httpcore.http11] - DEBUG - trace:47 - receive_response_headers.started request=<Request [b'POST']>"
+    }
+  },
+  {
+    "session_id": "test_session_1759291861",
+    "timestamp": "2025-10-01T13:11:01.580628",
+    "agent_name": "httpcore.http11",
+    "action": "log",
+    "status": "info",
+    "details": {
+      "level": "DEBUG",
+      "function": "trace",
+      "line": 47,
+      "message": "receive_response_headers.complete return_value=(b'HTTP/1.1', 200, b'OK', [(b'Content-Length', b'2195'), (b'Content-Type', b'application/json'), (b'apim-request-id', b'b17fde1f-2cf7-4205-9861-8751f1de363d'), (b'Strict-Transport-Security', b'max-age=31536000; includeSubDomains; preload'), (b'x-content-type-options', b'nosniff'), (b'x-ms-region', b'East US'), (b'x-ratelimit-remaining-requests', b'1998'), (b'x-ratelimit-limit-requests', b'2000'), (b'x-ratelimit-remaining-tokens', b'199861'), (b'x-ratelimit-limit-tokens', b'200000'), (b'azureml-model-session', b'd068-20250922222629'), (b'x-accel-buffering', b'no'), (b'x-ms-rai-invoked', b'true'), (b'x-request-id', b'66fb2672-5590-43be-b8e6-d4413cc52d3b'), (b'x-ms-deployment-name', b'gpt-4o-mini'), (b'Date', b'Wed, 01 Oct 2025 04:10:59 GMT')])",
+      "formatted_message": "2025-10-01 13:11:01,580 - [httpcore.http11] - DEBUG - trace:47 - receive_response_headers.complete return_value=(b'HTTP/1.1', 200, b'OK', [(b'Content-Length', b'2195'), (b'Content-Type', b'application/json'), (b'apim-request-id', b'b17fde1f-2cf7-4205-9861-8751f1de363d'), (b'Strict-Transport-Security', b'max-age=31536000; includeSubDomains; preload'), (b'x-content-type-options', b'nosniff'), (b'x-ms-region', b'East US'), (b'x-ratelimit-remaining-requests', b'1998'), (b'x-ratelimit-limit-requests', b'2000'), (b'x-ratelimit-remaining-tokens', b'199861'), (b'x-ratelimit-limit-tokens', b'200000'), (b'azureml-model-session', b'd068-20250922222629'), (b'x-accel-buffering', b'no'), (b'x-ms-rai-invoked', b'true'), (b'x-request-id', b'66fb2672-5590-43be-b8e6-d4413cc52d3b'), (b'x-ms-deployment-name', b'gpt-4o-mini'), (b'Date', b'Wed, 01 Oct 2025 04:10:59 GMT')])"
+    }
+  },
+  {
+    "session_id": "test_session_1759291861",
+    "timestamp": "2025-10-01T13:11:01.589388",
+    "agent_name": "httpx",
+    "action": "log",
+    "status": "info",
+    "details": {
+      "level": "INFO",
+      "function": "_send_single_request",
+      "line": 1025,
+      "message": "HTTP Request: POST https://sales-poc-rg-aoai-01.openai.azure.com/openai/deployments/gpt-4o-mini/chat/completions?api-version=2024-12-01-preview \"HTTP/1.1 200 OK\"",
+      "formatted_message": "2025-10-01 13:11:01,585 - [httpx] - INFO - _send_single_request:1025 - HTTP Request: POST https://sales-poc-rg-aoai-01.openai.azure.com/openai/deployments/gpt-4o-mini/chat/completions?api-version=2024-12-01-preview \"HTTP/1.1 200 OK\""
+    }
+  },
+  {
+    "session_id": "test_session_1759291861",
+    "timestamp": "2025-10-01T13:11:01.601771",
+    "agent_name": "httpcore.http11",
+    "action": "log",
+    "status": "info",
+    "details": {
+      "level": "DEBUG",
+      "function": "trace",
+      "line": 47,
+      "message": "receive_response_body.started request=<Request [b'POST']>",
+      "formatted_message": "2025-10-01 13:11:01,601 - [httpcore.http11] - DEBUG - trace:47 - receive_response_body.started request=<Request [b'POST']>"
+    }
+  },
+  {
+    "session_id": "test_session_1759291861",
+    "timestamp": "2025-10-01T13:11:01.610147",
+    "agent_name": "httpcore.http11",
+    "action": "log",
+    "status": "info",
+    "details": {
+      "level": "DEBUG",
+      "function": "trace",
+      "line": 47,
+      "message": "receive_response_body.complete",
+      "formatted_message": "2025-10-01 13:11:01,610 - [httpcore.http11] - DEBUG - trace:47 - receive_response_body.complete"
+    }
+  },
+  {
+    "session_id": "test_session_1759291861",
+    "timestamp": "2025-10-01T13:11:01.617486",
+    "agent_name": "httpcore.http11",
+    "action": "log",
+    "status": "info",
+    "details": {
+      "level": "DEBUG",
+      "function": "trace",
+      "line": 47,
+      "message": "response_closed.started",
+      "formatted_message": "2025-10-01 13:11:01,617 - [httpcore.http11] - DEBUG - trace:47 - response_closed.started"
+    }
+  },
+  {
+    "session_id": "test_session_1759291861",
+    "timestamp": "2025-10-01T13:11:01.625476",
+    "agent_name": "httpcore.http11",
+    "action": "log",
+    "status": "info",
+    "details": {
+      "level": "DEBUG",
+      "function": "trace",
+      "line": 47,
+      "message": "response_closed.complete",
+      "formatted_message": "2025-10-01 13:11:01,624 - [httpcore.http11] - DEBUG - trace:47 - response_closed.complete"
+    }
+  },
+  {
+    "session_id": "test_session_1759291861",
+    "timestamp": "2025-10-01T13:11:01.628590",
+    "agent_name": "openai._base_client",
+    "action": "log",
+    "status": "info",
+    "details": {
+      "level": "DEBUG",
+      "function": "request",
+      "line": 1016,
+      "message": "HTTP Response: POST https://sales-poc-rg-aoai-01.openai.azure.com/openai/deployments/gpt-4o-mini/chat/completions?api-version=2024-12-01-preview \"200 OK\" Headers({'content-length': '2195', 'content-type': 'application/json', 'apim-request-id': 'b17fde1f-2cf7-4205-9861-8751f1de363d', 'strict-transport-security': 'max-age=31536000; includeSubDomains; preload', 'x-content-type-options': 'nosniff', 'x-ms-region': 'East US', 'x-ratelimit-remaining-requests': '1998', 'x-ratelimit-limit-requests': '2000', 'x-ratelimit-remaining-tokens': '199861', 'x-ratelimit-limit-tokens': '200000', 'azureml-model-session': 'd068-20250922222629', 'x-accel-buffering': 'no', 'x-ms-rai-invoked': 'true', 'x-request-id': '66fb2672-5590-43be-b8e6-d4413cc52d3b', 'x-ms-deployment-name': 'gpt-4o-mini', 'date': 'Wed, 01 Oct 2025 04:10:59 GMT'})",
+      "formatted_message": "2025-10-01 13:11:01,627 - [openai._base_client] - DEBUG - request:1016 - HTTP Response: POST https://sales-poc-rg-aoai-01.openai.azure.com/openai/deployments/gpt-4o-mini/chat/completions?api-version=2024-12-01-preview \"200 OK\" Headers({'content-length': '2195', 'content-type': 'application/json', 'apim-request-id': 'b17fde1f-2cf7-4205-9861-8751f1de363d', 'strict-transport-security': 'max-age=31536000; includeSubDomains; preload', 'x-content-type-options': 'nosniff', 'x-ms-region': 'East US', 'x-ratelimit-remaining-requests': '1998', 'x-ratelimit-limit-requests': '2000', 'x-ratelimit-remaining-tokens': '199861', 'x-ratelimit-limit-tokens': '200000', 'azureml-model-session': 'd068-20250922222629', 'x-accel-buffering': 'no', 'x-ms-rai-invoked': 'true', 'x-request-id': '66fb2672-5590-43be-b8e6-d4413cc52d3b', 'x-ms-deployment-name': 'gpt-4o-mini', 'date': 'Wed, 01 Oct 2025 04:10:59 GMT'})"
+    }
+  },
+  {
+    "session_id": "test_session_1759291861",
+    "timestamp": "2025-10-01T13:11:01.633100",
+    "agent_name": "openai._base_client",
+    "action": "log",
+    "status": "info",
+    "details": {
+      "level": "DEBUG",
+      "function": "request",
+      "line": 1024,
+      "message": "request_id: 66fb2672-5590-43be-b8e6-d4413cc52d3b",
+      "formatted_message": "2025-10-01 13:11:01,633 - [openai._base_client] - DEBUG - request:1024 - request_id: 66fb2672-5590-43be-b8e6-d4413cc52d3b"
+    }
+  },
+  {
+    "session_id": "test_session_1759291861",
+    "timestamp": "2025-10-01T13:11:01.635506",
+    "agent_name": "src.agents.analytics_agent",
+    "action": "log",
+    "status": "info",
+    "details": {
+      "level": "INFO",
+      "function": "analyze_system_events",
+      "line": 351,
+      "message": "システム事象の包括的分析完了",
+      "formatted_message": "2025-10-01 13:11:01,635 - [src.agents.analytics_agent] - INFO - analyze_system_events:351 - システム事象の包括的分析完了"
+    }
+  },
+  {
+    "session_id": "test_session_1759291861",
+    "timestamp": "2025-10-01T13:11:01.640638",
+    "agent_name": "agent_activity",
+    "action": "LLM分析実行完了",
+    "status": "info",
+    "details": {
+      "level": "INFO",
+      "function": "test_agents",
+      "line": 242,
+      "message": "STEP 3-2: LLM分析実行完了",
+      "formatted_message": "2025-10-01 13:11:01,640 - [agent_activity] - INFO - test_agents:242 - STEP 3-2: LLM分析実行完了"
+    }
+  },
+  {
+    "session_id": "test_session_1759291861",
+    "timestamp": "2025-10-01T13:11:01.643639",
+    "agent_name": "main",
+    "action": "log",
+    "status": "info",
+    "details": {
+      "level": "INFO",
+      "function": "test_agents",
+      "line": 243,
+      "message": "分析結果全体: {'timestamp': datetime.datetime(2025, 10, 1, 13, 10, 54, 336899), 'period': {'start': datetime.datetime(2025, 9, 24, 13, 10, 54, 336899), 'end': datetime.datetime(2025, 10, 1, 13, 10, 54, 336899)}, 'analyses': {'sales': {'period': {'start': datetime.datetime(2025, 9, 24, 13, 10, 54, 336899), 'end': datetime.datetime(2025, 10, 1, 13, 10, 54, 336899)}, 'metrics': {'total_revenue': 0, 'total_transactions': 0, 'average_transaction_value': 0, 'top_products': [{'product_id': '2912f6f2-99c7-4b04-a8af-2e9a1ba63465', 'product_name': 'コカ・コーラ', 'estimated_units_sold': 6.0, 'estimated_revenue': 900.0}, {'product_id': '4e87f69c-251a-4f3c-b40b-5257dd4ca995', 'product_name': 'ポテトチップス うすしお味', 'estimated_units_sold': 4.5, 'estimated_revenue': 810.0}, {'product_id': 'e698a756-d271-4d1e-b9ff-73fa568e76d8', 'product_name': 'カップヌードル', 'estimated_units_sold': 3.0, 'estimated_revenue': 600.0}], 'hourly_pattern': {'peak_hours': [11, 12, 13, 17, 18, 19], 'slow_hours': [2, 3, 4, 5, 6], 'average_by_hour': {0: 0, 1: 0, 2: 0, 3: 0, 4: 0, 5: 0, 6: 0, 7: 0, 8: 0, 9: 0, 10: 0, 11: 0, 12: 0, 13: 0, 14: 0, 15: 0, 16: 0, 17: 0, 18: 0, 19: 0, 20: 0, 21: 0, 22: 0, 23: 0}}, 'daily_pattern': {}, 'conversion_rate': 0.0, 'customer_retention': 0.0}, 'insights': ['売上パターンが時間帯によって明確な違いが見られます'], 'recommendations': ['ピーク時間帯の在庫確保を優先してください']}, 'inventory': {'period': {'start': datetime.datetime(2025, 9, 24, 13, 10, 54, 336899), 'end': datetime.datetime(2025, 10, 1, 13, 10, 54, 336899)}, 'summary': {'total_products': 3, 'out_of_stock_rate': 0.0, 'average_stock_level': 0.3, 'inventory_value': 9000}, 'product_analysis': [{'product_id': '2912f6f2-99c7-4b04-a8af-2e9a1ba63465', 'product_name': 'コカ・コーラ', 'current_stock': 20, 'stock_level': 0.4, 'status': 'healthy', 'turnover_estimate': 2.5}, {'product_id': '4e87f69c-251a-4f3c-b40b-5257dd4ca995', 'product_name': 'ポテトチップス うすしお味', 'current_stock': 15, 'stock_level': 0.3, 'status': 'healthy', 'turnover_estimate': 2.5}, {'product_id': 'e698a756-d271-4d1e-b9ff-73fa568e76d8', 'product_name': 'カップヌードル', 'current_stock': 10, 'stock_level': 0.2, 'status': 'low', 'turnover_estimate': 2.5}], 'insights': ['在庫切れ率は0.0%です'], 'recommendations': ['在庫切れ商品の優先的な補充を検討してください']}, 'financial': {'period': {'start': datetime.datetime(2025, 9, 24, 13, 10, 54, 336899), 'end': datetime.datetime(2025, 10, 1, 13, 10, 54, 336899)}, 'summary': {'total_revenue': 0, 'total_cost': 0, 'gross_profit': 0, 'gross_margin': 0, 'account_count': 0}, 'insights': ['粗利益率は0.0%です'], 'recommendations': ['利益率向上のため、コスト管理を強化してください']}, 'system': {'period': {'start': datetime.datetime(2025, 9, 24, 13, 10, 54, 336899), 'end': datetime.datetime(2025, 10, 1, 13, 10, 54, 336899)}, 'metrics': {'response_time': 0.3, 'error_rate': 0.005, 'uptime': 0.998, 'throughput': 100, 'memory_usage': 0.6, 'cpu_usage': 0.4}, 'performance_score': 0.8679000000000001, 'status': 'good', 'insights': ['システム性能スコアは86.8%です'], 'recommendations': ['システム性能が良好です。現在の設定を維持してください']}, 'trends': {'period': {'start': datetime.datetime(2025, 9, 24, 13, 10, 54, 336899), 'end': datetime.datetime(2025, 10, 1, 13, 10, 54, 336899)}, 'trends': {'sales_trend': 'stable', 'inventory_trend': 'decreasing', 'profit_trend': 'increasing', 'customer_trend': 'stable', 'growth_rate': 0.05, 'seasonal_patterns': {'peak_season': 'summer', 'slow_season': 'winter'}}, 'insights': ['売上は安定した推移を示しています'], 'recommendations': ['現在のトレンドを維持するための施策を継続してください']}}, 'overall_insights': ['全体的なビジネス洞察:', '現在のデータ分析に基づくと、売上パターンに時間帯による明確な違いが見られることから、特定の時間帯において売上が高まる傾向が確認されています。この情報を活用することで、プロモーションやマーケティング活動をその時間帯に集中させることで、売上の最大化を図ることが可能です。'], 'overall_recommendations': ['推奨事項の優先順位は以下の通りです：', '1. **ピーク時間帯の在庫確保を優先してください**', '- ピーク時間帯に在庫が不足すると、売上機会を逸する可能性が高いため、最優先です。', '2. **在庫切れ商品の優先的な補充を検討してください**']}",
+      "formatted_message": "2025-10-01 13:11:01,642 - [__main__] - INFO - test_agents:243 - 分析結果全体: {'timestamp': datetime.datetime(2025, 10, 1, 13, 10, 54, 336899), 'period': {'start': datetime.datetime(2025, 9, 24, 13, 10, 54, 336899), 'end': datetime.datetime(2025, 10, 1, 13, 10, 54, 336899)}, 'analyses': {'sales': {'period': {'start': datetime.datetime(2025, 9, 24, 13, 10, 54, 336899), 'end': datetime.datetime(2025, 10, 1, 13, 10, 54, 336899)}, 'metrics': {'total_revenue': 0, 'total_transactions': 0, 'average_transaction_value': 0, 'top_products': [{'product_id': '2912f6f2-99c7-4b04-a8af-2e9a1ba63465', 'product_name': 'コカ・コーラ', 'estimated_units_sold': 6.0, 'estimated_revenue': 900.0}, {'product_id': '4e87f69c-251a-4f3c-b40b-5257dd4ca995', 'product_name': 'ポテトチップス うすしお味', 'estimated_units_sold': 4.5, 'estimated_revenue': 810.0}, {'product_id': 'e698a756-d271-4d1e-b9ff-73fa568e76d8', 'product_name': 'カップヌードル', 'estimated_units_sold': 3.0, 'estimated_revenue': 600.0}], 'hourly_pattern': {'peak_hours': [11, 12, 13, 17, 18, 19], 'slow_hours': [2, 3, 4, 5, 6], 'average_by_hour': {0: 0, 1: 0, 2: 0, 3: 0, 4: 0, 5: 0, 6: 0, 7: 0, 8: 0, 9: 0, 10: 0, 11: 0, 12: 0, 13: 0, 14: 0, 15: 0, 16: 0, 17: 0, 18: 0, 19: 0, 20: 0, 21: 0, 22: 0, 23: 0}}, 'daily_pattern': {}, 'conversion_rate': 0.0, 'customer_retention': 0.0}, 'insights': ['売上パターンが時間帯によって明確な違いが見られます'], 'recommendations': ['ピーク時間帯の在庫確保を優先してください']}, 'inventory': {'period': {'start': datetime.datetime(2025, 9, 24, 13, 10, 54, 336899), 'end': datetime.datetime(2025, 10, 1, 13, 10, 54, 336899)}, 'summary': {'total_products': 3, 'out_of_stock_rate': 0.0, 'average_stock_level': 0.3, 'inventory_value': 9000}, 'product_analysis': [{'product_id': '2912f6f2-99c7-4b04-a8af-2e9a1ba63465', 'product_name': 'コカ・コーラ', 'current_stock': 20, 'stock_level': 0.4, 'status': 'healthy', 'turnover_estimate': 2.5}, {'product_id': '4e87f69c-251a-4f3c-b40b-5257dd4ca995', 'product_name': 'ポテトチップス うすしお味', 'current_stock': 15, 'stock_level': 0.3, 'status': 'healthy', 'turnover_estimate': 2.5}, {'product_id': 'e698a756-d271-4d1e-b9ff-73fa568e76d8', 'product_name': 'カップヌードル', 'current_stock': 10, 'stock_level': 0.2, 'status': 'low', 'turnover_estimate': 2.5}], 'insights': ['在庫切れ率は0.0%です'], 'recommendations': ['在庫切れ商品の優先的な補充を検討してください']}, 'financial': {'period': {'start': datetime.datetime(2025, 9, 24, 13, 10, 54, 336899), 'end': datetime.datetime(2025, 10, 1, 13, 10, 54, 336899)}, 'summary': {'total_revenue': 0, 'total_cost': 0, 'gross_profit': 0, 'gross_margin': 0, 'account_count': 0}, 'insights': ['粗利益率は0.0%です'], 'recommendations': ['利益率向上のため、コスト管理を強化してください']}, 'system': {'period': {'start': datetime.datetime(2025, 9, 24, 13, 10, 54, 336899), 'end': datetime.datetime(2025, 10, 1, 13, 10, 54, 336899)}, 'metrics': {'response_time': 0.3, 'error_rate': 0.005, 'uptime': 0.998, 'throughput': 100, 'memory_usage': 0.6, 'cpu_usage': 0.4}, 'performance_score': 0.8679000000000001, 'status': 'good', 'insights': ['システム性能スコアは86.8%です'], 'recommendations': ['システム性能が良好です。現在の設定を維持してください']}, 'trends': {'period': {'start': datetime.datetime(2025, 9, 24, 13, 10, 54, 336899), 'end': datetime.datetime(2025, 10, 1, 13, 10, 54, 336899)}, 'trends': {'sales_trend': 'stable', 'inventory_trend': 'decreasing', 'profit_trend': 'increasing', 'customer_trend': 'stable', 'growth_rate': 0.05, 'seasonal_patterns': {'peak_season': 'summer', 'slow_season': 'winter'}}, 'insights': ['売上は安定した推移を示しています'], 'recommendations': ['現在のトレンドを維持するための施策を継続してください']}}, 'overall_insights': ['全体的なビジネス洞察:', '現在のデータ分析に基づくと、売上パターンに時間帯による明確な違いが見られることから、特定の時間帯において売上が高まる傾向が確認されています。この情報を活用することで、プロモーションやマーケティング活動をその時間帯に集中させることで、売上の最大化を図ることが可能です。'], 'overall_recommendations': ['推奨事項の優先順位は以下の通りです：', '1. **ピーク時間帯の在庫確保を優先してください**', '- ピーク時間帯に在庫が不足すると、売上機会を逸する可能性が高いため、最優先です。', '2. **在庫切れ商品の優先的な補充を検討してください**']}"
+    }
+  },
+  {
+    "session_id": "test_session_1759291861",
+    "timestamp": "2025-10-01T13:11:01.649639",
+    "agent_name": "agent_activity",
+    "action": "log",
+    "status": "info",
+    "details": {
+      "level": "INFO",
+      "function": "test_agents",
+      "line": 260,
+      "message": "分析1 - sales: {'period': {'start': datetime.datetime(2025, 9, 24, 13, 10, 54, 336899), 'end': datetime.datetime(2025, 10, 1, 13, 10, 54, 336899)}, 'metrics': {'total_revenue': 0, 'total_transactions': 0, 'average_transaction_value': 0, 'top_products': [{'product_id': '2912f6f2-99c7-4b04-a8af-2e9a1ba63465', 'product_name': 'コカ・コーラ', 'estimated_units_sold': 6.0, 'estimated_revenue': 900.0}, {'product_id': '4e87f69c-251a-4f3c-b40b-5257dd4ca995', 'product_name': 'ポテトチップス うすしお味', 'estimated_units_sold': 4.5, 'estimated_revenue': 810.0}, {'product_id': 'e698a756-d271-4d1e-b9ff-73fa568e76d8', 'product_name': 'カップヌードル', 'estimated_units_sold': 3.0, 'estimated_revenue': 600.0}], 'hourly_pattern': {'peak_hours': [11, 12, 13, 17, 18, 19], 'slow_hours': [2, 3, 4, 5, 6], 'average_by_hour': {0: 0, 1: 0, 2: 0, 3: 0, 4: 0, 5: 0, 6: 0, 7: 0, 8: 0, 9: 0, 10: 0, 11: 0, 12: 0, 13: 0, 14: 0, 15: 0, 16: 0, 17: 0, 18: 0, 19: 0, 20: 0, 21: 0, 22: 0, 23: 0}}, 'daily_pattern': {}, 'conversion_rate': 0.0, 'customer_retention': 0.0}, 'insights': ['売上パターンが時間帯によって明確な違いが見られます'], 'recommendations': ['ピーク時間帯の在庫確保を優先してください']}",
+      "formatted_message": "2025-10-01 13:11:01,649 - [agent_activity] - INFO - test_agents:260 - 分析1 - sales: {'period': {'start': datetime.datetime(2025, 9, 24, 13, 10, 54, 336899), 'end': datetime.datetime(2025, 10, 1, 13, 10, 54, 336899)}, 'metrics': {'total_revenue': 0, 'total_transactions': 0, 'average_transaction_value': 0, 'top_products': [{'product_id': '2912f6f2-99c7-4b04-a8af-2e9a1ba63465', 'product_name': 'コカ・コーラ', 'estimated_units_sold': 6.0, 'estimated_revenue': 900.0}, {'product_id': '4e87f69c-251a-4f3c-b40b-5257dd4ca995', 'product_name': 'ポテトチップス うすしお味', 'estimated_units_sold': 4.5, 'estimated_revenue': 810.0}, {'product_id': 'e698a756-d271-4d1e-b9ff-73fa568e76d8', 'product_name': 'カップヌードル', 'estimated_units_sold': 3.0, 'estimated_revenue': 600.0}], 'hourly_pattern': {'peak_hours': [11, 12, 13, 17, 18, 19], 'slow_hours': [2, 3, 4, 5, 6], 'average_by_hour': {0: 0, 1: 0, 2: 0, 3: 0, 4: 0, 5: 0, 6: 0, 7: 0, 8: 0, 9: 0, 10: 0, 11: 0, 12: 0, 13: 0, 14: 0, 15: 0, 16: 0, 17: 0, 18: 0, 19: 0, 20: 0, 21: 0, 22: 0, 23: 0}}, 'daily_pattern': {}, 'conversion_rate': 0.0, 'customer_retention': 0.0}, 'insights': ['売上パターンが時間帯によって明確な違いが見られます'], 'recommendations': ['ピーク時間帯の在庫確保を優先してください']}"
+    }
+  },
+  {
+    "session_id": "test_session_1759291861",
+    "timestamp": "2025-10-01T13:11:01.653637",
+    "agent_name": "main",
+    "action": "log",
+    "status": "info",
+    "details": {
+      "level": "INFO",
+      "function": "test_agents",
+      "line": 261,
+      "message": "分析1 - sales: {'period': {'start': datetime.datetime(2025, 9, 24, 13, 10, 54, 336899), 'end': datetime.datetime(2025, 10, 1, 13, 10, 54, 336899)}, 'metrics': {'total_revenue': 0, 'total_transactions': 0, 'average_transaction_value': 0, 'top_products': [{'product_id': '2912f6f2-99c7-4b04-a8af-2e9a1ba63465', 'product_name': 'コカ・コーラ', 'estimated_units_sold': 6.0, 'estimated_revenue': 900.0}, {'product_id': '4e87f69c-251a-4f3c-b40b-5257dd4ca995', 'product_name': 'ポテトチップス うすしお味', 'estimated_units_sold': 4.5, 'estimated_revenue': 810.0}, {'product_id': 'e698a756-d271-4d1e-b9ff-73fa568e76d8', 'product_name': 'カップヌードル', 'estimated_units_sold': 3.0, 'estimated_revenue': 600.0}], 'hourly_pattern': {'peak_hours': [11, 12, 13, 17, 18, 19], 'slow_hours': [2, 3, 4, 5, 6], 'average_by_hour': {0: 0, 1: 0, 2: 0, 3: 0, 4: 0, 5: 0, 6: 0, 7: 0, 8: 0, 9: 0, 10: 0, 11: 0, 12: 0, 13: 0, 14: 0, 15: 0, 16: 0, 17: 0, 18: 0, 19: 0, 20: 0, 21: 0, 22: 0, 23: 0}}, 'daily_pattern': {}, 'conversion_rate': 0.0, 'customer_retention': 0.0}, 'insights': ['売上パターンが時間帯によって明確な違いが見られます'], 'recommendations': ['ピーク時間帯の在庫確保を優先してください']}",
+      "formatted_message": "2025-10-01 13:11:01,653 - [__main__] - INFO - test_agents:261 - 分析1 - sales: {'period': {'start': datetime.datetime(2025, 9, 24, 13, 10, 54, 336899), 'end': datetime.datetime(2025, 10, 1, 13, 10, 54, 336899)}, 'metrics': {'total_revenue': 0, 'total_transactions': 0, 'average_transaction_value': 0, 'top_products': [{'product_id': '2912f6f2-99c7-4b04-a8af-2e9a1ba63465', 'product_name': 'コカ・コーラ', 'estimated_units_sold': 6.0, 'estimated_revenue': 900.0}, {'product_id': '4e87f69c-251a-4f3c-b40b-5257dd4ca995', 'product_name': 'ポテトチップス うすしお味', 'estimated_units_sold': 4.5, 'estimated_revenue': 810.0}, {'product_id': 'e698a756-d271-4d1e-b9ff-73fa568e76d8', 'product_name': 'カップヌードル', 'estimated_units_sold': 3.0, 'estimated_revenue': 600.0}], 'hourly_pattern': {'peak_hours': [11, 12, 13, 17, 18, 19], 'slow_hours': [2, 3, 4, 5, 6], 'average_by_hour': {0: 0, 1: 0, 2: 0, 3: 0, 4: 0, 5: 0, 6: 0, 7: 0, 8: 0, 9: 0, 10: 0, 11: 0, 12: 0, 13: 0, 14: 0, 15: 0, 16: 0, 17: 0, 18: 0, 19: 0, 20: 0, 21: 0, 22: 0, 23: 0}}, 'daily_pattern': {}, 'conversion_rate': 0.0, 'customer_retention': 0.0}, 'insights': ['売上パターンが時間帯によって明確な違いが見られます'], 'recommendations': ['ピーク時間帯の在庫確保を優先してください']}"
+    }
+  },
+  {
+    "session_id": "test_session_1759291861",
+    "timestamp": "2025-10-01T13:11:01.659644",
+    "agent_name": "agent_activity",
+    "action": "log",
+    "status": "info",
+    "details": {
+      "level": "INFO",
+      "function": "test_agents",
+      "line": 260,
+      "message": "分析2 - inventory: {'period': {'start': datetime.datetime(2025, 9, 24, 13, 10, 54, 336899), 'end': datetime.datetime(2025, 10, 1, 13, 10, 54, 336899)}, 'summary': {'total_products': 3, 'out_of_stock_rate': 0.0, 'average_stock_level': 0.3, 'inventory_value': 9000}, 'product_analysis': [{'product_id': '2912f6f2-99c7-4b04-a8af-2e9a1ba63465', 'product_name': 'コカ・コーラ', 'current_stock': 20, 'stock_level': 0.4, 'status': 'healthy', 'turnover_estimate': 2.5}, {'product_id': '4e87f69c-251a-4f3c-b40b-5257dd4ca995', 'product_name': 'ポテトチップス うすしお味', 'current_stock': 15, 'stock_level': 0.3, 'status': 'healthy', 'turnover_estimate': 2.5}, {'product_id': 'e698a756-d271-4d1e-b9ff-73fa568e76d8', 'product_name': 'カップヌードル', 'current_stock': 10, 'stock_level': 0.2, 'status': 'low', 'turnover_estimate': 2.5}], 'insights': ['在庫切れ率は0.0%です'], 'recommendations': ['在庫切れ商品の優先的な補充を検討してください']}",
+      "formatted_message": "2025-10-01 13:11:01,658 - [agent_activity] - INFO - test_agents:260 - 分析2 - inventory: {'period': {'start': datetime.datetime(2025, 9, 24, 13, 10, 54, 336899), 'end': datetime.datetime(2025, 10, 1, 13, 10, 54, 336899)}, 'summary': {'total_products': 3, 'out_of_stock_rate': 0.0, 'average_stock_level': 0.3, 'inventory_value': 9000}, 'product_analysis': [{'product_id': '2912f6f2-99c7-4b04-a8af-2e9a1ba63465', 'product_name': 'コカ・コーラ', 'current_stock': 20, 'stock_level': 0.4, 'status': 'healthy', 'turnover_estimate': 2.5}, {'product_id': '4e87f69c-251a-4f3c-b40b-5257dd4ca995', 'product_name': 'ポテトチップス うすしお味', 'current_stock': 15, 'stock_level': 0.3, 'status': 'healthy', 'turnover_estimate': 2.5}, {'product_id': 'e698a756-d271-4d1e-b9ff-73fa568e76d8', 'product_name': 'カップヌードル', 'current_stock': 10, 'stock_level': 0.2, 'status': 'low', 'turnover_estimate': 2.5}], 'insights': ['在庫切れ率は0.0%です'], 'recommendations': ['在庫切れ商品の優先的な補充を検討してください']}"
+    }
+  },
+  {
+    "session_id": "test_session_1759291861",
+    "timestamp": "2025-10-01T13:11:01.664730",
+    "agent_name": "main",
+    "action": "log",
+    "status": "info",
+    "details": {
+      "level": "INFO",
+      "function": "test_agents",
+      "line": 261,
+      "message": "分析2 - inventory: {'period': {'start': datetime.datetime(2025, 9, 24, 13, 10, 54, 336899), 'end': datetime.datetime(2025, 10, 1, 13, 10, 54, 336899)}, 'summary': {'total_products': 3, 'out_of_stock_rate': 0.0, 'average_stock_level': 0.3, 'inventory_value': 9000}, 'product_analysis': [{'product_id': '2912f6f2-99c7-4b04-a8af-2e9a1ba63465', 'product_name': 'コカ・コーラ', 'current_stock': 20, 'stock_level': 0.4, 'status': 'healthy', 'turnover_estimate': 2.5}, {'product_id': '4e87f69c-251a-4f3c-b40b-5257dd4ca995', 'product_name': 'ポテトチップス うすしお味', 'current_stock': 15, 'stock_level': 0.3, 'status': 'healthy', 'turnover_estimate': 2.5}, {'product_id': 'e698a756-d271-4d1e-b9ff-73fa568e76d8', 'product_name': 'カップヌードル', 'current_stock': 10, 'stock_level': 0.2, 'status': 'low', 'turnover_estimate': 2.5}], 'insights': ['在庫切れ率は0.0%です'], 'recommendations': ['在庫切れ商品の優先的な補充を検討してください']}",
+      "formatted_message": "2025-10-01 13:11:01,663 - [__main__] - INFO - test_agents:261 - 分析2 - inventory: {'period': {'start': datetime.datetime(2025, 9, 24, 13, 10, 54, 336899), 'end': datetime.datetime(2025, 10, 1, 13, 10, 54, 336899)}, 'summary': {'total_products': 3, 'out_of_stock_rate': 0.0, 'average_stock_level': 0.3, 'inventory_value': 9000}, 'product_analysis': [{'product_id': '2912f6f2-99c7-4b04-a8af-2e9a1ba63465', 'product_name': 'コカ・コーラ', 'current_stock': 20, 'stock_level': 0.4, 'status': 'healthy', 'turnover_estimate': 2.5}, {'product_id': '4e87f69c-251a-4f3c-b40b-5257dd4ca995', 'product_name': 'ポテトチップス うすしお味', 'current_stock': 15, 'stock_level': 0.3, 'status': 'healthy', 'turnover_estimate': 2.5}, {'product_id': 'e698a756-d271-4d1e-b9ff-73fa568e76d8', 'product_name': 'カップヌードル', 'current_stock': 10, 'stock_level': 0.2, 'status': 'low', 'turnover_estimate': 2.5}], 'insights': ['在庫切れ率は0.0%です'], 'recommendations': ['在庫切れ商品の優先的な補充を検討してください']}"
+    }
+  },
+  {
+    "session_id": "test_session_1759291861",
+    "timestamp": "2025-10-01T13:11:01.669730",
+    "agent_name": "agent_activity",
+    "action": "log",
+    "status": "info",
+    "details": {
+      "level": "INFO",
+      "function": "test_agents",
+      "line": 260,
+      "message": "分析3 - financial: {'period': {'start': datetime.datetime(2025, 9, 24, 13, 10, 54, 336899), 'end': datetime.datetime(2025, 10, 1, 13, 10, 54, 336899)}, 'summary': {'total_revenue': 0, 'total_cost': 0, 'gross_profit': 0, 'gross_margin': 0, 'account_count': 0}, 'insights': ['粗利益率は0.0%です'], 'recommendations': ['利益率向上のため、コスト管理を強化してください']}",
+      "formatted_message": "2025-10-01 13:11:01,669 - [agent_activity] - INFO - test_agents:260 - 分析3 - financial: {'period': {'start': datetime.datetime(2025, 9, 24, 13, 10, 54, 336899), 'end': datetime.datetime(2025, 10, 1, 13, 10, 54, 336899)}, 'summary': {'total_revenue': 0, 'total_cost': 0, 'gross_profit': 0, 'gross_margin': 0, 'account_count': 0}, 'insights': ['粗利益率は0.0%です'], 'recommendations': ['利益率向上のため、コスト管理を強化してください']}"
+    }
+  },
+  {
+    "session_id": "test_session_1759291861",
+    "timestamp": "2025-10-01T13:11:01.675238",
+    "agent_name": "main",
+    "action": "log",
+    "status": "info",
+    "details": {
+      "level": "INFO",
+      "function": "test_agents",
+      "line": 261,
+      "message": "分析3 - financial: {'period': {'start': datetime.datetime(2025, 9, 24, 13, 10, 54, 336899), 'end': datetime.datetime(2025, 10, 1, 13, 10, 54, 336899)}, 'summary': {'total_revenue': 0, 'total_cost': 0, 'gross_profit': 0, 'gross_margin': 0, 'account_count': 0}, 'insights': ['粗利益率は0.0%です'], 'recommendations': ['利益率向上のため、コスト管理を強化してください']}",
+      "formatted_message": "2025-10-01 13:11:01,674 - [__main__] - INFO - test_agents:261 - 分析3 - financial: {'period': {'start': datetime.datetime(2025, 9, 24, 13, 10, 54, 336899), 'end': datetime.datetime(2025, 10, 1, 13, 10, 54, 336899)}, 'summary': {'total_revenue': 0, 'total_cost': 0, 'gross_profit': 0, 'gross_margin': 0, 'account_count': 0}, 'insights': ['粗利益率は0.0%です'], 'recommendations': ['利益率向上のため、コスト管理を強化してください']}"
+    }
+  },
+  {
+    "session_id": "test_session_1759291861",
+    "timestamp": "2025-10-01T13:11:01.679238",
+    "agent_name": "agent_activity",
+    "action": "log",
+    "status": "info",
+    "details": {
+      "level": "INFO",
+      "function": "test_agents",
+      "line": 260,
+      "message": "分析4 - system: {'period': {'start': datetime.datetime(2025, 9, 24, 13, 10, 54, 336899), 'end': datetime.datetime(2025, 10, 1, 13, 10, 54, 336899)}, 'metrics': {'response_time': 0.3, 'error_rate': 0.005, 'uptime': 0.998, 'throughput': 100, 'memory_usage': 0.6, 'cpu_usage': 0.4}, 'performance_score': 0.8679000000000001, 'status': 'good', 'insights': ['システム性能スコアは86.8%です'], 'recommendations': ['システム性能が良好です。現在の設定を維持してください']}",
+      "formatted_message": "2025-10-01 13:11:01,679 - [agent_activity] - INFO - test_agents:260 - 分析4 - system: {'period': {'start': datetime.datetime(2025, 9, 24, 13, 10, 54, 336899), 'end': datetime.datetime(2025, 10, 1, 13, 10, 54, 336899)}, 'metrics': {'response_time': 0.3, 'error_rate': 0.005, 'uptime': 0.998, 'throughput': 100, 'memory_usage': 0.6, 'cpu_usage': 0.4}, 'performance_score': 0.8679000000000001, 'status': 'good', 'insights': ['システム性能スコアは86.8%です'], 'recommendations': ['システム性能が良好です。現在の設定を維持してください']}"
+    }
+  },
+  {
+    "session_id": "test_session_1759291861",
+    "timestamp": "2025-10-01T13:11:01.685382",
+    "agent_name": "main",
+    "action": "log",
+    "status": "info",
+    "details": {
+      "level": "INFO",
+      "function": "test_agents",
+      "line": 261,
+      "message": "分析4 - system: {'period': {'start': datetime.datetime(2025, 9, 24, 13, 10, 54, 336899), 'end': datetime.datetime(2025, 10, 1, 13, 10, 54, 336899)}, 'metrics': {'response_time': 0.3, 'error_rate': 0.005, 'uptime': 0.998, 'throughput': 100, 'memory_usage': 0.6, 'cpu_usage': 0.4}, 'performance_score': 0.8679000000000001, 'status': 'good', 'insights': ['システム性能スコアは86.8%です'], 'recommendations': ['システム性能が良好です。現在の設定を維持してください']}",
+      "formatted_message": "2025-10-01 13:11:01,685 - [__main__] - INFO - test_agents:261 - 分析4 - system: {'period': {'start': datetime.datetime(2025, 9, 24, 13, 10, 54, 336899), 'end': datetime.datetime(2025, 10, 1, 13, 10, 54, 336899)}, 'metrics': {'response_time': 0.3, 'error_rate': 0.005, 'uptime': 0.998, 'throughput': 100, 'memory_usage': 0.6, 'cpu_usage': 0.4}, 'performance_score': 0.8679000000000001, 'status': 'good', 'insights': ['システム性能スコアは86.8%です'], 'recommendations': ['システム性能が良好です。現在の設定を維持してください']}"
+    }
+  },
+  {
+    "session_id": "test_session_1759291861",
+    "timestamp": "2025-10-01T13:11:01.687478",
+    "agent_name": "agent_activity",
+    "action": "log",
+    "status": "info",
+    "details": {
+      "level": "INFO",
+      "function": "test_agents",
+      "line": 260,
+      "message": "分析5 - trends: {'period': {'start': datetime.datetime(2025, 9, 24, 13, 10, 54, 336899), 'end': datetime.datetime(2025, 10, 1, 13, 10, 54, 336899)}, 'trends': {'sales_trend': 'stable', 'inventory_trend': 'decreasing', 'profit_trend': 'increasing', 'customer_trend': 'stable', 'growth_rate': 0.05, 'seasonal_patterns': {'peak_season': 'summer', 'slow_season': 'winter'}}, 'insights': ['売上は安定した推移を示しています'], 'recommendations': ['現在のトレンドを維持するための施策を継続してください']}",
+      "formatted_message": "2025-10-01 13:11:01,687 - [agent_activity] - INFO - test_agents:260 - 分析5 - trends: {'period': {'start': datetime.datetime(2025, 9, 24, 13, 10, 54, 336899), 'end': datetime.datetime(2025, 10, 1, 13, 10, 54, 336899)}, 'trends': {'sales_trend': 'stable', 'inventory_trend': 'decreasing', 'profit_trend': 'increasing', 'customer_trend': 'stable', 'growth_rate': 0.05, 'seasonal_patterns': {'peak_season': 'summer', 'slow_season': 'winter'}}, 'insights': ['売上は安定した推移を示しています'], 'recommendations': ['現在のトレンドを維持するための施策を継続してください']}"
+    }
+  },
+  {
+    "session_id": "test_session_1759291861",
+    "timestamp": "2025-10-01T13:11:01.691478",
+    "agent_name": "main",
+    "action": "log",
+    "status": "info",
+    "details": {
+      "level": "INFO",
+      "function": "test_agents",
+      "line": 261,
+      "message": "分析5 - trends: {'period': {'start': datetime.datetime(2025, 9, 24, 13, 10, 54, 336899), 'end': datetime.datetime(2025, 10, 1, 13, 10, 54, 336899)}, 'trends': {'sales_trend': 'stable', 'inventory_trend': 'decreasing', 'profit_trend': 'increasing', 'customer_trend': 'stable', 'growth_rate': 0.05, 'seasonal_patterns': {'peak_season': 'summer', 'slow_season': 'winter'}}, 'insights': ['売上は安定した推移を示しています'], 'recommendations': ['現在のトレンドを維持するための施策を継続してください']}",
+      "formatted_message": "2025-10-01 13:11:01,691 - [__main__] - INFO - test_agents:261 - 分析5 - trends: {'period': {'start': datetime.datetime(2025, 9, 24, 13, 10, 54, 336899), 'end': datetime.datetime(2025, 10, 1, 13, 10, 54, 336899)}, 'trends': {'sales_trend': 'stable', 'inventory_trend': 'decreasing', 'profit_trend': 'increasing', 'customer_trend': 'stable', 'growth_rate': 0.05, 'seasonal_patterns': {'peak_season': 'summer', 'slow_season': 'winter'}}, 'insights': ['売上は安定した推移を示しています'], 'recommendations': ['現在のトレンドを維持するための施策を継続してください']}"
+    }
+  },
+  {
+    "session_id": "test_session_1759291861",
+    "timestamp": "2025-10-01T13:11:01.696478",
+    "agent_name": "agent_activity",
+    "action": "log",
+    "status": "info",
+    "details": {
+      "level": "INFO",
+      "function": "test_agents",
+      "line": 269,
+      "message": "洞察1: 全体的なビジネス洞察:",
+      "formatted_message": "2025-10-01 13:11:01,696 - [agent_activity] - INFO - test_agents:269 - 洞察1: 全体的なビジネス洞察:"
+    }
+  },
+  {
+    "session_id": "test_session_1759291861",
+    "timestamp": "2025-10-01T13:11:01.700478",
+    "agent_name": "main",
+    "action": "log",
+    "status": "info",
+    "details": {
+      "level": "INFO",
+      "function": "test_agents",
+      "line": 270,
+      "message": "洞察1: 全体的なビジネス洞察:",
+      "formatted_message": "2025-10-01 13:11:01,700 - [__main__] - INFO - test_agents:270 - 洞察1: 全体的なビジネス洞察:"
+    }
+  },
+  {
+    "session_id": "test_session_1759291861",
+    "timestamp": "2025-10-01T13:11:01.705563",
+    "agent_name": "agent_activity",
+    "action": "log",
+    "status": "info",
+    "details": {
+      "level": "INFO",
+      "function": "test_agents",
+      "line": 269,
+      "message": "洞察2: 現在のデータ分析に基づくと、売上パターンに時間帯による明確な違いが見られることから、特定の時間帯において売上が高まる傾向が確認されています。この情報を活用することで、プロモーションやマーケティング活動をその時間帯に集中させることで、売上の最大化を図ることが可能です。",
+      "formatted_message": "2025-10-01 13:11:01,705 - [agent_activity] - INFO - test_agents:269 - 洞察2: 現在のデータ分析に基づくと、売上パターンに時間帯による明確な違いが見られることから、特定の時間帯において売上が高まる傾向が確認されています。この情報を活用することで、プロモーションやマーケティング活動をその時間帯に集中させることで、売上の最大化を図ることが可能です。"
+    }
+  },
+  {
+    "session_id": "test_session_1759291861",
+    "timestamp": "2025-10-01T13:11:01.708554",
+    "agent_name": "main",
+    "action": "log",
+    "status": "info",
+    "details": {
+      "level": "INFO",
+      "function": "test_agents",
+      "line": 270,
+      "message": "洞察2: 現在のデータ分析に基づくと、売上パターンに時間帯による明確な違いが見られることから、特定の時間帯において売上が高まる傾向が確認されています。この情報を活用することで、プロモーションやマーケティング活動をその時間帯に集中させることで、売上の最大化を図ることが可能です。",
+      "formatted_message": "2025-10-01 13:11:01,708 - [__main__] - INFO - test_agents:270 - 洞察2: 現在のデータ分析に基づくと、売上パターンに時間帯による明確な違いが見られることから、特定の時間帯において売上が高まる傾向が確認されています。この情報を活用することで、プロモーションやマーケティング活動をその時間帯に集中させることで、売上の最大化を図ることが可能です。"
+    }
+  },
+  {
+    "session_id": "test_session_1759291861",
+    "timestamp": "2025-10-01T13:11:01.711634",
+    "agent_name": "agent_activity",
+    "action": "log",
+    "status": "info",
+    "details": {
+      "level": "INFO",
+      "function": "test_agents",
+      "line": 280,
+      "message": "LLM応答チェック結果: False",
+      "formatted_message": "2025-10-01 13:11:01,711 - [agent_activity] - INFO - test_agents:280 - LLM応答チェック結果: False"
+    }
+  },
+  {
+    "session_id": "test_session_1759291861",
+    "timestamp": "2025-10-01T13:11:01.714634",
+    "agent_name": "main",
+    "action": "log",
+    "status": "info",
+    "details": {
+      "level": "INFO",
+      "function": "test_agents",
+      "line": 281,
+      "message": "LLM応答を含むか: False",
+      "formatted_message": "2025-10-01 13:11:01,714 - [__main__] - INFO - test_agents:281 - LLM応答を含むか: False"
+    }
+  },
+  {
+    "session_id": "test_session_1759291861",
+    "timestamp": "2025-10-01T13:11:01.717776",
+    "agent_name": "agent_activity",
+    "action": "分析エージェントテスト成功",
+    "status": "info",
+    "details": {
+      "level": "INFO",
+      "function": "test_agents",
+      "line": 283,
+      "message": "=== 分析エージェントテスト成功 ===",
+      "formatted_message": "2025-10-01 13:11:01,717 - [agent_activity] - INFO - test_agents:283 - === 分析エージェントテスト成功 ==="
+    }
+  },
+  {
+    "session_id": "test_session_1759291861",
+    "timestamp": "2025-10-01T13:11:01.719776",
+    "agent_name": "agent_activity",
+    "action": "エージェント連携テスト開始",
+    "status": "info",
+    "details": {
+      "level": "INFO",
+      "function": "test_agents",
+      "line": 301,
+      "message": "=== エージェント連携テスト開始 ===",
+      "formatted_message": "2025-10-01 13:11:01,719 - [agent_activity] - INFO - test_agents:301 - === エージェント連携テスト開始 ==="
+    }
+  },
+  {
+    "session_id": "test_session_1759291861",
+    "timestamp": "2025-10-01T13:11:01.722775",
+    "agent_name": "main",
+    "action": "log",
+    "status": "info",
+    "details": {
+      "level": "INFO",
+      "function": "test_agents",
+      "line": 302,
+      "message": "エージェント連携テストを開始します（LLM応答確認重視）",
+      "formatted_message": "2025-10-01 13:11:01,722 - [__main__] - INFO - test_agents:302 - エージェント連携テストを開始します（LLM応答確認重視）"
+    }
+  },
+  {
+    "session_id": "test_session_1759291861",
+    "timestamp": "2025-10-01T13:11:01.724775",
+    "agent_name": "agent_activity",
+    "action": "在庫補充計画作成開始",
+    "status": "info",
+    "details": {
+      "level": "INFO",
+      "function": "test_agents",
+      "line": 306,
+      "message": "STEP 4-1: 在庫補充計画作成開始",
+      "formatted_message": "2025-10-01 13:11:01,724 - [agent_activity] - INFO - test_agents:306 - STEP 4-1: 在庫補充計画作成開始"
+    }
+  },
+  {
+    "session_id": "test_session_1759291861",
+    "timestamp": "2025-10-01T13:11:01.732775",
+    "agent_name": "src.agents.procurement_agent",
+    "action": "log",
+    "status": "info",
+    "details": {
+      "level": "INFO",
+      "function": "monitor_inventory_and_procure",
+      "line": 401,
+      "message": "在庫監視と自動調達を実行中...",
+      "formatted_message": "2025-10-01 13:11:01,732 - [src.agents.procurement_agent] - INFO - monitor_inventory_and_procure:401 - 在庫監視と自動調達を実行中..."
+    }
+  },
+  {
+    "session_id": "test_session_1759291861",
+    "timestamp": "2025-10-01T13:11:01.743106",
+    "agent_name": "agent_activity",
+    "action": "在庫補充計画作成完了",
+    "status": "info",
+    "details": {
+      "level": "INFO",
+      "function": "test_agents",
+      "line": 309,
+      "message": "STEP 4-2: 在庫補充計画作成完了",
+      "formatted_message": "2025-10-01 13:11:01,742 - [agent_activity] - INFO - test_agents:309 - STEP 4-2: 在庫補充計画作成完了"
+    }
+  },
+  {
+    "session_id": "test_session_1759291861",
+    "timestamp": "2025-10-01T13:11:01.750106",
+    "agent_name": "main",
+    "action": "log",
+    "status": "info",
+    "details": {
+      "level": "INFO",
+      "function": "test_agents",
+      "line": 310,
+      "message": "在庫補充結果: {'success': True, 'message': '調達が必要な商品はありません', 'procurement_results': {'inventory_status': {'total_products': 3, 'total_slots': 0, 'active_slots': 0, 'out_of_stock_slots': 0, 'low_stock_products': 0, 'healthy_products': 3, 'product_details': [{'product_id': '2912f6f2-99c7-4b04-a8af-2e9a1ba63465', 'product_name': 'コカ・コーラ', 'current_stock': 20, 'max_capacity': 50, 'stock_level': 0.4, 'status': 'healthy'}, {'product_id': '4e87f69c-251a-4f3c-b40b-5257dd4ca995', 'product_name': 'ポテトチップス うすしお味', 'current_stock': 15, 'max_capacity': 50, 'stock_level': 0.3, 'status': 'healthy'}, {'product_id': 'e698a756-d271-4d1e-b9ff-73fa568e76d8', 'product_name': 'カップヌードル', 'current_stock': 10, 'max_capacity': 50, 'stock_level': 0.2, 'status': 'healthy'}]}, 'procurement_actions': [], 'cost_analysis': {}, 'recommendations': []}}",
+      "formatted_message": "2025-10-01 13:11:01,750 - [__main__] - INFO - test_agents:310 - 在庫補充結果: {'success': True, 'message': '調達が必要な商品はありません', 'procurement_results': {'inventory_status': {'total_products': 3, 'total_slots': 0, 'active_slots': 0, 'out_of_stock_slots': 0, 'low_stock_products': 0, 'healthy_products': 3, 'product_details': [{'product_id': '2912f6f2-99c7-4b04-a8af-2e9a1ba63465', 'product_name': 'コカ・コーラ', 'current_stock': 20, 'max_capacity': 50, 'stock_level': 0.4, 'status': 'healthy'}, {'product_id': '4e87f69c-251a-4f3c-b40b-5257dd4ca995', 'product_name': 'ポテトチップス うすしお味', 'current_stock': 15, 'max_capacity': 50, 'stock_level': 0.3, 'status': 'healthy'}, {'product_id': 'e698a756-d271-4d1e-b9ff-73fa568e76d8', 'product_name': 'カップヌードル', 'current_stock': 10, 'max_capacity': 50, 'stock_level': 0.2, 'status': 'healthy'}]}, 'procurement_actions': [], 'cost_analysis': {}, 'recommendations': []}}"
+    }
+  },
+  {
+    "session_id": "test_session_1759291861",
+    "timestamp": "2025-10-01T13:11:01.755218",
+    "agent_name": "agent_activity",
+    "action": "価格最適化実行開始",
+    "status": "info",
+    "details": {
+      "level": "INFO",
+      "function": "test_agents",
+      "line": 328,
+      "message": "STEP 4-3: 価格最適化実行開始",
+      "formatted_message": "2025-10-01 13:11:01,754 - [agent_activity] - INFO - test_agents:328 - STEP 4-3: 価格最適化実行開始"
+    }
+  },
+  {
+    "session_id": "test_session_1759291861",
+    "timestamp": "2025-10-01T13:11:01.759217",
+    "agent_name": "src.agents.vending_agent",
+    "action": "log",
+    "status": "info",
+    "details": {
+      "level": "INFO",
+      "function": "optimize_pricing",
+      "line": 644,
+      "message": "価格最適化を実行中...",
+      "formatted_message": "2025-10-01 13:11:01,759 - [src.agents.vending_agent] - INFO - optimize_pricing:644 - 価格最適化を実行中..."
+    }
+  },
+  {
+    "session_id": "test_session_1759291861",
+    "timestamp": "2025-10-01T13:11:01.762221",
+    "agent_name": "openai._base_client",
+    "action": "log",
+    "status": "info",
+    "details": {
+      "level": "DEBUG",
+      "function": "_build_request",
+      "line": 482,
+      "message": "Request options: {'method': 'post', 'url': '/deployments/gpt-4o-mini/chat/completions', 'headers': {'api-key': '<redacted>'}, 'files': None, 'idempotency_key': 'stainless-python-retry-192e97d3-7cc3-4002-9772-7170fa13001d', 'json_data': {'messages': [{'role': 'system', 'content': 'あなたは価格戦略の専門家です。データに基づいた最適な価格戦略を提案します。'}, {'role': 'user', 'content': '\\n            価格調整候補:\\n            - ポテトチップス うすしお味: 現在180.0円 → 最適170円 (-5.6%)\\n- カップヌードル: 現在200.0円 → 最適220円 (+10.0%)\\n\\n            上記の価格調整候補に基づいて、全体的な価格戦略を提案してください。\\n            以下のポイントを考慮：\\n            1. 顧客満足度への影響\\n            2. 売上・利益への影響\\n            3. 競合他社との関係\\n            4. 実施タイミングと段階的アプローチ\\n            '}], 'model': 'gpt-4o-mini', 'max_tokens': 300, 'temperature': 0.7}}",
+      "formatted_message": "2025-10-01 13:11:01,762 - [openai._base_client] - DEBUG - _build_request:482 - Request options: {'method': 'post', 'url': '/deployments/gpt-4o-mini/chat/completions', 'headers': {'api-key': '<redacted>'}, 'files': None, 'idempotency_key': 'stainless-python-retry-192e97d3-7cc3-4002-9772-7170fa13001d', 'json_data': {'messages': [{'role': 'system', 'content': 'あなたは価格戦略の専門家です。データに基づいた最適な価格戦略を提案します。'}, {'role': 'user', 'content': '\\n            価格調整候補:\\n            - ポテトチップス うすしお味: 現在180.0円 → 最適170円 (-5.6%)\\n- カップヌードル: 現在200.0円 → 最適220円 (+10.0%)\\n\\n            上記の価格調整候補に基づいて、全体的な価格戦略を提案してください。\\n            以下のポイントを考慮：\\n            1. 顧客満足度への影響\\n            2. 売上・利益への影響\\n            3. 競合他社との関係\\n            4. 実施タイミングと段階的アプローチ\\n            '}], 'model': 'gpt-4o-mini', 'max_tokens': 300, 'temperature': 0.7}}"
+    }
+  },
+  {
+    "session_id": "test_session_1759291861",
+    "timestamp": "2025-10-01T13:11:01.771375",
+    "agent_name": "openai._base_client",
+    "action": "log",
+    "status": "info",
+    "details": {
+      "level": "DEBUG",
+      "function": "request",
+      "line": 978,
+      "message": "Sending HTTP Request: POST https://sales-poc-rg-aoai-01.openai.azure.com/openai/deployments/gpt-4o-mini/chat/completions?api-version=2024-12-01-preview",
+      "formatted_message": "2025-10-01 13:11:01,771 - [openai._base_client] - DEBUG - request:978 - Sending HTTP Request: POST https://sales-poc-rg-aoai-01.openai.azure.com/openai/deployments/gpt-4o-mini/chat/completions?api-version=2024-12-01-preview"
+    }
+  },
+  {
+    "session_id": "test_session_1759291861",
+    "timestamp": "2025-10-01T13:11:01.779693",
+    "agent_name": "httpcore.http11",
+    "action": "log",
+    "status": "info",
+    "details": {
+      "level": "DEBUG",
+      "function": "trace",
+      "line": 47,
+      "message": "send_request_headers.started request=<Request [b'POST']>",
+      "formatted_message": "2025-10-01 13:11:01,779 - [httpcore.http11] - DEBUG - trace:47 - send_request_headers.started request=<Request [b'POST']>"
+    }
+  },
+  {
+    "session_id": "test_session_1759291861",
+    "timestamp": "2025-10-01T13:11:01.781692",
+    "agent_name": "httpcore.http11",
+    "action": "log",
+    "status": "info",
+    "details": {
+      "level": "DEBUG",
+      "function": "trace",
+      "line": 47,
+      "message": "send_request_headers.complete",
+      "formatted_message": "2025-10-01 13:11:01,781 - [httpcore.http11] - DEBUG - trace:47 - send_request_headers.complete"
+    }
+  },
+  {
+    "session_id": "test_session_1759291861",
+    "timestamp": "2025-10-01T13:11:01.790867",
+    "agent_name": "httpcore.http11",
+    "action": "log",
+    "status": "info",
+    "details": {
+      "level": "DEBUG",
+      "function": "trace",
+      "line": 47,
+      "message": "send_request_body.started request=<Request [b'POST']>",
+      "formatted_message": "2025-10-01 13:11:01,790 - [httpcore.http11] - DEBUG - trace:47 - send_request_body.started request=<Request [b'POST']>"
+    }
+  },
+  {
+    "session_id": "test_session_1759291861",
+    "timestamp": "2025-10-01T13:11:01.793867",
+    "agent_name": "httpcore.http11",
+    "action": "log",
+    "status": "info",
+    "details": {
+      "level": "DEBUG",
+      "function": "trace",
+      "line": 47,
+      "message": "send_request_body.complete",
+      "formatted_message": "2025-10-01 13:11:01,793 - [httpcore.http11] - DEBUG - trace:47 - send_request_body.complete"
+    }
+  },
+  {
+    "session_id": "test_session_1759291861",
+    "timestamp": "2025-10-01T13:11:01.798867",
+    "agent_name": "httpcore.http11",
+    "action": "log",
+    "status": "info",
+    "details": {
+      "level": "DEBUG",
+      "function": "trace",
+      "line": 47,
+      "message": "receive_response_headers.started request=<Request [b'POST']>",
+      "formatted_message": "2025-10-01 13:11:01,798 - [httpcore.http11] - DEBUG - trace:47 - receive_response_headers.started request=<Request [b'POST']>"
+    }
+  },
+  {
+    "session_id": "test_session_1759291864",
+    "timestamp": "2025-10-01T13:11:04.882609",
+    "agent_name": "httpcore.http11",
+    "action": "log",
+    "status": "info",
+    "details": {
+      "level": "DEBUG",
+      "function": "trace",
+      "line": 47,
+      "message": "receive_response_headers.complete return_value=(b'HTTP/1.1', 200, b'OK', [(b'Content-Length', b'2291'), (b'Content-Type', b'application/json'), (b'apim-request-id', b'1bf76ca3-d372-49ff-88b4-f7edf444de15'), (b'Strict-Transport-Security', b'max-age=31536000; includeSubDomains; preload'), (b'x-content-type-options', b'nosniff'), (b'x-ms-region', b'East US'), (b'x-ratelimit-remaining-requests', b'1997'), (b'x-ratelimit-limit-requests', b'2000'), (b'x-ratelimit-remaining-tokens', b'199775'), (b'x-ratelimit-limit-tokens', b'200000'), (b'azureml-model-session', b'd069-20250922222629'), (b'x-accel-buffering', b'no'), (b'x-ms-rai-invoked', b'true'), (b'x-request-id', b'dbedbdc0-a2c0-4e76-8433-e21a7687c177'), (b'x-ms-deployment-name', b'gpt-4o-mini'), (b'Date', b'Wed, 01 Oct 2025 04:11:02 GMT')])",
+      "formatted_message": "2025-10-01 13:11:04,882 - [httpcore.http11] - DEBUG - trace:47 - receive_response_headers.complete return_value=(b'HTTP/1.1', 200, b'OK', [(b'Content-Length', b'2291'), (b'Content-Type', b'application/json'), (b'apim-request-id', b'1bf76ca3-d372-49ff-88b4-f7edf444de15'), (b'Strict-Transport-Security', b'max-age=31536000; includeSubDomains; preload'), (b'x-content-type-options', b'nosniff'), (b'x-ms-region', b'East US'), (b'x-ratelimit-remaining-requests', b'1997'), (b'x-ratelimit-limit-requests', b'2000'), (b'x-ratelimit-remaining-tokens', b'199775'), (b'x-ratelimit-limit-tokens', b'200000'), (b'azureml-model-session', b'd069-20250922222629'), (b'x-accel-buffering', b'no'), (b'x-ms-rai-invoked', b'true'), (b'x-request-id', b'dbedbdc0-a2c0-4e76-8433-e21a7687c177'), (b'x-ms-deployment-name', b'gpt-4o-mini'), (b'Date', b'Wed, 01 Oct 2025 04:11:02 GMT')])"
+    }
+  },
+  {
+    "session_id": "test_session_1759291864",
+    "timestamp": "2025-10-01T13:11:04.892913",
+    "agent_name": "httpx",
+    "action": "log",
+    "status": "info",
+    "details": {
+      "level": "INFO",
+      "function": "_send_single_request",
+      "line": 1025,
+      "message": "HTTP Request: POST https://sales-poc-rg-aoai-01.openai.azure.com/openai/deployments/gpt-4o-mini/chat/completions?api-version=2024-12-01-preview \"HTTP/1.1 200 OK\"",
+      "formatted_message": "2025-10-01 13:11:04,891 - [httpx] - INFO - _send_single_request:1025 - HTTP Request: POST https://sales-poc-rg-aoai-01.openai.azure.com/openai/deployments/gpt-4o-mini/chat/completions?api-version=2024-12-01-preview \"HTTP/1.1 200 OK\""
+    }
+  },
+  {
+    "session_id": "test_session_1759291864",
+    "timestamp": "2025-10-01T13:11:04.901175",
+    "agent_name": "httpcore.http11",
+    "action": "log",
+    "status": "info",
+    "details": {
+      "level": "DEBUG",
+      "function": "trace",
+      "line": 47,
+      "message": "receive_response_body.started request=<Request [b'POST']>",
+      "formatted_message": "2025-10-01 13:11:04,901 - [httpcore.http11] - DEBUG - trace:47 - receive_response_body.started request=<Request [b'POST']>"
+    }
+  },
+  {
+    "session_id": "test_session_1759291864",
+    "timestamp": "2025-10-01T13:11:04.910426",
+    "agent_name": "httpcore.http11",
+    "action": "log",
+    "status": "info",
+    "details": {
+      "level": "DEBUG",
+      "function": "trace",
+      "line": 47,
+      "message": "receive_response_body.complete",
+      "formatted_message": "2025-10-01 13:11:04,910 - [httpcore.http11] - DEBUG - trace:47 - receive_response_body.complete"
+    }
+  },
+  {
+    "session_id": "test_session_1759291864",
+    "timestamp": "2025-10-01T13:11:04.917927",
+    "agent_name": "httpcore.http11",
+    "action": "log",
+    "status": "info",
+    "details": {
+      "level": "DEBUG",
+      "function": "trace",
+      "line": 47,
+      "message": "response_closed.started",
+      "formatted_message": "2025-10-01 13:11:04,917 - [httpcore.http11] - DEBUG - trace:47 - response_closed.started"
+    }
+  },
+  {
+    "session_id": "test_session_1759291864",
+    "timestamp": "2025-10-01T13:11:04.924955",
+    "agent_name": "httpcore.http11",
+    "action": "log",
+    "status": "info",
+    "details": {
+      "level": "DEBUG",
+      "function": "trace",
+      "line": 47,
+      "message": "response_closed.complete",
+      "formatted_message": "2025-10-01 13:11:04,923 - [httpcore.http11] - DEBUG - trace:47 - response_closed.complete"
+    }
+  },
+  {
+    "session_id": "test_session_1759291864",
+    "timestamp": "2025-10-01T13:11:04.930054",
+    "agent_name": "openai._base_client",
+    "action": "log",
+    "status": "info",
+    "details": {
+      "level": "DEBUG",
+      "function": "request",
+      "line": 1016,
+      "message": "HTTP Response: POST https://sales-poc-rg-aoai-01.openai.azure.com/openai/deployments/gpt-4o-mini/chat/completions?api-version=2024-12-01-preview \"200 OK\" Headers({'content-length': '2291', 'content-type': 'application/json', 'apim-request-id': '1bf76ca3-d372-49ff-88b4-f7edf444de15', 'strict-transport-security': 'max-age=31536000; includeSubDomains; preload', 'x-content-type-options': 'nosniff', 'x-ms-region': 'East US', 'x-ratelimit-remaining-requests': '1997', 'x-ratelimit-limit-requests': '2000', 'x-ratelimit-remaining-tokens': '199775', 'x-ratelimit-limit-tokens': '200000', 'azureml-model-session': 'd069-20250922222629', 'x-accel-buffering': 'no', 'x-ms-rai-invoked': 'true', 'x-request-id': 'dbedbdc0-a2c0-4e76-8433-e21a7687c177', 'x-ms-deployment-name': 'gpt-4o-mini', 'date': 'Wed, 01 Oct 2025 04:11:02 GMT'})",
+      "formatted_message": "2025-10-01 13:11:04,930 - [openai._base_client] - DEBUG - request:1016 - HTTP Response: POST https://sales-poc-rg-aoai-01.openai.azure.com/openai/deployments/gpt-4o-mini/chat/completions?api-version=2024-12-01-preview \"200 OK\" Headers({'content-length': '2291', 'content-type': 'application/json', 'apim-request-id': '1bf76ca3-d372-49ff-88b4-f7edf444de15', 'strict-transport-security': 'max-age=31536000; includeSubDomains; preload', 'x-content-type-options': 'nosniff', 'x-ms-region': 'East US', 'x-ratelimit-remaining-requests': '1997', 'x-ratelimit-limit-requests': '2000', 'x-ratelimit-remaining-tokens': '199775', 'x-ratelimit-limit-tokens': '200000', 'azureml-model-session': 'd069-20250922222629', 'x-accel-buffering': 'no', 'x-ms-rai-invoked': 'true', 'x-request-id': 'dbedbdc0-a2c0-4e76-8433-e21a7687c177', 'x-ms-deployment-name': 'gpt-4o-mini', 'date': 'Wed, 01 Oct 2025 04:11:02 GMT'})"
+    }
+  },
+  {
+    "session_id": "test_session_1759291864",
+    "timestamp": "2025-10-01T13:11:04.936056",
+    "agent_name": "openai._base_client",
+    "action": "log",
+    "status": "info",
+    "details": {
+      "level": "DEBUG",
+      "function": "request",
+      "line": 1024,
+      "message": "request_id: dbedbdc0-a2c0-4e76-8433-e21a7687c177",
+      "formatted_message": "2025-10-01 13:11:04,936 - [openai._base_client] - DEBUG - request:1024 - request_id: dbedbdc0-a2c0-4e76-8433-e21a7687c177"
+    }
+  },
+  {
+    "session_id": "test_session_1759291864",
+    "timestamp": "2025-10-01T13:11:04.942132",
+    "agent_name": "src.agents.vending_agent",
+    "action": "log",
+    "status": "info",
+    "details": {
+      "level": "INFO",
+      "function": "optimize_pricing",
+      "line": 705,
+      "message": "価格最適化完了: 2件の調整候補",
+      "formatted_message": "2025-10-01 13:11:04,942 - [src.agents.vending_agent] - INFO - optimize_pricing:705 - 価格最適化完了: 2件の調整候補"
+    }
+  },
+  {
+    "session_id": "test_session_1759291864",
+    "timestamp": "2025-10-01T13:11:04.947338",
+    "agent_name": "agent_activity",
+    "action": "価格最適化実行完了",
+    "status": "info",
+    "details": {
+      "level": "INFO",
+      "function": "test_agents",
+      "line": 331,
+      "message": "STEP 4-4: 価格最適化実行完了",
+      "formatted_message": "2025-10-01 13:11:04,947 - [agent_activity] - INFO - test_agents:331 - STEP 4-4: 価格最適化実行完了"
+    }
+  },
+  {
+    "session_id": "test_session_1759291864",
+    "timestamp": "2025-10-01T13:11:04.954482",
+    "agent_name": "main",
+    "action": "log",
+    "status": "info",
+    "details": {
+      "level": "INFO",
+      "function": "test_agents",
+      "line": 332,
+      "message": "価格最適化結果: {'success': True, 'optimization_results': {'price_adjustments': [{'product_id': '4e87f69c-251a-4f3c-b40b-5257dd4ca995', 'product_name': 'ポテトチップス うすしお味', 'current_price': 180.0, 'optimal_price': 170, 'adjustment_ratio': -0.05555555555555555, 'expected_demand_change': 4.86, 'priority': 'medium'}, {'product_id': 'e698a756-d271-4d1e-b9ff-73fa568e76d8', 'product_name': 'カップヌードル', 'current_price': 200.0, 'optimal_price': 220, 'adjustment_ratio': 0.1, 'expected_demand_change': 4.43, 'priority': 'medium'}], 'overall_strategy': '価格戦略を策定するにあたり、以下のポイントを考慮し、全体的なアプローチを提案します。\\n\\n### 1. 顧客満足度への影響\\n- **ポテトチップスの価格引き下げ**: うすしお味の価格を180円から170円に引き下げることで、価格感度の高い顧客層にアピールできます。これにより、購入意欲が向上し、顧客満足度の向上が期待されます。\\n- **カップヌードルの価格引き上げ**: 価格を200円から220円に引き上げる場合、顧客の反発を抑えるため、改良した新フレーバーの追加やパッケージのデザイン変更などの付加価値を提供することが重要です。顧客が納得する理由が必要です。\\n\\n### 2. 売上・利益への影響\\n- **ポテトチップスの価格引き下げ**: 売上数量の増加が見込まれるため、単価が下がってもトータルの売上は増加する可能性があります。利益率が低下する可能性がありますが、顧客のリピート率を', 'expected_impact': {}, 'recommendations': []}}",
+      "formatted_message": "2025-10-01 13:11:04,953 - [__main__] - INFO - test_agents:332 - 価格最適化結果: {'success': True, 'optimization_results': {'price_adjustments': [{'product_id': '4e87f69c-251a-4f3c-b40b-5257dd4ca995', 'product_name': 'ポテトチップス うすしお味', 'current_price': 180.0, 'optimal_price': 170, 'adjustment_ratio': -0.05555555555555555, 'expected_demand_change': 4.86, 'priority': 'medium'}, {'product_id': 'e698a756-d271-4d1e-b9ff-73fa568e76d8', 'product_name': 'カップヌードル', 'current_price': 200.0, 'optimal_price': 220, 'adjustment_ratio': 0.1, 'expected_demand_change': 4.43, 'priority': 'medium'}], 'overall_strategy': '価格戦略を策定するにあたり、以下のポイントを考慮し、全体的なアプローチを提案します。\\n\\n### 1. 顧客満足度への影響\\n- **ポテトチップスの価格引き下げ**: うすしお味の価格を180円から170円に引き下げることで、価格感度の高い顧客層にアピールできます。これにより、購入意欲が向上し、顧客満足度の向上が期待されます。\\n- **カップヌードルの価格引き上げ**: 価格を200円から220円に引き上げる場合、顧客の反発を抑えるため、改良した新フレーバーの追加やパッケージのデザイン変更などの付加価値を提供することが重要です。顧客が納得する理由が必要です。\\n\\n### 2. 売上・利益への影響\\n- **ポテトチップスの価格引き下げ**: 売上数量の増加が見込まれるため、単価が下がってもトータルの売上は増加する可能性があります。利益率が低下する可能性がありますが、顧客のリピート率を', 'expected_impact': {}, 'recommendations': []}}"
+    }
+  },
+  {
+    "session_id": "test_session_1759291864",
+    "timestamp": "2025-10-01T13:11:04.960482",
+    "agent_name": "agent_activity",
+    "action": "log",
+    "status": "info",
+    "details": {
+      "level": "INFO",
+      "function": "test_agents",
+      "line": 346,
+      "message": "価格調整1: {'product_id': '4e87f69c-251a-4f3c-b40b-5257dd4ca995', 'product_name': 'ポテトチップス うすしお味', 'current_price': 180.0, 'optimal_price': 170, 'adjustment_ratio': -0.05555555555555555, 'expected_demand_change': 4.86, 'priority': 'medium'}",
+      "formatted_message": "2025-10-01 13:11:04,960 - [agent_activity] - INFO - test_agents:346 - 価格調整1: {'product_id': '4e87f69c-251a-4f3c-b40b-5257dd4ca995', 'product_name': 'ポテトチップス うすしお味', 'current_price': 180.0, 'optimal_price': 170, 'adjustment_ratio': -0.05555555555555555, 'expected_demand_change': 4.86, 'priority': 'medium'}"
+    }
+  },
+  {
+    "session_id": "test_session_1759291864",
+    "timestamp": "2025-10-01T13:11:04.965557",
+    "agent_name": "main",
+    "action": "log",
+    "status": "info",
+    "details": {
+      "level": "INFO",
+      "function": "test_agents",
+      "line": 347,
+      "message": "価格調整1: {'product_id': '4e87f69c-251a-4f3c-b40b-5257dd4ca995', 'product_name': 'ポテトチップス うすしお味', 'current_price': 180.0, 'optimal_price': 170, 'adjustment_ratio': -0.05555555555555555, 'expected_demand_change': 4.86, 'priority': 'medium'}",
+      "formatted_message": "2025-10-01 13:11:04,965 - [__main__] - INFO - test_agents:347 - 価格調整1: {'product_id': '4e87f69c-251a-4f3c-b40b-5257dd4ca995', 'product_name': 'ポテトチップス うすしお味', 'current_price': 180.0, 'optimal_price': 170, 'adjustment_ratio': -0.05555555555555555, 'expected_demand_change': 4.86, 'priority': 'medium'}"
+    }
+  },
+  {
+    "session_id": "test_session_1759291864",
+    "timestamp": "2025-10-01T13:11:04.972206",
+    "agent_name": "agent_activity",
+    "action": "log",
+    "status": "info",
+    "details": {
+      "level": "INFO",
+      "function": "test_agents",
+      "line": 346,
+      "message": "価格調整2: {'product_id': 'e698a756-d271-4d1e-b9ff-73fa568e76d8', 'product_name': 'カップヌードル', 'current_price': 200.0, 'optimal_price': 220, 'adjustment_ratio': 0.1, 'expected_demand_change': 4.43, 'priority': 'medium'}",
+      "formatted_message": "2025-10-01 13:11:04,972 - [agent_activity] - INFO - test_agents:346 - 価格調整2: {'product_id': 'e698a756-d271-4d1e-b9ff-73fa568e76d8', 'product_name': 'カップヌードル', 'current_price': 200.0, 'optimal_price': 220, 'adjustment_ratio': 0.1, 'expected_demand_change': 4.43, 'priority': 'medium'}"
+    }
+  },
+  {
+    "session_id": "test_session_1759291864",
+    "timestamp": "2025-10-01T13:11:04.976207",
+    "agent_name": "main",
+    "action": "log",
+    "status": "info",
+    "details": {
+      "level": "INFO",
+      "function": "test_agents",
+      "line": 347,
+      "message": "価格調整2: {'product_id': 'e698a756-d271-4d1e-b9ff-73fa568e76d8', 'product_name': 'カップヌードル', 'current_price': 200.0, 'optimal_price': 220, 'adjustment_ratio': 0.1, 'expected_demand_change': 4.43, 'priority': 'medium'}",
+      "formatted_message": "2025-10-01 13:11:04,976 - [__main__] - INFO - test_agents:347 - 価格調整2: {'product_id': 'e698a756-d271-4d1e-b9ff-73fa568e76d8', 'product_name': 'カップヌードル', 'current_price': 200.0, 'optimal_price': 220, 'adjustment_ratio': 0.1, 'expected_demand_change': 4.43, 'priority': 'medium'}"
+    }
+  },
+  {
+    "session_id": "test_session_1759291864",
+    "timestamp": "2025-10-01T13:11:04.979206",
+    "agent_name": "agent_activity",
+    "action": "log",
+    "status": "info",
+    "details": {
+      "level": "INFO",
+      "function": "test_agents",
+      "line": 356,
+      "message": "LLM価格最適化チェック結果: False",
+      "formatted_message": "2025-10-01 13:11:04,979 - [agent_activity] - INFO - test_agents:356 - LLM価格最適化チェック結果: False"
+    }
+  },
+  {
+    "session_id": "test_session_1759291864",
+    "timestamp": "2025-10-01T13:11:04.987559",
+    "agent_name": "main",
+    "action": "log",
+    "status": "info",
+    "details": {
+      "level": "INFO",
+      "function": "test_agents",
+      "line": 357,
+      "message": "LLM価格最適化を含むか: False",
+      "formatted_message": "2025-10-01 13:11:04,987 - [__main__] - INFO - test_agents:357 - LLM価格最適化を含むか: False"
+    }
+  },
+  {
+    "session_id": "test_session_1759291864",
+    "timestamp": "2025-10-01T13:11:04.991559",
+    "agent_name": "agent_activity",
+    "action": "エージェント連携テスト成功",
+    "status": "info",
+    "details": {
+      "level": "INFO",
+      "function": "test_agents",
+      "line": 368,
+      "message": "=== エージェント連携テスト成功 ===",
+      "formatted_message": "2025-10-01 13:11:04,991 - [agent_activity] - INFO - test_agents:368 - === エージェント連携テスト成功 ==="
+    }
+  },
+  {
+    "session_id": "test_session_1759291864",
+    "timestamp": "2025-10-01T13:11:04.995559",
+    "agent_name": "agent_activity",
+    "action": "全エージェントテスト完了",
+    "status": "info",
+    "details": {
+      "level": "INFO",
+      "function": "test_agents",
+      "line": 379,
+      "message": "=== 全エージェントテスト完了 ===",
+      "formatted_message": "2025-10-01 13:11:04,995 - [agent_activity] - INFO - test_agents:379 - === 全エージェントテスト完了 ==="
+    }
+  },
+  {
+    "session_id": "test_session_1759291864",
+    "timestamp": "2025-10-01T13:11:04.998558",
+    "agent_name": "main",
+    "action": "log",
+    "status": "info",
+    "details": {
+      "level": "INFO",
+      "function": "test_agents",
+      "line": 380,
+      "message": "全エージェントテスト完了",
+      "formatted_message": "2025-10-01 13:11:04,998 - [__main__] - INFO - test_agents:380 - 全エージェントテスト完了"
+    }
+  },
+  {
+    "session_id": "test_session_1759291865",
+    "timestamp": "2025-10-01T13:11:05.003558",
+    "agent_name": "agent_activity",
+    "action": "テスト結果サマリー",
+    "status": "info",
+    "details": {
+      "level": "INFO",
+      "function": "test_agents",
+      "line": 434,
+      "message": "=== テスト結果サマリー ===",
+      "formatted_message": "2025-10-01 13:11:05,003 - [agent_activity] - INFO - test_agents:434 - === テスト結果サマリー ==="
+    }
+  },
+  {
+    "session_id": "test_session_1759291865",
+    "timestamp": "2025-10-01T13:11:05.007558",
+    "agent_name": "agent_activity",
+    "action": "log",
+    "status": "info",
+    "details": {
+      "level": "INFO",
+      "function": "test_agents",
+      "line": 435,
+      "message": "✅ 自動販売機エージェント: 運営状況取得成功",
+      "formatted_message": "2025-10-01 13:11:05,007 - [agent_activity] - INFO - test_agents:435 - ✅ 自動販売機エージェント: 運営状況取得成功"
+    }
+  },
+  {
+    "session_id": "test_session_1759291865",
+    "timestamp": "2025-10-01T13:11:05.012558",
+    "agent_name": "agent_activity",
+    "action": "log",
+    "status": "info",
+    "details": {
+      "level": "INFO",
+      "function": "test_agents",
+      "line": 436,
+      "message": "✅ 調達エージェント: 在庫レポート取得成功",
+      "formatted_message": "2025-10-01 13:11:05,012 - [agent_activity] - INFO - test_agents:436 - ✅ 調達エージェント: 在庫レポート取得成功"
+    }
+  },
+  {
+    "session_id": "test_session_1759291865",
+    "timestamp": "2025-10-01T13:11:05.018559",
+    "agent_name": "agent_activity",
+    "action": "log",
+    "status": "info",
+    "details": {
+      "level": "INFO",
+      "function": "test_agents",
+      "line": 437,
+      "message": "✅ 分析エージェント: LLM分析実行成功",
+      "formatted_message": "2025-10-01 13:11:05,018 - [agent_activity] - INFO - test_agents:437 - ✅ 分析エージェント: LLM分析実行成功"
+    }
+  },
+  {
+    "session_id": "test_session_1759291865",
+    "timestamp": "2025-10-01T13:11:05.021654",
+    "agent_name": "agent_activity",
+    "action": "log",
+    "status": "info",
+    "details": {
+      "level": "INFO",
+      "function": "test_agents",
+      "line": 438,
+      "message": "✅ エージェント連携: 調達計画・価格最適化実行成功",
+      "formatted_message": "2025-10-01 13:11:05,021 - [agent_activity] - INFO - test_agents:438 - ✅ エージェント連携: 調達計画・価格最適化実行成功"
+    }
+  },
+  {
+    "session_id": "test_session_1759291865",
+    "timestamp": "2025-10-01T13:11:05.024654",
+    "agent_name": "agent_activity",
+    "action": "全エージェント正常動作確認完了",
+    "status": "info",
+    "details": {
+      "level": "INFO",
+      "function": "test_agents",
+      "line": 439,
+      "message": "=== 全エージェント正常動作確認完了 ===",
+      "formatted_message": "2025-10-01 13:11:05,024 - [agent_activity] - INFO - test_agents:439 - === 全エージェント正常動作確認完了 ==="
+    }
+  }
+]

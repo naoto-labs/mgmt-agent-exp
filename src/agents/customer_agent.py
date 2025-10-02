@@ -445,6 +445,49 @@ class CustomerAgent:
         else:
             return "low"
 
+    async def respond_to_inquiry(
+        self, customer_id: str, inquiry: str
+    ) -> Dict[str, Any]:
+        """顧客問い合わせに対応（simulation用）"""
+        logger.info(f"問い合わせ対応: {customer_id}")
+
+        try:
+            # 簡易的な応答生成
+            response_text = "お問い合わせありがとうございます。"
+
+            # 問い合わせ内容に基づく応答を生成
+            if "価格" in inquiry or "いくら" in inquiry:
+                # 商品価格問い合わせ
+                response_text += (
+                    "商品価格をご案内します。コーラは150円、お茶は120円です。"
+                )
+            elif "在庫" in inquiry or "ありますか" in inquiry:
+                # 在庫確認
+                response_text += "現在の商品在庫をご確認ください。"
+            else:
+                # 一般的な問い合わせ
+                response_text += "ご質問いただいた内容について確認いたします。"
+
+            response_text += "\n何か他のお手伝いできることはありますか？"
+
+            return {
+                "customer_id": customer_id,
+                "inquiry": inquiry,
+                "response": response_text,
+                "status": "responded",
+                "timestamp": datetime.now().isoformat(),
+            }
+
+        except Exception as e:
+            logger.error(f"問い合わせ対応エラー: {e}")
+            return {
+                "customer_id": customer_id,
+                "inquiry": inquiry,
+                "response": "申し訳ありませんが、現在対応できません。",
+                "status": "error",
+                "error": str(e),
+            }
+
 
 # グローバルインスタンス
 customer_agent = CustomerAgent()

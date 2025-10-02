@@ -12,11 +12,18 @@
 -e file:.
 aiofiles==24.1.0
     # via mgmt-agent-exp
+aiohappyeyeballs==2.6.1
+    # via aiohttp
+aiohttp==3.12.15
+    # via langchain-community
+aiosignal==1.4.0
+    # via aiohttp
 alembic==1.16.5
     # via mgmt-agent-exp
 annotated-types==0.7.0
     # via pydantic
 anthropic==0.69.0
+    # via langchain-anthropic
     # via mgmt-agent-exp
 anyio==4.11.0
     # via anthropic
@@ -24,38 +31,92 @@ anyio==4.11.0
     # via openai
     # via starlette
     # via watchfiles
+attrs==25.3.0
+    # via aiohttp
+    # via jsonschema
+    # via referencing
+backoff==2.2.1
+    # via posthog
 bcrypt==5.0.0
+    # via chromadb
     # via mgmt-agent-exp
+beautifulsoup4==4.14.2
+    # via bs4
 black==25.9.0
+bs4==0.0.2
+    # via mgmt-agent-exp
+build==1.3.0
+    # via chromadb
+cachetools==6.2.0
+    # via google-auth
 certifi==2025.8.3
     # via httpcore
     # via httpx
+    # via kubernetes
+    # via requests
 cffi==2.0.0
     # via cryptography
+charset-normalizer==3.4.3
+    # via requests
+chromadb==1.1.0
+    # via mgmt-agent-exp
 click==8.3.0
     # via black
+    # via typer
     # via uvicorn
 colorama==0.4.6
+    # via build
     # via click
     # via pytest
     # via tqdm
     # via uvicorn
+coloredlogs==15.0.1
+    # via onnxruntime
+contourpy==1.3.3
+    # via matplotlib
 coverage==7.10.7
     # via pytest-cov
 cryptography==46.0.1
     # via mgmt-agent-exp
+cycler==0.12.1
+    # via matplotlib
+dataclasses-json==0.6.7
+    # via langchain-community
 distro==1.9.0
     # via anthropic
     # via openai
+    # via posthog
 dnspython==2.8.0
     # via pymongo
 docstring-parser==0.17.0
     # via anthropic
+durationpy==0.10
+    # via kubernetes
+fake-useragent==2.2.0
+    # via mgmt-agent-exp
 fastapi==0.118.0
     # via mgmt-agent-exp
+filelock==3.19.1
+    # via huggingface-hub
 flake8==7.3.0
+flatbuffers==25.9.23
+    # via onnxruntime
+fonttools==4.60.1
+    # via matplotlib
+frozenlist==1.7.0
+    # via aiohttp
+    # via aiosignal
+fsspec==2025.9.0
+    # via huggingface-hub
+google-auth==2.41.1
+    # via kubernetes
+googleapis-common-protos==1.70.0
+    # via opentelemetry-exporter-otlp-proto-grpc
 greenlet==3.2.4
     # via sqlalchemy
+grpcio==1.75.1
+    # via chromadb
+    # via opentelemetry-exporter-otlp-proto-grpc
 h11==0.16.0
     # via httpcore
     # via uvicorn
@@ -65,11 +126,26 @@ httptools==0.6.4
     # via uvicorn
 httpx==0.28.1
     # via anthropic
+    # via chromadb
+    # via langsmith
     # via mgmt-agent-exp
     # via openai
+    # via tavily-python
+httpx-sse==0.4.1
+    # via langchain-community
+huggingface-hub==0.35.3
+    # via tokenizers
+humanfriendly==10.0
+    # via coloredlogs
 idna==3.10
     # via anyio
     # via httpx
+    # via requests
+    # via yarl
+importlib-metadata==8.7.0
+    # via opentelemetry-api
+importlib-resources==6.5.2
+    # via chromadb
 iniconfig==2.1.0
     # via pytest
 isort==6.0.1
@@ -78,57 +154,189 @@ jinja2==3.1.6
 jiter==0.11.0
     # via anthropic
     # via openai
+jsonpatch==1.33
+    # via langchain-core
+jsonpointer==3.0.0
+    # via jsonpatch
+jsonschema==4.25.1
+    # via chromadb
+jsonschema-specifications==2025.9.1
+    # via jsonschema
+kiwisolver==1.4.9
+    # via matplotlib
+kubernetes==34.1.0
+    # via chromadb
+langchain==0.3.27
+    # via langchain-community
+    # via mgmt-agent-exp
+langchain-anthropic==0.3.21
+    # via mgmt-agent-exp
+langchain-community==0.3.30
+    # via mgmt-agent-exp
+langchain-core==0.3.76
+    # via langchain
+    # via langchain-anthropic
+    # via langchain-community
+    # via langchain-openai
+    # via langchain-text-splitters
+langchain-openai==0.3.33
+    # via mgmt-agent-exp
+langchain-text-splitters==0.3.11
+    # via langchain
+langsmith==0.4.31
+    # via langchain
+    # via langchain-community
+    # via langchain-core
 mako==1.3.10
     # via alembic
+markdown-it-py==4.0.0
+    # via rich
 markupsafe==3.0.3
     # via jinja2
     # via mako
+marshmallow==3.26.1
+    # via dataclasses-json
+matplotlib==3.10.6
+    # via mgmt-agent-exp
+    # via seaborn
 mccabe==0.7.0
     # via flake8
+mdurl==0.1.2
+    # via markdown-it-py
+mmh3==5.2.0
+    # via chromadb
 motor==3.7.1
     # via mgmt-agent-exp
+mpmath==1.3.0
+    # via sympy
+multidict==6.6.4
+    # via aiohttp
+    # via yarl
 mypy==1.18.2
 mypy-extensions==1.1.0
     # via black
     # via mypy
-openai==1.109.1
+    # via typing-inspect
+numpy==2.3.3
+    # via chromadb
+    # via contourpy
+    # via langchain-community
+    # via matplotlib
+    # via onnxruntime
+    # via pandas
+    # via seaborn
+oauthlib==3.3.1
+    # via requests-oauthlib
+onnxruntime==1.23.0
+    # via chromadb
+openai==1.104.2
+    # via langchain-openai
     # via mgmt-agent-exp
+opentelemetry-api==1.37.0
+    # via chromadb
+    # via opentelemetry-exporter-otlp-proto-grpc
+    # via opentelemetry-sdk
+    # via opentelemetry-semantic-conventions
+opentelemetry-exporter-otlp-proto-common==1.37.0
+    # via opentelemetry-exporter-otlp-proto-grpc
+opentelemetry-exporter-otlp-proto-grpc==1.37.0
+    # via chromadb
+opentelemetry-proto==1.37.0
+    # via opentelemetry-exporter-otlp-proto-common
+    # via opentelemetry-exporter-otlp-proto-grpc
+opentelemetry-sdk==1.37.0
+    # via chromadb
+    # via opentelemetry-exporter-otlp-proto-grpc
+opentelemetry-semantic-conventions==0.58b0
+    # via opentelemetry-sdk
+orjson==3.11.3
+    # via chromadb
+    # via langsmith
+overrides==7.7.0
+    # via chromadb
 packaging==25.0
     # via black
+    # via build
+    # via huggingface-hub
+    # via langchain-core
+    # via langsmith
+    # via marshmallow
+    # via matplotlib
+    # via onnxruntime
     # via pytest
+pandas==2.3.3
+    # via seaborn
 pathspec==0.12.1
     # via black
     # via mypy
+pillow==11.3.0
+    # via matplotlib
 platformdirs==4.4.0
     # via black
 pluggy==1.6.0
     # via pytest
     # via pytest-cov
+posthog==5.4.0
+    # via chromadb
+propcache==0.3.2
+    # via aiohttp
+    # via yarl
+protobuf==6.32.1
+    # via googleapis-common-protos
+    # via onnxruntime
+    # via opentelemetry-proto
+pyasn1==0.6.1
+    # via pyasn1-modules
+    # via rsa
+pyasn1-modules==0.4.2
+    # via google-auth
+pybase64==1.4.2
+    # via chromadb
 pycodestyle==2.14.0
     # via flake8
 pycparser==2.23
     # via cffi
 pydantic==2.11.9
     # via anthropic
+    # via chromadb
     # via fastapi
+    # via langchain
+    # via langchain-anthropic
+    # via langchain-core
+    # via langsmith
     # via mgmt-agent-exp
     # via openai
     # via pydantic-settings
 pydantic-core==2.33.2
     # via pydantic
 pydantic-settings==2.11.0
+    # via langchain-community
     # via mgmt-agent-exp
 pyflakes==3.4.0
     # via flake8
 pygments==2.19.2
     # via pytest
+    # via rich
 pymongo==4.15.1
     # via motor
+pyparsing==3.2.5
+    # via matplotlib
+pypika==0.48.9
+    # via chromadb
+pyproject-hooks==1.2.0
+    # via build
+pyreadline3==3.5.4
+    # via humanfriendly
 pytest==8.4.2
     # via pytest-asyncio
     # via pytest-cov
 pytest-asyncio==1.2.0
 pytest-cov==7.0.0
+python-dateutil==2.9.0.post0
+    # via kubernetes
+    # via matplotlib
+    # via pandas
+    # via posthog
 python-dotenv==1.1.1
     # via mgmt-agent-exp
     # via pydantic-settings
@@ -137,39 +345,134 @@ python-multipart==0.0.20
     # via mgmt-agent-exp
 pytokens==0.1.10
     # via black
+pytz==2025.2
+    # via pandas
 pyyaml==6.0.3
+    # via chromadb
+    # via huggingface-hub
+    # via kubernetes
+    # via langchain
+    # via langchain-community
+    # via langchain-core
     # via uvicorn
+referencing==0.36.2
+    # via jsonschema
+    # via jsonschema-specifications
+regex==2025.9.18
+    # via tiktoken
+requests==2.32.5
+    # via huggingface-hub
+    # via kubernetes
+    # via langchain
+    # via langchain-community
+    # via langsmith
+    # via posthog
+    # via requests-oauthlib
+    # via requests-toolbelt
+    # via tavily-python
+    # via tiktoken
+requests-oauthlib==2.0.0
+    # via kubernetes
+requests-toolbelt==1.0.0
+    # via langsmith
+rich==14.1.0
+    # via chromadb
+    # via typer
+rpds-py==0.27.1
+    # via jsonschema
+    # via referencing
+rsa==4.9.1
+    # via google-auth
+seaborn==0.13.2
+    # via mgmt-agent-exp
+shellingham==1.5.4
+    # via typer
+six==1.17.0
+    # via kubernetes
+    # via posthog
+    # via python-dateutil
 sniffio==1.3.1
     # via anthropic
     # via anyio
     # via openai
+soupsieve==2.8
+    # via beautifulsoup4
 sqlalchemy==2.0.43
     # via alembic
+    # via langchain
+    # via langchain-community
     # via mgmt-agent-exp
 starlette==0.48.0
     # via fastapi
+sympy==1.14.0
+    # via onnxruntime
+tavily-python==0.7.12
+    # via mgmt-agent-exp
+tenacity==9.1.2
+    # via chromadb
+    # via langchain-community
+    # via langchain-core
+tiktoken==0.11.0
+    # via langchain-openai
+    # via mgmt-agent-exp
+    # via tavily-python
+tokenizers==0.22.1
+    # via chromadb
 tqdm==4.67.1
+    # via chromadb
+    # via huggingface-hub
     # via openai
+typer==0.19.2
+    # via chromadb
 typing-extensions==4.15.0
+    # via aiosignal
     # via alembic
     # via anthropic
     # via anyio
+    # via beautifulsoup4
+    # via chromadb
     # via fastapi
+    # via grpcio
+    # via huggingface-hub
+    # via langchain-core
     # via mypy
     # via openai
+    # via opentelemetry-api
+    # via opentelemetry-exporter-otlp-proto-grpc
+    # via opentelemetry-sdk
+    # via opentelemetry-semantic-conventions
     # via pydantic
     # via pydantic-core
     # via pytest-asyncio
+    # via referencing
     # via sqlalchemy
     # via starlette
+    # via typer
+    # via typing-inspect
     # via typing-inspection
+typing-inspect==0.9.0
+    # via dataclasses-json
 typing-inspection==0.4.1
     # via pydantic
     # via pydantic-settings
+tzdata==2025.2
+    # via pandas
+urllib3==2.3.0
+    # via kubernetes
+    # via requests
 uvicorn==0.37.0
+    # via chromadb
     # via mgmt-agent-exp
 watchfiles==1.1.0
     # via uvicorn
+websocket-client==1.8.0
+    # via kubernetes
 websockets==15.0.1
     # via mgmt-agent-exp
     # via uvicorn
+yarl==1.20.1
+    # via aiohttp
+zipp==3.23.0
+    # via importlib-metadata
+zstandard==0.25.0
+    # via langsmith

@@ -105,6 +105,18 @@ class InventoryService:
 
         if target_slot.dispense(quantity):
             logger.info(f"商品排出成功: {target_slot.product_name} x{quantity}")
+
+            # Record COGS in journal
+            try:
+                product = get_product_by_id(product_id)
+                cost_per_unit = product.price * 0.7 if product else 100  # Assume cost is 70% of selling price
+                total_cost = quantity * cost_per_unit
+                from src.accounting.journal_entry import journal_processor
+                from datetime import date
+                journal_processor.add_entry("5001", date.today(), total_cost, "debit", f"COGS - {product_id} x{quantity}")
+            except Exception as e:
+                logger.error(f"Journal entry for COGS error: {e}")
+
             self._check_alerts(target_slot)
             return True, f"{target_slot.product_name}を{quantity}個排出しました"
         else:
@@ -392,3 +404,11 @@ class InventoryService:
 
 # グローバルインスタンス
 inventory_service = InventoryService()
+
+def get_product_by_id(product_id: str) -> Optional[Product]:
+    """商品IDで商品を取得"""
+    from src.models.product import SAMPLE_PRODUCTS
+    for p in SAMPLE_PRODUCTS:
+        if p.product_id == product_id:
+            return p
+    return None

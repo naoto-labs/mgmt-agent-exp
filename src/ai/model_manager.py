@@ -274,12 +274,12 @@ class OpenAIModel(BaseAIModel):
                 {"role": msg.role, "content": msg.content} for msg in messages
             ]
 
-            # API呼び出し
+            # API呼び出し（Azure OpenAIではdeployment_nameを使用）
             response = await asyncio.get_event_loop().run_in_executor(
                 None,
                 self.client.chat.completions.create,
                 **{
-                    "model": self.config.model_name,
+                    "model": azure_deployment,  # Azureではデプロイメント名を使用
                     "messages": openai_messages,
                     "max_tokens": kwargs.get("max_tokens", self.config.max_tokens),
                     "temperature": kwargs.get("temperature", self.config.temperature),
@@ -342,6 +342,7 @@ class AzureOpenAIModel(BaseAIModel):
         super().__init__(config)
         self.client = None
         self.azure_endpoint = os.getenv("OPENAI_API_BASE")
+        self.azure_deployment = os.getenv("OPENAI_API_DEPLOYMENT", config.model_name)
         self._initialize_client()
 
     def _initialize_client(self):
@@ -354,12 +355,18 @@ class AzureOpenAIModel(BaseAIModel):
                 self.status = AIModelStatus.UNAVAILABLE
                 return
 
+            # Azure OpenAIクライアントの初期化（deployment_nameを指定）
+            azure_deployment = os.getenv(
+                "OPENAI_API_DEPLOYMENT", self.config.model_name
+            )
+
             self.client = AzureOpenAI(
                 api_version="2024-12-01-preview",
                 azure_endpoint=self.azure_endpoint,
                 api_key=self.config.api_key,
+                # azure_deploymentは指定せず、API呼び出し時にmodelで指定
             )
-            logger.info(f"Azure OpenAIモデル {self.config.model_name} を初期化しました")
+            logger.info(f"Azure OpenAIモデル {azure_deployment} を初期化しました")
         except ImportError:
             logger.warning(
                 "openaiまたはazure-openaiパッケージがインストールされていません"
@@ -392,16 +399,15 @@ class AzureOpenAIModel(BaseAIModel):
                 {"role": msg.role, "content": msg.content} for msg in messages
             ]
 
-            # API呼び出し
+            # API呼び出し（Azure OpenAIではdeployment_nameを使用）
             response = await asyncio.get_event_loop().run_in_executor(
                 None,
-                self.client.chat.completions.create,
-                **{
-                    "model": self.config.model_name,
-                    "messages": openai_messages,
-                    "max_tokens": kwargs.get("max_tokens", self.config.max_tokens),
-                    "temperature": kwargs.get("temperature", self.config.temperature),
-                },
+                lambda: self.client.chat.completions.create(
+                    model=self.azure_deployment,  # Azureではデプロイメント名を使用
+                    messages=openai_messages,
+                    max_tokens=kwargs.get("max_tokens", self.config.max_tokens),
+                    temperature=kwargs.get("temperature", self.config.temperature),
+                ),
             )
 
             response_time = time.time() - start_time
@@ -525,60 +531,96 @@ class ModelManager:
     def _initialize_models(self):
         """モデルを初期化"""
         try:
+            logger.info("モデル初期化を開始します...")
+
             # Azure OpenAIモデル（最優先・デフォルト）
-            if secure_config.azure_openai_key and secure_config.azure_endpoint:
-                azure_config = AIModelConfig(
-                    model_type=AIModelType.AZURE_OPENAI,
-                    model_name="gpt-4o-mini",  # Azure OpenAIでデプロイされたモデル名
-                    api_key=secure_config.azure_openai_key,
-                    max_tokens=1000,
-                    temperature=0.7,
-                    timeout=30.0,
+            try:
+                azure_key = secure_config.azure_openai_key
+                azure_endpoint = secure_config.azure_endpoint
+                azure_deployment = secure_config.azure_deployment or "gpt-4o-mini"
+
+                logger.info(
+                    f"Azure設定確認: key={bool(azure_key)}, endpoint={bool(azure_endpoint)}, deployment={azure_deployment}"
                 )
-                self.models["azure_openai"] = AzureOpenAIModel(azure_config)
-                self.primary_model = "azure_openai"
-                logger.info("Azure OpenAIモデルをプライマリとして設定しました")
+
+                if azure_key and azure_endpoint:
+                    logger.info(f"Azure OpenAIモデルを初期化します...")
+                    azure_config = AIModelConfig(
+                        model_type=AIModelType.AZURE_OPENAI,
+                        model_name=azure_deployment,  # Azureでデプロイされたモデル名
+                        api_key=azure_key,
+                        max_tokens=1000,
+                        temperature=0.7,
+                        timeout=30.0,
+                    )
+                    self.models["azure_openai"] = AzureOpenAIModel(azure_config)
+                    self.primary_model = "azure_openai"
+                    logger.info(
+                        f"✅ Azure OpenAIモデルをプライマリとして設定しました（モデル: {azure_deployment}）"
+                    )
+                else:
+                    logger.warning("❌ Azure OpenAI設定が不完全です")
+                    logger.info(f"   - APIキー: {bool(azure_key)}")
+                    logger.info(f"   - エンドポイント: {bool(azure_endpoint)}")
+                    logger.info(f"   - デプロイメント: {azure_deployment}")
+
+            except Exception as e:
+                logger.error(f"❌ Azure OpenAIモデル初期化エラー: {e}")
+                import traceback
+
+                logger.error(f"詳細なエラー情報: {traceback.format_exc()}")
 
             # OpenAIモデル（Azure OpenAIがなければ）
-            elif secure_config.openai_api_key:
-                openai_config = AIModelConfig(
-                    model_type=AIModelType.OPENAI,
-                    model_name="gpt-3.5-turbo",
-                    api_key=secure_config.openai_api_key,
-                    max_tokens=1000,
-                    temperature=0.7,
-                    timeout=30.0,
-                )
-                self.models["openai"] = OpenAIModel(openai_config)
-                self.primary_model = "openai"
-                logger.info("OpenAIモデルをプライマリとして設定しました")
+            try:
+                if not self.primary_model and secure_config.openai_api_key:
+                    openai_config = AIModelConfig(
+                        model_type=AIModelType.OPENAI,
+                        model_name="gpt-3.5-turbo",
+                        api_key=secure_config.openai_api_key,
+                        max_tokens=1000,
+                        temperature=0.7,
+                        timeout=30.0,
+                    )
+                    self.models["openai"] = OpenAIModel(openai_config)
+                    self.primary_model = "openai"
+                    logger.info("OpenAIモデルをプライマリとして設定しました")
+            except Exception as e:
+                logger.error(f"OpenAIモデル初期化エラー: {e}")
 
             # Anthropicモデル（OpenAIがなければ）
-            elif secure_config.anthropic_api_key:
-                anthropic_config = AIModelConfig(
-                    model_type=AIModelType.ANTHROPIC,
-                    model_name="claude-3-sonnet-20240229",
-                    api_key=secure_config.anthropic_api_key,
-                    max_tokens=1000,
-                    temperature=0.7,
-                    timeout=30.0,
-                )
-                self.models["anthropic"] = AnthropicModel(anthropic_config)
-                self.primary_model = "anthropic"
-                logger.info("Anthropicモデルをプライマリとして設定しました")
+            try:
+                if not self.primary_model and secure_config.anthropic_api_key:
+                    anthropic_config = AIModelConfig(
+                        model_type=AIModelType.ANTHROPIC,
+                        model_name="claude-3-sonnet-20240229",
+                        api_key=secure_config.anthropic_api_key,
+                        max_tokens=1000,
+                        temperature=0.7,
+                        timeout=30.0,
+                    )
+                    self.models["anthropic"] = AnthropicModel(anthropic_config)
+                    self.primary_model = "anthropic"
+                    logger.info("Anthropicモデルをプライマリとして設定しました")
+            except Exception as e:
+                logger.error(f"Anthropicモデル初期化エラー: {e}")
 
             # モックモデル（開発用）
-            mock_config = AIModelConfig(
-                model_type=AIModelType.MOCK, model_name="mock-model", api_key="mock-key"
-            )
-            self.models["mock"] = MockModel(mock_config)
-            if not self.primary_model:
-                self.primary_model = "mock"
-            else:
-                self.fallback_models.append("mock")
+            try:
+                mock_config = AIModelConfig(
+                    model_type=AIModelType.MOCK,
+                    model_name="mock-model",
+                    api_key="mock-key",
+                )
+                self.models["mock"] = MockModel(mock_config)
+                if not self.primary_model:
+                    self.primary_model = "mock"
+                else:
+                    self.fallback_models.append("mock")
+            except Exception as e:
+                logger.error(f"モックモデル初期化エラー: {e}")
 
             logger.info(
-                f"モデルマネージャーを初期化しました。プライマリ: {self.primary_model}"
+                f"モデルマネージャーを初期化しました。プライマリ: {self.primary_model}, モデル数: {len(self.models)}"
             )
 
         except Exception as e:
