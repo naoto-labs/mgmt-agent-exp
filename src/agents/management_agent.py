@@ -14,7 +14,11 @@ logging.getLogger("httpx").setLevel(logging.WARNING)
 logging.getLogger("httpcore").setLevel(logging.WARNING)
 logging.getLogger("urllib3").setLevel(logging.WARNING)
 
+from langchain.embeddings import OpenAIEmbeddings
+from langchain.memory import ConversationBufferWindowMemory, VectorStoreRetrieverMemory
 from langchain.tools import StructuredTool
+from langchain_community.vectorstores import Chroma
+from langchain_core.runnables import RunnableLambda, RunnableSequence
 from pydantic import BaseModel, Field
 
 from src.domain.models.product import SAMPLE_PRODUCTS
@@ -45,8 +49,8 @@ class BusinessMetrics(BaseModel):
     timestamp: datetime
 
 
-class SessionBasedManagementAgent:
-    """セッション型経営管理Agent"""
+class NodeBasedManagementAgent:
+    """Node-Based経営管理Agent (RunnableSequence)"""
 
     def __init__(self, provider: str = "openai"):
         """
@@ -58,9 +62,7 @@ class SessionBasedManagementAgent:
         self._system_prompt_logged = False  # システムプロンプトログ出力フラグ
 
         # model_managerを使用するため、プロバイダー指定は情報用途のみ
-        logger.info(
-            f"SessionBasedManagementAgent initialized with provider: {provider}"
-        )
+        logger.info(f"NodeBasedManagementAgent initialized with provider: {provider}")
 
         # LLM接続確認
         self._verify_llm_connection()
@@ -68,6 +70,15 @@ class SessionBasedManagementAgent:
         # 設定からAgent目的を取得してシステムプロンプト生成
         self.agent_objectives = settings.agent_objectives
         self.system_prompt = self._generate_system_prompt()
+
+        # メモリー初期化
+        self._initialize_memory()
+
+        # Node定義 (Case A)
+        self.nodes = self._create_nodes()
+
+        # Chain構築
+        self.chain = self._build_chain()
 
         # ツールの初期化
         self.tools = self._create_tools()
@@ -952,6 +963,258 @@ JSON形式で以下の構造で回答してください：
         self.current_session.decisions_made.append(decision)
         return decision
 
+    # Case A node functions (agent_design.md準拠)
+
+    async def inventory_check_node(self, inputs: Dict[str, Any]) -> Dict[str, Any]:
+        """在庫確認node: check_inventory_status + get_business_metrics"""
+        logger.info("Executing inventory_check_node")
+        try:
+            # Get business metrics first
+            metrics = self.get_business_metrics()
+            # Check inventory status using the metrics
+            inventory_status = await self.check_inventory_status()
+            result = {
+                "node": "inventory_check",
+                "metrics": metrics,
+                "inventory_status": inventory_status,
+                "status": "completed",
+                "chain_context": f"Inventory check: {inventory_status.get('status', 'none')}",
+            }
+            # Memory save
+            self.short_term_memory.save_context(
+                {"input": "inventory_check"}, {"output": str(result)}
+            )
+            return result
+        except Exception as e:
+            logger.error(f"inventory_check_node error: {e}")
+            return {"node": "inventory_check", "status": "error", "error": str(e)}
+
+    async def sales_plan_node(self, inputs: Dict[str, Any]) -> Dict[str, Any]:
+        """売上計画node: plan_sales_strategy + analyze_financial_performance"""
+        logger.info("Executing sales_plan_node")
+        try:
+            metrics = inputs.get("metrics", self.get_business_metrics())
+            # Analyze financial performance
+            analysis = await self.analyze_financial_performance()
+            result = {
+                "node": "sales_plan",
+                "metrics": metrics,
+                "financial_analysis": analysis,
+                "status": "completed",
+                "chain_context": f"Sales plan: analysis completed",
+            }
+            self.short_term_memory.save_context(
+                {"input": "sales_plan"}, {"output": str(result)}
+            )
+            return result
+        except Exception as e:
+            logger.error(f"sales_plan_node error: {e}")
+            return {"node": "sales_plan", "status": "error", "error": str(e)}
+
+    async def pricing_node(self, inputs: Dict[str, Any]) -> Dict[str, Any]:
+        """価格調整node: update_pricing"""
+        logger.info("Executing pricing_node")
+        try:
+            metrics = inputs.get("metrics", self.get_business_metrics())
+            # Simple pricing logic - increase price for high-margin items
+            if metrics.get("profit_margin", 0) > 0.3:
+                if SAMPLE_PRODUCTS:
+                    self.update_pricing(
+                        SAMPLE_PRODUCTS[0].product_id, 160
+                    )  # Example price update
+                    result = {
+                        "node": "pricing",
+                        "action": "price_increased",
+                        "previous_margin": metrics["profit_margin"],
+                        "status": "completed",
+                        "chain_context": "Pricing updated",
+                    }
+                else:
+                    result = {
+                        "node": "pricing",
+                        "action": "no_products",
+                        "status": "completed",
+                    }
+            else:
+                result = {
+                    "node": "pricing",
+                    "action": "no_change",
+                    "status": "completed",
+                }
+            self.short_term_memory.save_context(
+                {"input": "pricing"}, {"output": str(result)}
+            )
+            return result
+        except Exception as e:
+            logger.error(f"pricing_node error: {e}")
+            return {"node": "pricing", "status": "error", "error": str(e)}
+
+    async def restock_node(self, inputs: Dict[str, Any]) -> Dict[str, Any]:
+        """在庫補充node: assign_restocking_task"""
+        logger.info("Executing restock_node")
+        try:
+            inventory_status = inputs.get(
+                "inventory_status", await self.check_inventory_status()
+            )
+            low_stock_items = inventory_status.get("low_stock_items", [])
+            if low_stock_items:
+                task_result = self.assign_restocking_task(low_stock_items, "normal")
+                result = {
+                    "node": "restock",
+                    "action": "task_assigned",
+                    "products": low_stock_items,
+                    "task_id": task_result.get("task_id"),
+                    "status": "completed",
+                    "chain_context": f"Restock task assigned for {low_stock_items}",
+                }
+            else:
+                result = {
+                    "node": "restock",
+                    "action": "no_action",
+                    "status": "completed",
+                }
+            self.short_term_memory.save_context(
+                {"input": "restock"}, {"output": str(result)}
+            )
+            return result
+        except Exception as e:
+            logger.error(f"restock_node error: {e}")
+            return {"node": "restock", "status": "error", "error": str(e)}
+
+    async def procurement_request_generation_node(
+        self, inputs: Dict[str, Any]
+    ) -> Dict[str, Any]:
+        """発注依頼node: request_procurement"""
+        logger.info("Executing procurement_request_generation_node")
+        try:
+            inventory_status = inputs.get(
+                "inventory_status", await self.check_inventory_status()
+            )
+            reorder_needed = inventory_status.get("reorder_needed", [])
+            if reorder_needed:
+                procurement_result = self.request_procurement(
+                    reorder_needed, {item: 20 for item in reorder_needed}
+                )
+                result = {
+                    "node": "procurement",
+                    "action": "procurement_requested",
+                    "products": reorder_needed,
+                    "order_id": procurement_result.get("order_id"),
+                    "status": "completed",
+                    "chain_context": f"Procurement requested for {reorder_needed}",
+                }
+            else:
+                result = {
+                    "node": "procurement",
+                    "action": "no_action",
+                    "status": "completed",
+                }
+            self.short_term_memory.save_context(
+                {"input": "procurement"}, {"output": str(result)}
+            )
+            return result
+        except Exception as e:
+            logger.error(f"procurement_request_generation_node error: {e}")
+            return {"node": "procurement", "status": "error", "error": str(e)}
+
+    def sales_processing_node(self, inputs: Dict[str, Any]) -> Dict[str, Any]:
+        """売上処理node: 仮定実装"""
+        logger.info("Executing sales_processing_node")
+        # Simple processing - could integrate with actual sales system
+        result = {
+            "node": "sales_processing",
+            "action": "processed",
+            "transactions": 5,  # Example
+            "status": "completed",
+            "chain_context": "Sales processed",
+        }
+        self.short_term_memory.save_context(
+            {"input": "sales_processing"}, {"output": str(result)}
+        )
+        return result
+
+    async def customer_interaction_node(self, inputs: Dict[str, Any]) -> Dict[str, Any]:
+        """顧客対応node: respond_to_customer_inquiry + handle_customer_complaint"""
+        logger.info("Executing customer_interaction_node")
+        try:
+            # Process any pending customer interactions
+            # This is a simplified implementation
+            feedback = self.collect_customer_feedback()
+            if feedback.get("feedback_count", 0) > 10:  # Example threshold
+                campaign_result = self.create_customer_engagement_campaign("loyalty")
+                result = {
+                    "node": "customer_interaction",
+                    "action": "campaign_created",
+                    "feedback_count": feedback["feedback_count"],
+                    "campaign_type": campaign_result.get("campaign_type"),
+                    "status": "completed",
+                    "chain_context": f"Customer interaction: campaign created",
+                }
+            else:
+                result = {
+                    "node": "customer_interaction",
+                    "action": "no_action",
+                    "status": "completed",
+                }
+            self.short_term_memory.save_context(
+                {"input": "customer_interaction"}, {"output": str(result)}
+            )
+            return result
+        except Exception as e:
+            logger.error(f"customer_interaction_node error: {e}")
+            return {"node": "customer_interaction", "status": "error", "error": str(e)}
+
+    async def profit_calculation_node(self, inputs: Dict[str, Any]) -> Dict[str, Any]:
+        """利益計算node: analyze_financial_performance"""
+        logger.info("Executing profit_calculation_node")
+        try:
+            analysis = inputs.get(
+                "financial_analysis", await self.analyze_financial_performance()
+            )
+            result = {
+                "node": "profit_calculation",
+                "analysis": analysis,
+                "margin": analysis.get("metrics", {}).get("profit_margin", 0),
+                "status": "completed",
+                "chain_context": f"Profit calculated: {analysis.get('metrics', {}).get('profit_margin', 0):.1%}",
+            }
+            self.short_term_memory.save_context(
+                {"input": "profit_calculation"}, {"output": str(result)}
+            )
+            return result
+        except Exception as e:
+            logger.error(f"profit_calculation_node error: {e}")
+            return {"node": "profit_calculation", "status": "error", "error": str(e)}
+
+    async def feedback_node(self, inputs: Dict[str, Any]) -> Dict[str, Any]:
+        """フィードバックnode: feedback_engine"""
+        logger.info("Executing feedback_node")
+        try:
+            feedback_result = self.collect_customer_feedback()
+            result = {
+                "node": "feedback",
+                "feedback": feedback_result,
+                "trends": feedback_result.get("trends"),
+                "status": "completed",
+                "chain_context": f"Feedback collected: {feedback_result.get('average_rating', 0)} rating",
+            }
+            # Save to long-term memory
+            if self.long_term_memory:
+                try:
+                    self.long_term_memory.save_context(
+                        {"event": "daily_feedback", "date": datetime.now().isoformat()},
+                        {"feedback": str(feedback_result)},
+                    )
+                except Exception as mem_e:
+                    logger.warning(f"Long-term memory save failed: {mem_e}")
+            self.short_term_memory.save_context(
+                {"input": "feedback"}, {"output": str(result)}
+            )
+            return result
+        except Exception as e:
+            logger.error(f"feedback_node error: {e}")
+            return {"node": "feedback", "status": "error", "error": str(e)}
+
     async def morning_routine(self) -> Dict[str, Any]:
         """朝の業務ルーチン"""
         session_id = await self.start_management_session("morning_routine")
@@ -1100,4 +1363,4 @@ JSON形式で以下の構造で回答してください：
 
 
 # グローバルインスタンス
-management_agent = SessionBasedManagementAgent(provider="openai")
+management_agent = NodeBasedManagementAgent(provider="openai")
