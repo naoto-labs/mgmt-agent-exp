@@ -1,26 +1,28 @@
-import pytest
-from unittest.mock import MagicMock, patch
 from datetime import date, datetime
 from decimal import Decimal
+from unittest.mock import MagicMock, patch
 
-from src.accounting.journal_entry import (
-    JournalEntryProcessor,
+import pytest
+
+from src.domain.accounting.journal_entry import (
+    AccountCode,
+    AccountingEntry,
     ChartOfAccounts,
     JournalEntry,
-    AccountingEntry,
-    AccountCode,
-    journal_processor
+    JournalEntryProcessor,
+    journal_processor,
 )
-from src.accounting.management_accounting import (
+from src.domain.accounting.management_accounting import (
+    EfficiencyRating,
+    InventoryEfficiency,
     ManagementAccountingAnalyzer,
     ProductProfitability,
-    InventoryEfficiency,
     ProfitabilityRating,
-    EfficiencyRating,
-    management_analyzer
+    management_analyzer,
 )
-from src.models.transaction import Transaction, PaymentMethod
-from src.models.product import Product, ProductCategory
+from src.domain.models.product import Product, ProductCategory
+from src.domain.models.transaction import PaymentMethod, Transaction
+
 
 class TestChartOfAccounts:
     """勘定科目表のテスト"""
@@ -44,6 +46,7 @@ class TestChartOfAccounts:
         assert AccountCode.SALES_REVENUE in accounts
         assert len(accounts) >= 6  # 最低6科目あるはず
 
+
 class TestAccountingEntry:
     """会計エントリのテスト"""
 
@@ -53,7 +56,7 @@ class TestAccountingEntry:
             account_code=AccountCode.CASH,
             account_name="現金",
             debit_amount=1000.0,
-            credit_amount=0.0
+            credit_amount=0.0,
         )
 
         assert entry.is_debit() is True
@@ -66,12 +69,13 @@ class TestAccountingEntry:
             account_code=AccountCode.SALES_REVENUE,
             account_name="売上高",
             debit_amount=0.0,
-            credit_amount=1500.0
+            credit_amount=1500.0,
         )
 
         assert entry.is_debit() is False
         assert entry.is_credit() is True
         assert entry.get_amount() == 1500.0
+
 
 class TestJournalEntry:
     """仕訳エントリのテスト"""
@@ -80,14 +84,11 @@ class TestJournalEntry:
         """仕訳エントリ作成テスト"""
         entries = [
             AccountingEntry(AccountCode.CASH, "現金", debit_amount=1000.0),
-            AccountingEntry(AccountCode.SALES_REVENUE, "売上高", credit_amount=1000.0)
+            AccountingEntry(AccountCode.SALES_REVENUE, "売上高", credit_amount=1000.0),
         ]
 
         journal = JournalEntry(
-            entry_id="JE001",
-            date=date.today(),
-            description="商品販売",
-            entries=entries
+            entry_id="JE001", date=date.today(), description="商品販売", entries=entries
         )
 
         assert journal.entry_id == "JE001"
@@ -98,17 +99,20 @@ class TestJournalEntry:
         """バランスの取れていない仕訳テスト"""
         entries = [
             AccountingEntry(AccountCode.CASH, "現金", debit_amount=1000.0),
-            AccountingEntry(AccountCode.SALES_REVENUE, "売上高", credit_amount=800.0)  # バランスが取れていない
+            AccountingEntry(
+                AccountCode.SALES_REVENUE, "売上高", credit_amount=800.0
+            ),  # バランスが取れていない
         ]
 
         journal = JournalEntry(
             entry_id="JE002",
             date=date.today(),
             description="不正な仕訳",
-            entries=entries
+            entries=entries,
         )
 
         assert journal.is_balanced() is False
+
 
 class TestJournalEntryProcessor:
     """仕訳処理プロセッサのテスト"""
@@ -132,7 +136,7 @@ class TestJournalEntryProcessor:
             machine_id="VM001",
             items=[],
             subtotal=1000.0,
-            total_amount=1000.0
+            total_amount=1000.0,
         )
 
         journal_entry = processor.record_sale(transaction)
@@ -156,7 +160,7 @@ class TestJournalEntryProcessor:
             machine_id="VM001",
             items=[],
             subtotal=0.0,
-            total_amount=0.0
+            total_amount=0.0,
         )
 
         with pytest.raises(ValueError, match="売上金額は0より大きくなければなりません"):
@@ -169,10 +173,12 @@ class TestJournalEntryProcessor:
             description="テスト用商品",
             category=ProductCategory.DRINK,
             price=200.0,
-            cost=120.0
+            cost=120.0,
         )
 
-        journal_entries = processor.record_purchase(product, 10, "テストサプライヤー", "PO001")
+        journal_entries = processor.record_purchase(
+            product, 10, "テストサプライヤー", "PO001"
+        )
 
         assert len(journal_entries) == 2  # 仕入時と在庫計上の2つ
         assert all(entry.is_balanced() for entry in journal_entries)
@@ -187,7 +193,7 @@ class TestJournalEntryProcessor:
                 machine_id="VM001",
                 items=[],
                 subtotal=1000.0,
-                total_amount=1000.0
+                total_amount=1000.0,
             )
             processor.record_sale(transaction)
 
@@ -207,7 +213,7 @@ class TestJournalEntryProcessor:
             machine_id="VM001",
             items=[],
             subtotal=1000.0,
-            total_amount=1000.0
+            total_amount=1000.0,
         )
         processor.record_sale(transaction)
 
@@ -215,7 +221,7 @@ class TestJournalEntryProcessor:
         cash_balance = processor.get_account_balance(AccountCode.CASH)
         sales_balance = processor.get_account_balance(AccountCode.SALES_REVENUE)
 
-        assert cash_balance == 1000.0   # 借方残高
+        assert cash_balance == 1000.0  # 借方残高
         assert sales_balance == -1000.0  # 貸方残高（負数で表示）
 
     def test_get_trial_balance(self, processor):
@@ -227,7 +233,7 @@ class TestJournalEntryProcessor:
                 machine_id="VM001",
                 items=[],
                 subtotal=1000.0,
-                total_amount=1000.0
+                total_amount=1000.0,
             )
             processor.record_sale(transaction)
 
@@ -235,6 +241,7 @@ class TestJournalEntryProcessor:
 
         assert trial_balance["total_debit"] == trial_balance["total_credit"]
         assert len(trial_balance["accounts"]) >= 2  # 少なくとも現金と売上高
+
 
 class TestManagementAccountingAnalyzer:
     """管理会計分析のテスト"""
@@ -256,7 +263,7 @@ class TestManagementAccountingAnalyzer:
             description="テスト用",
             category=ProductCategory.DRINK,
             price=200.0,
-            cost=120.0
+            cost=120.0,
         )
 
         transaction = Transaction(
@@ -264,16 +271,22 @@ class TestManagementAccountingAnalyzer:
             machine_id="VM001",
             items=[],
             subtotal=200.0,
-            total_amount=200.0
+            total_amount=200.0,
         )
 
         analyzer.journal_processor.record_sale(transaction)
 
         # 分析を実行
-        profitability = analyzer.analyze_product_profitability("product_1", period_days=30)
+        profitability = analyzer.analyze_product_profitability(
+            "product_1", period_days=30
+        )
 
         assert profitability.product_id == "product_1"
-        assert profitability.profitability_rating in [ProfitabilityRating.EXCELLENT, ProfitabilityRating.GOOD, ProfitabilityRating.AVERAGE]
+        assert profitability.profitability_rating in [
+            ProfitabilityRating.EXCELLENT,
+            ProfitabilityRating.GOOD,
+            ProfitabilityRating.AVERAGE,
+        ]
         assert profitability.gross_margin >= 0
 
     def test_calculate_inventory_turnover(self, analyzer):
@@ -281,7 +294,13 @@ class TestManagementAccountingAnalyzer:
         efficiency = analyzer.calculate_inventory_turnover("product_1")
 
         assert efficiency.product_id == "product_1"
-        assert efficiency.efficiency_rating in [EfficiencyRating.EXCELLENT, EfficiencyRating.GOOD, EfficiencyRating.AVERAGE, EfficiencyRating.POOR, EfficiencyRating.INEFFICIENT]
+        assert efficiency.efficiency_rating in [
+            EfficiencyRating.EXCELLENT,
+            EfficiencyRating.GOOD,
+            EfficiencyRating.AVERAGE,
+            EfficiencyRating.POOR,
+            EfficiencyRating.INEFFICIENT,
+        ]
         assert efficiency.inventory_turnover_ratio >= 0
         assert efficiency.inventory_turnover_days >= 0
 
@@ -293,7 +312,7 @@ class TestManagementAccountingAnalyzer:
             machine_id="VM001",
             items=[],
             subtotal=1000.0,
-            total_amount=1000.0
+            total_amount=1000.0,
         )
         analyzer.journal_processor.record_sale(transaction)
 
@@ -325,7 +344,9 @@ class TestManagementAccountingAnalyzer:
 
     def test_generate_profitability_report(self, analyzer):
         """収益性レポート生成テスト"""
-        report = analyzer.generate_profitability_report(["product_1", "product_2"], period_days=30)
+        report = analyzer.generate_profitability_report(
+            ["product_1", "product_2"], period_days=30
+        )
 
         assert "period" in report
         assert "products" in report
@@ -357,7 +378,10 @@ class TestManagementAccountingAnalyzer:
 
         # データ不足
         insufficient_values = [100]
-        assert analyzer._calculate_trend_direction(insufficient_values) == "insufficient_data"
+        assert (
+            analyzer._calculate_trend_direction(insufficient_values)
+            == "insufficient_data"
+        )
 
     def test_generate_management_dashboard_data(self, analyzer):
         """管理会計ダッシュボードデータ生成テスト"""
@@ -368,6 +392,7 @@ class TestManagementAccountingAnalyzer:
         assert "trend_analysis" in dashboard
         assert "inventory_efficiency" in dashboard
         assert "kpi_summary" in dashboard
+
 
 # 統合テスト
 def test_journal_processor_integration():
@@ -380,7 +405,7 @@ def test_journal_processor_integration():
         machine_id="VM001",
         items=[],
         subtotal=1500.0,
-        total_amount=1500.0
+        total_amount=1500.0,
     )
 
     sale_entry = processor.record_sale(transaction)
@@ -391,10 +416,12 @@ def test_journal_processor_integration():
         description="テスト用",
         category=ProductCategory.DRINK,
         price=200.0,
-        cost=120.0
+        cost=120.0,
     )
 
-    purchase_entries = processor.record_purchase(product, 5, "テストサプライヤー", "PO001")
+    purchase_entries = processor.record_purchase(
+        product, 5, "テストサプライヤー", "PO001"
+    )
 
     # 結果を検証
     assert len(processor.journal_entries) == 3  # 売上1 + 仕入2
@@ -404,7 +431,8 @@ def test_journal_processor_integration():
     inventory_balance = processor.get_account_balance(AccountCode.INVENTORY)
 
     assert cash_balance == 1500.0  # 売上による現金増加
-    assert inventory_balance > 0   # 仕入による在庫増加
+    assert inventory_balance > 0  # 仕入による在庫増加
+
 
 # エラーハンドリングテスト
 def test_journal_processor_error_handling():
@@ -417,11 +445,12 @@ def test_journal_processor_error_handling():
         machine_id="VM001",
         items=[],
         subtotal=0.0,
-        total_amount=0.0
+        total_amount=0.0,
     )
 
     with pytest.raises(ValueError, match="売上金額は0より大きくなければなりません"):
         processor.record_sale(invalid_transaction)
+
 
 # パフォーマンステスト
 def test_journal_processor_performance():
@@ -437,7 +466,7 @@ def test_journal_processor_performance():
             machine_id="VM001",
             items=[],
             subtotal=1000.0,
-            total_amount=1000.0
+            total_amount=1000.0,
         )
         processor.record_sale(transaction)
 
@@ -446,6 +475,7 @@ def test_journal_processor_performance():
     # 100件の処理が1秒以内に完了することを確認
     assert elapsed_time < 1.0
     assert len(processor.journal_entries) == 100
+
 
 # データ整合性テスト
 def test_accounting_data_integrity():
@@ -458,7 +488,7 @@ def test_accounting_data_integrity():
         machine_id="VM001",
         items=[],
         subtotal=1000.0,
-        total_amount=1000.0
+        total_amount=1000.0,
     )
     processor.record_sale(transaction)
 
@@ -472,6 +502,7 @@ def test_accounting_data_integrity():
         # 残高は借方残高 - 貸方残高で計算されているはず
         expected_balance = account["debit"] - account["credit"]
         assert abs(account["balance"] - expected_balance) < 0.01
+
 
 if __name__ == "__main__":
     # テスト実行

@@ -7,13 +7,19 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.middleware.trustedhost import TrustedHostMiddleware
 from fastapi.responses import JSONResponse
 from fastapi.staticfiles import StaticFiles
-
-from src.api.procurement import router as procurement_router
-from src.api.tablet import router as tablet_router
-from src.api.vending import router as vending_router
-from src.config.security import secure_config, setup_secure_logging
-from src.config.settings import settings, validate_startup_settings
 from store_simulation_scenarios import scenario_runner
+
+from src.infrastructure import (
+    procurement_router,
+    tablet_router,
+    vending_router,
+)
+from src.shared import (
+    secure_config,
+    settings,
+    setup_secure_logging,
+    validate_startup_settings,
+)
 
 # ロガーのセットアップ
 logging.basicConfig(

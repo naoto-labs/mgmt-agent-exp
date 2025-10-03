@@ -17,12 +17,9 @@ logging.getLogger("urllib3").setLevel(logging.WARNING)
 from langchain.tools import StructuredTool
 from pydantic import BaseModel, Field
 
-from src.agents.procurement_agent import procurement_agent
-from src.agents.search_agent import search_agent
-from src.ai.model_manager import model_manager
-from src.config.security import secure_config
-from src.config.settings import settings
-from src.models.product import SAMPLE_PRODUCTS
+from src.domain.models.product import SAMPLE_PRODUCTS
+from src.infrastructure import model_manager
+from src.shared import secure_config, settings
 
 logger = logging.getLogger(__name__)
 
@@ -217,7 +214,7 @@ class SessionBasedManagementAgent:
                 description="在庫レベルと回転率を確認",
             ),
             StructuredTool.from_function(
-                func=self.update_pricing_strategy,
+                func=self.update_pricing,
                 name="update_pricing",
                 description="価格戦略を決定し、システムに反映",
             ),
@@ -283,8 +280,8 @@ class SessionBasedManagementAgent:
             # 各種サービスをインポート
             from datetime import date, timedelta
 
-            from src.accounting.management_accounting import management_analyzer
-            from src.services.inventory_service import inventory_service
+            from src.application.services.inventory_service import inventory_service
+            from src.domain.accounting.management_accounting import management_analyzer
 
             # 在庫情報を取得
             inventory_summary = inventory_service.get_inventory_summary()
@@ -375,7 +372,9 @@ class SessionBasedManagementAgent:
         """財務パフォーマンスを分析（model_manager経由）"""
         logger.info("Analyzing financial performance using LLM")
         try:
-            from src.ai.model_manager import AIMessage, model_manager
+            from src.ai.model_manager import AIMessage
+
+            from src.infrastructure import model_manager
 
             metrics = self.get_business_metrics()
 
@@ -450,7 +449,9 @@ JSON形式で回答してください：
         """在庫状況を確認（model_manager経由）"""
         logger.info("Checking inventory status using LLM")
         try:
-            from src.ai.model_manager import AIMessage, model_manager
+            from src.ai.model_manager import AIMessage
+
+            from src.infrastructure import model_manager
 
             metrics = self.get_business_metrics()
             inventory_level = metrics["inventory_level"]
@@ -516,9 +517,9 @@ JSON形式で回答してください：
                 "estimated_stockout": {},
             }
 
-    def update_pricing_strategy(self, product: str, price: float) -> Dict[str, Any]:
+    def update_pricing(self, product: str, price: float) -> Dict[str, Any]:
         """価格戦略を更新"""
-        logger.info("Tool update_pricing_strategy called")
+        logger.info("Tool update_pricing called")
         logger.info(f"Updating pricing for {product} to {price}")
         return {
             "success": True,
@@ -627,38 +628,48 @@ JSON形式で回答してください：
 
             logger.info(f"生成された検索クエリ: {search_query}")
 
-            search_results = await search_agent.search_products(search_query)
-            logger.info(
-                f"検索結果取得: {search_results['total_found']}件 (クエリ: {search_results['query']})"
-            )
-            recommended_products = search_results["results"][:2]  # 上位2つ
+            # Shared Toolsから商品検索機能を使用
+            from src.agents.shared_tools import shared_registry
+
+            search_tool = shared_registry.get_tool("market_search")
+            if search_tool:
+                search_results = await search_tool.asearch(query=search_query)
+                logger.info(
+                    f"検索結果取得: {len(search_results) if search_results else 0}件 (クエリ: {search_query})"
+                )
+                recommended_products = (
+                    search_results[:2] if search_results else []
+                )  # 上位2つ
+            else:
+                recommended_products = []
+                logger.warning("検索ツールが利用できません")
 
             if recommended_products:
                 procurement_tasks = []
-                for product in recommended_products:
-                    # Procurement Agentで発注依頼（正しいメソッドを使用）
-                    procurement_result = (
-                        await procurement_agent.create_order_instruction(
+                for product in recommended_products[:2]:  # dict形式を想定
+                    # Procurement AgentからShared Toolsに変更
+                    procurement_tool = shared_registry.get_tool("procurement_order")
+                    if procurement_tool:
+                        procurement_result = await procurement_tool.aexecute(
                             product_info={
-                                "product_name": product["title"],
+                                "product_name": product.get("name", "") or product,
                                 "recommended_quantity": 10,
                             },
                             supplier_info={
                                 "name": "Search Supplier",
-                                "url": product["url"],
-                                "price": product["price"] or 150,
+                                "url": product.get("url", ""),
+                                "price": product.get("price", 150),
                             },
                         )
-                    )
 
-                    if procurement_result.get("success"):
-                        order = procurement_result.get("order_instruction", {})
-                        procurement_tasks.append(
-                            {
-                                "product": product["title"],
-                                "order_id": order.get("order_id", "unknown"),
-                            }
-                        )
+                        if procurement_result.get("success"):
+                            order = procurement_result.get("order", {})
+                            procurement_tasks.append(
+                                {
+                                    "product": product.get("name", "") or product,
+                                    "order_id": order.get("order_id", "unknown"),
+                                }
+                            )
 
                 if procurement_tasks:
                     procurement_notification = {
@@ -788,7 +799,9 @@ JSON形式で回答してください：
         logger.info("Making strategic decision using model_manager")
 
         try:
-            from src.ai.model_manager import AIMessage, model_manager
+            from src.ai.model_manager import AIMessage
+
+            from src.infrastructure import model_manager
 
             # LLMに渡すメッセージを作成
             user_content = f"""
@@ -921,9 +934,7 @@ JSON形式で以下の構造で回答してください：
                     if SAMPLE_PRODUCTS:
                         product = SAMPLE_PRODUCTS[0]  # Using first registered product
                         new_price = round(product.price * 1.05, 0)  # Example adjustment
-                        result = self.update_pricing_strategy(
-                            product.product_id, new_price
-                        )
+                        result = self.update_pricing(product.product_id, new_price)
                         executed_actions.append(
                             f"Executed pricing update for {product.product_id} to ¥{new_price}"
                         )
@@ -1008,6 +1019,46 @@ JSON形式で以下の構造で回答してください：
             await self.end_management_session()
 
     async def evening_summary(self) -> Dict[str, Any]:
+        """夕方の業務総括"""
+        session_id = await self.start_management_session("evening_summary")
+
+        try:
+            daily_performance = self.get_business_metrics()
+            inventory_status = await self.check_inventory_status()
+
+            evening_analysis = f"""
+            今日一日の業績を総括し、明日への改善点を特定してください。
+            
+            【今日の実績】
+            - 売上: {daily_performance["sales"]}
+            - 利益率: {daily_performance["profit_margin"]}
+            - 在庫状況: {inventory_status["status"]}
+            
+            【分析項目】
+            1. 今日の成功要因
+            2. 改善が必要な領域
+            3. 明日の重点課題
+            """
+
+            decisions = await self.make_strategic_decision(evening_analysis)
+
+            return {
+                "session_id": session_id,
+                "session_type": "evening_summary",
+                "daily_performance": daily_performance,
+                "inventory_status": inventory_status,
+                "decisions": decisions,
+                "lessons_learned": [
+                    "在庫管理の改善が必要",
+                    "顧客満足度を維持できた",
+                ],
+                "status": "completed",
+            }
+
+        finally:
+            await self.end_management_session()
+
+    async def feedback_engine(self) -> Dict[str, Any]:
         """夕方の業務総括"""
         session_id = await self.start_management_session("evening_summary")
 

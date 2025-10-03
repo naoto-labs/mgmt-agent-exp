@@ -1,370 +1,206 @@
+"""
+新しいorchestratorアーキテクチャの統合テスト
+"""
+
 import asyncio
-import random
-from datetime import datetime
 from unittest.mock import AsyncMock, MagicMock, patch
 
 import pytest
 
-from src.agents.customer_agent import CustomerAgent
-from src.agents.search_agent import SearchAgent, SearchResult, WebSearchService
-from src.ai.model_manager import AIMessage, AIModelType, AIResponse
-from src.services.conversation_service import ConversationService
-from src.services.inventory_service import InventoryService
+# New orchestrator imports
+from src.agents.analytics_agent.advisory.orchestrator import analytics_orchestrator
+from src.agents.management_agent.orchestrator import management_agent
+from src.agents.recorder_agent.orchestrator import recorder_orchestrator
 
 
-class TestSearchAgent:
-    """検索エージェントのテスト"""
-
-    @pytest.fixture
-    def search_agent(self):
-        """検索エージェントのフィクスチャ"""
-        return SearchAgent()
-
-    @pytest.fixture
-    def sample_search_results(self):
-        """サンプル検索結果のフィクスチャ"""
-        return [
-            SearchResult(
-                query="コカ・コーラ 価格",
-                title="コカ・コーラ 販売サイト",
-                url="https://example.com/coke",
-                snippet="高品質なコカ・コーラをお探しならこちら",
-                price=150.0,
-                availability="在庫あり",
-                relevance_score=0.9,
-            ),
-            SearchResult(
-                query="コカ・コーラ 価格",
-                title="コカ・コーラ 通販",
-                url="https://example2.com/coke",
-                snippet="激安コカ・コーラ",
-                price=140.0,
-                availability="在庫あり",
-                relevance_score=0.8,
-            ),
-        ]
-
-    def test_search_agent_initialization(self, search_agent):
-        """検索エージェントの初期化テスト"""
-        assert search_agent.web_search is not None
-        assert search_agent.model_manager is not None
-        assert search_agent.search_history == []
+class TestManagementAgentOrchestrator:
+    """Management Agent Orchestratorのテスト"""
 
     @pytest.mark.asyncio
-    async def test_find_suppliers_success(self, search_agent, sample_search_results):
-        """仕入れ先検索成功テスト"""
+    async def test_morning_routine(self):
+        """朝の業務ルーチンテスト"""
         with patch.object(
-            search_agent.web_search, "search_products", new_callable=AsyncMock
-        ) as mock_search:
-            mock_search.return_value = sample_search_results
+            management_agent, "make_strategic_decision", new_callable=AsyncMock
+        ) as mock_make_decision:
+            mock_make_decision.return_value = {
+                "decision": "在庫を最適化する",
+                "rationale": "データに基づく判断",
+                "actions": ["価格更新", "補充依頼"],
+            }
 
-            results = await search_agent.find_suppliers("コカ・コーラ", max_results=5)
+            session_id = await management_agent.start_management_session(
+                "morning_routine"
+            )
+            await management_agent.start_management_session("morning_routine")
 
-            assert len(results) == 2
-            assert results[0].price == 150.0
-            assert results[1].price == 140.0
-            mock_search.assert_called_once_with("コカ・コーラ", 5)
+            result = await management_agent.morning_routine()
+
+            assert "session_id" in result
+            assert "decisions" in result
+            assert result["status"] == "completed"
+
+            # セッション終了
+            await management_agent.end_management_session()
 
     @pytest.mark.asyncio
-    async def test_find_suppliers_no_results(self, search_agent):
-        """仕入れ先検索結果なしテスト"""
+    async def test_evening_summary(self):
+        """夕方の業務総括テスト"""
         with patch.object(
-            search_agent.web_search, "search_products", new_callable=AsyncMock
-        ) as mock_search:
-            mock_search.return_value = []
+            management_agent, "make_strategic_decision", new_callable=AsyncMock
+        ) as mock_make_decision:
+            mock_make_decision.return_value = {
+                "decision": "1日の振り返りを実行",
+                "rationale": "業績分析に基づく",
+                "actions": ["レポート生成", "改善策立案"],
+            }
 
-            results = await search_agent.find_suppliers("存在しない商品")
+            result = await management_agent.evening_summary()
 
-            assert results == []
+            assert "daily_performance" in result
+            assert "decisions" in result
+            assert "lessons_learned" in result
+            assert result["status"] == "completed"
+
+
+class TestAnalyticsAgentOrchestrator:
+    """Analytics Agent Orchestratorのテスト"""
 
     @pytest.mark.asyncio
-    async def test_compare_prices(self, search_agent, sample_search_results):
-        """価格比較テスト"""
-        with patch.object(
-            search_agent, "find_suppliers", new_callable=AsyncMock
-        ) as mock_find:
-            mock_find.return_value = sample_search_results
+    async def test_comprehensive_analysis(self):
+        """包括的分析テスト"""
+        result = await analytics_orchestrator.run_comprehensive_analysis()
 
-            comparison = await search_agent.compare_prices("コカ・コーラ")
-
-            assert comparison.product_name == "コカ・コーラ"
-            assert comparison.best_price == 140.0  # 最安価格
-            assert comparison.average_price == 145.0  # 平均価格
-            assert comparison.price_range == (140.0, 150.0)
-            assert len(comparison.search_results) == 2
-
-    def test_search_stats(self, search_agent):
-        """検索統計テスト"""
-        # 検索履歴を追加
-        search_agent.search_history = [
-            {"product_name": "商品1", "results_count": 5, "timestamp": datetime.now()},
-            {"product_name": "商品2", "results_count": 3, "timestamp": datetime.now()},
-        ]
-
-        stats = search_agent.get_search_stats()
-
-        assert stats["total_searches"] == 2
-        assert stats["avg_results_per_search"] == 4.0
-
-
-class TestCustomerAgent:
-    """顧客エージェントのテスト"""
-
-    @pytest.fixture
-    def customer_agent(self):
-        """顧客エージェントのフィクスチャ"""
-        return CustomerAgent()
-
-    @pytest.fixture
-    def mock_conversation_service(self):
-        """モック会話サービスのフィクスチャ"""
-        service = MagicMock(spec=ConversationService)
-        service.get_conversation_history = AsyncMock(return_value=[])
-        service.create_session = AsyncMock(return_value="session_123")
-        service.add_message = AsyncMock()
-        return service
-
-    @pytest.fixture
-    def mock_inventory_service(self):
-        """モック在庫サービスのフィクスチャ"""
-        service = MagicMock(spec=InventoryService)
-        service.get_inventory_summary.return_value = MagicMock(
-            total_slots=10, out_of_stock_slots=1
-        )
-        return service
+        assert "timestamp" in result
+        assert "analysis_results" in result
+        assert "session_type" in result
+        assert result["session_type"] == "comprehensive_analysis"
 
     @pytest.mark.asyncio
-    async def test_engage_customer_success(
-        self, customer_agent, mock_conversation_service, mock_inventory_service
-    ):
-        """顧客エンゲージメント成功テスト"""
-        customer_agent.conversation_service = mock_conversation_service
-        customer_agent.inventory_service = mock_inventory_service
+    async def test_real_time_monitoring(self):
+        """リアルタイム監視テスト"""
+        result = await analytics_orchestrator.run_real_time_monitoring()
 
-        # AI応答をモック
-        mock_response = AIResponse(
-            content='{"content": "こんにちは！", "engagement_type": "greeting", "suggested_products": [], "insights": {}}',
-            model_used="mock",
-            tokens_used=10,
-            response_time=0.5,
-            success=True,
-        )
+        assert "performance_health" in result
+        assert "safety_status" in result
+        assert "alerts" in result
+        assert result["status"] == "monitoring_active"
 
-        with patch.object(
-            customer_agent.model_manager, "generate_response", new_callable=AsyncMock
-        ) as mock_generate:
-            mock_generate.return_value = mock_response
 
-            result = await customer_agent.engage_customer("customer_123", "VM001")
+class TestRecorderAgentOrchestrator:
+    """Recorder Agent Orchestratorのテスト"""
+
+    @pytest.mark.asyncio
+    async def test_record_session_data(self):
+        """セッションデータ記録テスト"""
+        test_data = {
+            "session_id": "test_session_123",
+            "actions_taken": 3,
+            "decisions_made": 2,
+        }
+
+        with patch(
+            "src.agents.recorder_agent.learning_tools.session_recorder.record_session",
+            new_callable=AsyncMock,
+        ) as mock_record:
+            mock_record.return_value = {"success": True, "recorded_data": test_data}
+
+            result = await recorder_orchestrator.record_session_data(test_data)
 
             assert result["success"] is True
-            assert result["session_id"] == "session_123"
-            assert "message" in result
-            mock_conversation_service.create_session.assert_called_once()
+            assert result["recorded_data"]["session_id"] == "test_session_123"
 
     @pytest.mark.asyncio
-    async def test_engage_customer_ai_error(
-        self, customer_agent, mock_conversation_service, mock_inventory_service
-    ):
-        """顧客エンゲージメントAIエラーテスト"""
-        customer_agent.conversation_service = mock_conversation_service
-        customer_agent.inventory_service = mock_inventory_service
+    async def test_run_data_maintenance(self):
+        """データメンテナンステスト"""
+        result = await recorder_orchestrator.run_data_maintenance()
 
-        # AIエラーをモック
-        mock_response = AIResponse(
-            content="",
-            model_used="mock",
-            tokens_used=0,
-            response_time=0.0,
-            success=False,
-            error_message="AIエラー",
-        )
+        assert "status" in result
+        assert result["status"] == "maintenance_completed"
+        assert "timestamp" in result
 
-        with patch.object(
-            customer_agent.model_manager, "generate_response", new_callable=AsyncMock
-        ) as mock_generate:
-            mock_generate.return_value = mock_response
 
-            result = await customer_agent.engage_customer("customer_123", "VM001")
-
-            assert result["success"] is True  # エラー時もデフォルトメッセージで成功扱い
-            assert "message" in result
+class TestAgentOrchestratorIntegration:
+    """Agent Orchestrator統合テスト"""
 
     @pytest.mark.asyncio
-    async def test_handle_customer_message(
-        self, customer_agent, mock_conversation_service
-    ):
-        """顧客メッセージ処理テスト"""
-        customer_agent.conversation_service = mock_conversation_service
-
-        # 会話データをモック
-        conversation_data = {
-            "session_id": "session_123",
-            "customer_context": {},
-            "message_history": [
-                {
-                    "role": "assistant",
-                    "content": "こんにちは",
-                    "timestamp": datetime.now().isoformat(),
-                }
-            ],
-            "previous_insights": {},
-        }
-        mock_conversation_service.get_conversation_for_ai_agent = AsyncMock(
-            return_value=conversation_data
-        )
-
-        # AI応答をモック
-        mock_response = AIResponse(
-            content='{"content": "お役に立てることはありますか？", "engagement_type": "inquiry", "suggested_products": [], "insights": {}}',
-            model_used="mock",
-            tokens_used=15,
-            response_time=0.3,
-            success=True,
-        )
-
+    async def test_management_and_analytics_flow(self):
+        """Management Agent → Analytics Agent連携テスト"""
+        # Managementセッション実行
         with patch.object(
-            customer_agent.model_manager, "generate_response", new_callable=AsyncMock
-        ) as mock_generate:
-            mock_generate.return_value = mock_response
+            management_agent, "make_strategic_decision", new_callable=AsyncMock
+        ) as mock_make_decision:
+            mock_make_decision.return_value = {
+                "decision": "在庫戦略の調整",
+                "rationale": "分析結果に基づく",
+                "actions": ["在庫補充"],
+            }
 
-            result = await customer_agent.handle_customer_message(
-                "session_123", "こんにちは"
+            session_result = await management_agent.morning_routine()
+            session_data = session_result
+
+            # Analytics分析実行
+            analysis_result = await analytics_orchestrator.run_comprehensive_analysis()
+
+            # Recorderデータ記録
+            record_result = await recorder_orchestrator.record_session_data(
+                session_data
             )
 
-            assert result["success"] is True
-            assert "お役に立てることはありますか？" in result["message"]
-            mock_conversation_service.add_message.assert_called()
-
-    def test_analyze_customer_preferences(self, customer_agent):
-        """顧客嗜好分析テスト"""
-        history = [
-            {
-                "summary": "コーヒーについて質問",
-                "context": {"product_category": "drink"},
-            },
-            {
-                "summary": "スナックについて会話",
-                "context": {"product_category": "snack"},
-            },
-        ]
-
-        preferences = customer_agent._analyze_customer_preferences(history)
-
-        assert "コーヒー" in preferences
-        assert "スナック" in preferences
-
-
-class TestWebSearchService:
-    """Web検索サービスのテスト"""
-
-    @pytest.fixture
-    def web_search(self):
-        """Web検索サービスのフィクスチャ"""
-        return WebSearchService()
+            # 統合結果確認
+            assert session_result["status"] == "completed"
+            assert "timestamp" in analysis_result
+            assert record_result["success"] is True
 
     @pytest.mark.asyncio
-    async def test_search_products_simulation(self, web_search):
-        """商品検索シミュレーションテスト"""
-        results = await web_search.search_products("コカ・コーラ", max_results=5)
+    async def test_full_agent_workflow(self):
+        """完全なAgentワークフローテスト"""
+        # 朝のセッション
+        morning_session = await management_agent.start_management_session(
+            "morning_routine"
+        )
 
-        assert len(results) > 0
-        assert all(result.price is not None for result in results)
-        assert all(result.relevance_score > 0 for result in results)
+        # 分析実行
+        analytics_result = await analytics_orchestrator.run_real_time_monitoring()
 
-    def test_estimate_base_price(self, web_search):
-        """ベース価格推定テスト"""
-        price = web_search._estimate_base_price("コカ・コーラ")
-        assert price == 150.0
+        # 夕方の総括
+        evening_result = await management_agent.evening_summary()
 
-        price = web_search._estimate_base_price("ポテトチップス")
-        assert price == 180.0
+        # 記録
+        log_result = await recorder_orchestrator.record_session_data(
+            {"day": "test_day", "performance": evening_result["daily_performance"]}
+        )
 
-        price = web_search._estimate_base_price("不明な商品")
-        assert price == 200.0  # デフォルト価格
-
-    def test_deduplicate_results(self, web_search):
-        """検索結果重複除去テスト"""
-        results = [
-            SearchResult(
-                query="test",
-                title="タイトル1",
-                url="https://example1.com",
-                snippet="説明1",
-                relevance_score=0.9,
-            ),
-            SearchResult(
-                query="test",
-                title="タイトル2",
-                url="https://example2.com",
-                snippet="説明2",
-                relevance_score=0.8,
-            ),
-            SearchResult(
-                query="test",
-                title="タイトル1",
-                url="https://example1.com",
-                snippet="説明1",
-                relevance_score=0.9,
-            ),  # 重複
-        ]
-
-        unique_results = web_search._deduplicate_results(results)
-
-        assert len(unique_results) == 2  # 重複が除去される
+        assert morning_session is not None
+        assert "performance_health" in analytics_result
+        assert "daily_performance" in evening_result
+        assert log_result["success"] is True
 
 
 # パフォーマンステスト
 @pytest.mark.asyncio
-async def test_search_agent_performance():
-    """検索エージェントのパフォーマンステスト"""
-    agent = SearchAgent()
+async def test_orchestrator_performance():
+    """Orchestratorパフォーマンステスト"""
+    import time
 
-    start_time = datetime.now()
+    start_time = time.time()
 
-    # 複数回の検索を実行
-    for i in range(3):
-        results = await agent.find_suppliers(f"商品{i}", max_results=5)
-        assert len(results) >= 0
+    # 複数の分析を実行
+    tasks = [
+        analytics_orchestrator.run_real_time_monitoring(),
+        analytics_orchestrator.run_real_time_monitoring(),
+        recorder_orchestrator.run_data_maintenance(),
+    ]
 
-    elapsed_time = (datetime.now() - start_time).total_seconds()
+    results = await asyncio.gather(*tasks)
 
-    # 各検索が1秒以内に完了することを確認
-    assert elapsed_time < 3.0
+    elapsed_time = time.time() - start_time
 
+    # 各タスクが完了しているか確認
+    assert len(results) == 3
+    assert all("timestamp" in result or "status" in result for result in results)
 
-# エラーハンドリングテスト
-@pytest.mark.asyncio
-async def test_search_agent_error_handling():
-    """検索エージェントのエラーハンドリングテスト"""
-    agent = SearchAgent()
-
-    # Web検索で例外が発生する場合
-    with patch.object(
-        agent.web_search, "search_products", new_callable=AsyncMock
-    ) as mock_search:
-        mock_search.side_effect = Exception("検索エラー")
-
-        results = await agent.find_suppliers("エラー商品")
-
-        assert results == []  # エラー時は空リストを返す
-
-
-# インテグレーションテスト
-@pytest.mark.asyncio
-async def test_customer_agent_integration():
-    """顧客エージェントの統合テスト"""
-    agent = CustomerAgent()
-
-    # エンゲージメントとメッセージ処理の流れをテスト
-    engagement = await agent.engage_customer("test_customer", "VM001")
-    assert engagement["success"] is True
-
-    if engagement["session_id"]:
-        response = await agent.handle_customer_message(
-            engagement["session_id"], "テストメッセージ"
-        )
-        assert "success" in response
+    # 所要時間が適当か確認（5秒以内）
+    assert elapsed_time < 5.0
 
 
 if __name__ == "__main__":

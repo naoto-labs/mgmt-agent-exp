@@ -2,19 +2,30 @@
 
 ## 概要
 
-AI Agent Autonomous Vending Machine Systemは、3-Agent + 17-tool自律型アーキテクチャによる完全自律型自動販売システムです。
-Azure OpenAI + Tavily統合により、高度なAI意思決定と実Web検索を実現します。
+AI Agent Autonomous Vending Machine Systemは、3-Agent + XX個-toolのクリーンアーキテクチャによる完全自律型自動販売シミュレーションシステムです。
+
 
 ## アーキテクチャ概要
+
 
 ```
 ai-vending-system/
 ├── agents/                      # 🚀 自律Agent（主要3つ + 共有Tool）
 │   ├── management_agent/        # 店長Agent
 │   │   ├── management_tools/    # 経営判断Tool
-│   │   │   ├── get_business_metrics.py
+│   │   │   ├── plan_agent_operations.py
+│   │   │   ├── plan_sales_strategy.py
+│   │   │   ├── update_pricing.py
 │   │   │   ├── analyze_financial_performance.py
 │   │   │   ├── feedback_engine.py
+│   │   ├── procurement_tools/
+│   │   │   ├── request_procurement.py
+│   │   │   ├── assign_restocking_task.py
+│   │   │   └── coordinate_employee_tasks.py
+│   │   │   └── calculate_optimal_order.py
+│   │   ├── customer_tools/
+│   │   │   ├── respond_to_customer_inquiry.py
+│   │   │   ├── handle_customer_complaint.py
 │   │   └── orchestrator.py
 │   ├── analytics_agent/         # 監査Agent
 │   │   ├── business_monitoring/ # ビジネス監視
@@ -25,7 +36,7 @@ ai-vending-system/
 │   │   │   ├── decision_quality_monitor.py
 │   │   │   ├── safety_compliance_checker.py
 │   │   │   └── performance_tracker.py
-│   │   ├── analysis/            # 分析業務
+│   │   ├── advisory/            # アドバイス業務
 │   │   │   ├── efficiency_analyzer.py
 │   │   │   └── cost_benefit_analyzer.py
 │   │   └── orchestrator.py
@@ -34,24 +45,15 @@ ai-vending-system/
 │   │   │   ├── session_recorder.py
 │   │   │   ├── data_persistence.py
 │   │   │   ├── pattern_analyzer.py
-│   │   │   └── objective_data_manager.py
 │   │   └── orchestrator.py
-│   ├── shared_tools/            # 🔧 共有Tool (4カテゴリ)
+│   ├── shared_tools/            # 🔧 共有Tool 
 │   │   ├── data_retrieval/
 │   │   │   ├── check_inventory_status.py
+│   │   │   ├── get_business_metrics.py
 │   │   │   └── collect_customer_feedback.py
-│   │   ├── customer_tools/
-│   │   │   ├── respond_to_customer_inquiry.py
-│   │   │   ├── handle_customer_complaint.py
-│   │   │   └── create_customer_engagement_campaign.py
-│   │   ├── procurement_tools/
-│   │   │   ├── request_procurement.py
-│   │   │   ├── assign_restocking_task.py
-│   │   │   └── coordinate_employee_tasks.py
 │   │   └── market_tools/
 │   │       ├── search_products.py
 │   │       ├── supplier_research.py
-│   │       └── market_analysis.py
 │   └── orchestrator/            # 全Agent協調制御
 ├── domain/                      # ビジネスルール・モデル
 ├── infrastructure/              # 技術実装・API・DB
@@ -72,21 +74,22 @@ ai-vending-system/
 4. **モジュラー設計**: 新機能の容易な追加
 5. **総合監視**: AI意思決定プロセス・システム状態追跡
 
-### 3-Agent + 17-tool共有アーキテクチャ
+### 3-Agent + tool共有アーキテクチャ
 
-- **定義**: 店長Agent(経営判断)・監査Agent(データ分析)・記録Agent(学習蓄積)の3つの独立Agentが、4カテゴリ17関数からなる共有toolシステムを協調して使用
-- **特徴**: toolは店長Agent主導設計だが、監査Agent・記録Agentもシステム情報取得時に共有アクセス可能
-- **目的**: Agent間連携による効率的な分工と自律的運営の実現
+- **定義**: 店長Agent(経営判断)・監査Agent(データ分析)・記録Agent(学習蓄積)の3つの独立Agentが、必要なToolを使用して、業務を遂行
+- **特徴**: toolは店長Agent主導設計だが、監査Agent・記録Agentもシステム情報取得時に共有Tollからシステムデータへアクセス可能
+- **目的**: 店長Agentによる自律的運営の実現。記録AgentがAgentの長期タスク実行を補助し、監査Agentは独立して店長Agentを監督
 
 ## Agent定義
 
 ### 店長Agent (Management Agent)
 
-- **役割**: 経営判断の最終決定者。4カテゴリのtoolを活用して意思決定
-- **動作形態**: セッション型 (朝/昼/夕の業務サイクル)
+- **役割**: 経営判断の最終決定者。3つの専用カテゴリと２つの共通カテゴリのtoolを活用して意思決定
+- **動作形態**: セッション型 時間ごとの業務サイクル)
 - **責務**: 戦略立案, 人間協働指示, 事業KPI管理
 - **主な機能**:
-  - 朝ルーチン: 夜間データの分析と今日の業務計画立案
+概念的には以下。Langchain,graph nodeで時間を表現
+  - 朝ルーチン: 前日データの分析と今日の業務計画立案
   - 昼間チェック: 午前実績の分析と昼間戦略調整
   - 夕方総括: 1日全体の実績評価と改善策立案
   - 戦略的意思決定: AI分析に基づく経営判断の実行
@@ -94,9 +97,9 @@ ai-vending-system/
 
 ### 監査Agent (Analytics Agent)
 
-- **役割**: データ分析と業務改善提案
-- **動作形態**: 常時稼働
-- **責務**: KPI算出, 無駄削減提案, 業務効率化監査
+- **役割**: データ分析と店長を監査、業務改善提案
+- **動作形態**: 指定した頻度で稼働
+- **責務**: KPI算出, 無駄削減提案, 業務監査
 - **主な機能**:
   - リアルタイムKPI監視: 売上・在庫・顧客満足度の継続監視
   - パフォーマンス分析: 日次・週次・月次の実績分析・レポート生成
@@ -108,83 +111,70 @@ ai-vending-system/
 
 - **役割**: 全行動の記録と学習データ蓄積
 - **動作形態**: 常時稼働
-- **責務**: パターン分析, 成功事例抽出, 失敗学習
+- **責務**: 店長の行動と在庫、実績の客観的な記録、パターン分析, 成功事例抽出, 失敗学習
 - **主な機能**:
   - セッション記録: Agentの意思決定・行動・結果の詳細ログ化
   - パターン学習: 成功・失敗パターンの自動認識・蓄積
   - データ永続化: 学習データの長期保存・検索
-  - 改善フィードバック: 蓄積データからの意思決定改善
 - **実装状況**: 記録機能実装済み、学習・分析機能は作成中
 
 ## Tool定義
 
-以下のTool定義は、アーキテクチャ概要のフォルダ構成と完全に対応しています。各AgentのToolを整理分類して定義します。
+以下のTool定義は、アーキテクチャ概要のフォルダ構成と対応しています。各AgentのToolを整理分類して定義します。
 
 ### Management Agent Tools (経営判断特化)
 
 **management_agent/management_tools/**: 店長Agentの戦略的意思決定を支援するTool群
+- **plan_agent_operations.py**: ❌ 未完成(拡張案) - 日次・週次業務計画の立案・実行手順策定。
+- **plan_sales_strategy.py**: ❌ 未完成 - 売上目標設定・プロモーション戦略立案。
+- **analyze_financial_performance.py**: ✅ 実装済み - 財務データ分析、収益性評価、改善提案。
+- **update_pricing.py**: ✅ 実装済み - 商品価格の需要変動・在庫状況に基づく最適価格設定。
+- **feedback_engine.py**: ✅ 実装済み -  一日の業績を総括。翌日への改善点を特定。
 
-- **get_business_metrics.py**: ✅ 実装済み - 売上・在庫・顧客満足度・利益率などのKPIデータを収集・集計。経営判断の基礎データとして使用。定期的に全Agentが参照し、戦略立案の前提となる。
-- **analyze_financial_performance.py**: ✅ 実装済み - 財務データ分析、収益性評価、改善提案。貸借対照表・損益計算書の自動生成・連続比較分析。
-- **update_pricing_strategy.py**: ✅ 実装済み - 商品価格の動的調整・競合価格分析。需要変動・在庫状況に基づく最適価格設定。
-- **assign_restocking_task.py**: ✅ 実装済み - 従業員に商品補充作業を指示。緊急度設定・タスクID生成。
-- **request_procurement.py**: ✅ 実装済み - 商品発注依頼生成・サプライヤ連絡。発注数量・タイミング計算。
-- **coordinate_employee_tasks.py**: ✅ 実装済み - 従業員業務配分・進捗管理。新商品発注通知・タスク調整。
+**management_agent/customer_tools/**: 顧客対応Tool群 (Management Agentに統合実装)
 - **respond_to_customer_inquiry.py**: ✅ 実装済み - 顧客問い合わせ対応・AI支援回答生成。
 - **handle_customer_complaint.py**: ✅ 実装済み - 顧客苦情処理・補償措置実施。
 - **collect_customer_feedback.py**: ✅ 実装済み - 顧客フィードバック収集・満足度分析。
-- **create_customer_engagement_campaign.py**: ✅ 実装済み - 顧客エンゲージメント施策企画・実行。
-- **plan_agent_operations.py**: ❌ 未完成 - 日次・週次業務計画の立案・実行手順策定。
-- **plan_sales_strategy.py**: ❌ 未完成 - 売上目標設定・プロモーション戦略立案。
+- **recommend_product.py**: ❌ 未完成 - 購入履歴・嗜好分析に基づく商品推薦。パーソナライズ提案・クロスセル機会創出。
+
+**management_agent/procurement_tools/**: 調達・在庫管理Tool群 (Management Agentに統合実装)
+- **assign_restocking_task.py**: ✅ 実装済み - 従業員に商品補充作業を指示。
+- **request_procurement.py**: ✅ 実装済み - 商品発注依頼生成・サプライヤ連絡依頼。
+- **calculate_optimal_order.py**: ❌ 未完成(拡張案) - 在庫回転率・需要予測に基づく最適発注数量計算。過剰/不足在庫防止。
 
 ### Analytics Agent Tools (監視・分析・ガバナンス特化)
 
 **analytics_agent/business_monitoring/**: ビジネスKPIの継続監視Tool群
-- **performance_monitor.py**: 売上・収益・回転率などの実績データを継続監視、閾値逸脱を検知。ダッシュボード更新・リアルタイム表示。
-- **anomaly_detector.py**: 売上急変・在庫異常・顧客苦情急増などの異常を統計的手法で検出。通知システムとの連携で即時対応。
-- **compliance_checker.py**: 経費精算・消費税計算・会計基準遵守を確認、法令順守を確保。監査レポート生成。
+- **performance_monitor.py**: ❌ 未完成 -売上・収益・回転率などの実績データを継続監視、閾値逸脱を検知
+- **anomaly_detector.py**: ❌ 未完成 -売上急変・在庫異常・顧客苦情急増などの異常を統計的手法で検出。
+- **compliance_checker.py**: ❌ 未完成 -経費精算・消費税計算・会計基準遵守を確認、法令順守を確保。監査レポート生成。
 
 **analytics_agent/ai_governance/**: AI Agentの品質・安全監視Tool群
-- **decision_quality_monitor.py**: AI意思決定の正しさ・一貫性・成功率を評価、判断品質スコア算出。管理Agentへの改善フィードバック。
-- **safety_compliance_checker.py**: AIガードレールの遵守状況を確認、安全基準逸脱を検知。緊急停止トリガー機能。
-- **performance_tracker.py**: AI応答時間・成功率・学習進捗を監視、性能低下をアラート。最適化提案生成。
+- **decision_quality_monitor.py**: ❌ 未完成 -AI意思決定の正しさ・一貫性・成功率を評価、判断品質スコア算出。管理Agentへの改善フィードバック。
+- **safety_compliance_checker.py**: ❌ 未完成 -AIガードレールの遵守状況を確認、安全基準逸脱を検知。緊急停止トリガー機能。
+- **performance_tracker.py**: ❌ 未完成 -AI応答時間・成功率・学習進捗を監視、性能低下をアラート。最適化提案生成。
 
-**analytics_agent/analysis/**: 業務分析・最適化Tool群
-- **efficiency_analyzer.py**: 業務プロセス効率・無駄削減機会を分析、改善提案を生成。KPI比較・ベンチマーク分析。
-- **cost_benefit_analyzer.py**: 新施策・改善案の費用対効果を定量評価、投資判断支援。ROI計算・シナリオ分析。
+**analytics_agent/advisory/**: 業務分析・アドバイスTool群
+- **efficiency_analyzer.py**: ❌ 未完成 -業務プロセス効率・無駄削減機会を分析、改善提案を生成。KPI比較・ベンチマーク分析。
+- **cost_benefit_analyzer.py**: ❌ 未完成 -新施策・改善案の費用対効果を定量評価、投資判断支援。ROI計算・シナリオ分析。
 
 ### Recorder Agent Tools (学習・記録蓄積特化)
 
 **recorder_agent/learning_tools/**: データ蓄積・学習パターン生成Tool群
-- **session_recorder.py**: Agentの意思決定・行動・結果を時系列で記録、学習データ蓄積。詳細ログ分析用構造化保存。
-- **data_persistence.py**: 学習データ・分析結果を永続化、検索・再利用可能な形で保存。長期学習データのメンテナンス。
-- **pattern_analyzer.py**: 成功・失敗パターンを自動認識、将来判断の参考データに変換。機械学習モデルへの入力データ生成。
-- **objective_data_manager.py**: バイアスのかからない客観データを収集・整理・提供。信頼性の高い学習データベース構築。
+- **session_recorder.py**: ✅ 実装済み - Agentの意思決定・行動・結果を時系列で記録、学習データ蓄積。詳細ログ分析用構造化保存。
+- **data_persistence.py**: ❌ 未完成 -学習データ・分析結果を永続化、検索・再利用可能な形で保存。長期学習データのメンテナンス。
+- **pattern_analyzer.py**: ❌ 未完成 -成功・失敗パターンを自動認識、将来判断の参考データに変換。機械学習モデルへの入力データ生成。
 
 ### Shared Tools (全Agent共有・一部はManagement Agentに統合実装)
 
 **shared_tools/data_retrieval/**: 基本データ取得Tool群
-- **check_inventory_status.py**: ✅ 実装済み - 在庫レベル・有効期限・補充必要量をリアルタイム確認。補充判断の前提データ収集。
-- **collect_customer_feedback.py**: ✅ 実装済み - 顧客満足度・要望・クレームを収集・傾向分析。全Agentが利用する顧客データベース更新。
-
-**shared_tools/customer_tools/**: 顧客対応Tool群 (Management Agentに統合実装)
-- **respond_to_customer_inquiry.py**: ✅ 実装済み - 顧客問い合わせ内容を分析、適切な回答を自動生成。会話ログとの連携分析。
-- **handle_customer_complaint.py**: ✅ 実装済み - クレーム内容解決策を提案、補償措置を実施。エスカレート判断・対応履歴蓄積。
-- **create_customer_engagement_campaign.py**: ✅ 実装済み - 顧客エンゲージメント施策企画・実行。ターゲティング分析・効果測定。
-- **analyze_customer_sentiment.py**: ❌ 未完成 - 会話内容から感情分析・満足度スコア算出。顧客フィードバックの感情傾向把握。
-- **recommend_product.py**: ❌ 未完成 - 購入履歴・嗜好分析に基づく商品推薦。パーソナライズ提案・クロスセル機会創出。
-
-**shared_tools/procurement_tools/**: 調達・在庫管理Tool群 (Management Agentに統合実装)
-- **request_procurement.py**: ✅ 実装済み - 補充必要品の発注依頼生成、サプライヤ連絡。最適発注数量・タイミング計算。
-- **assign_restocking_task.py**: ✅ 実装済み - 従業員への在庫補充作業割り当て、タスク管理。優先順位付け・スケジューリング。
-- **coordinate_employee_tasks.py**: ✅ 実装済み - 調達・補充関連全業務の進捗管理・調整。ワークフロー最適化・効率化。
-- **calculate_optimal_order.py**: ❌ 未完成 - 在庫回転率・需要予測に基づく最適発注数量計算。過剰/不足在庫防止。
-- **generate_procurement_request.py**: ❌ 未完成 - 発注書自動生成・発注プロセス管理。備品・消耗品の一括発注対応。
+- **check_inventory_status.py**: ✅ 実装済み - 在庫レベル・有効期限・補充必要量をリアルタイム確認。補充判断の前提データ収集。定期的に全Agentが参照。
+- **get_business_metrics.py**: ✅ 実装済み - 売上・在庫・顧客満足度・利益率などのKPIデータを収集・集計。経営判断の基礎データとして使用。定期的に全Agentが参照。
+- **collect_customer_feedback.py**: ❌ 未完成 - 顧客満足度・要望・クレームを収集・傾向分析。全Agentが利用する顧客データベース更新。
 
 **shared_tools/market_tools/**: 市場・競合情報Tool群
-- **search_products.py**: 新商品・競合価格・トレンド情報をTavily検索。外部データ統合・価格比較。
-- **supplier_research.py**: 仕入れ先情報・信頼性評価・価格比較。発注先選定支援・リスク評価。
-- **market_analysis.py**: 需要変動・価格動向・競合戦略分析。予測分析・戦略立案支援。
+- **search_products.py**: ✅ 実装済み - 新商品・競合価格・トレンド情報をweb検索。外部データ統合・価格比較。
+- **supplier_research.py**: ❌ 未完成 - 仕入れ先情報・信頼性評価・価格比較。発注先選定支援・リスク評価。
 
 ## コンポーネント実装状況
 
@@ -196,37 +186,34 @@ ai-vending-system/
 - **動作形態**: セッション型実行 (店長Agentが朝/昼/夕サイクルで業務実行)
 - **目的**: 効率的・自律的・拡張可能な自動販売機事業運営
 
-#### AI処理技術スタック詳細
+#### AI処理技術スタック
 
 **Core Framework**
 - Python 3.9+ | FastAPI 0.104.1 | Uvicorn 0.24.0 | Pydantic 2.5.0
 
 ```
 AI Processing Stack
-├── AI Models ✅実装済み
-│   ├── Large Language Models (Azure OpenAI GPT-4o-mini)
-│   ├── Fallback Models (Anthropic 0.5.0・OpenAI 1.3.7)
-│   └── ReAct Execution (Decision Reasoning・Tool Chain)
-├── Agent Frameworks ✅実装済み
-│   ├── Orchestration (LangChain 0.1.0 Tool System)
-│   ├── Memory Management (LangChain・会話履歴・ChromaDB 0.4.22)
-│   └── Tool Integration (17個Tool連携・Function Calling)
-├── SaaS External Tools ✅実装済み
-│   ├── Search APIs (Tavily 0.3.0+・バックアップDuckDuckGo)
-│   ├── Payment APIs (Stripe統合検討中・PayPal・Square対応)
-│   └── Communication APIs (検討中: Mail・Slack・Teams)
-└── Runtime Infrastructure ✅実装済み
-    ├── Local Development (Python AsyncIO・Concurrent処理)
-    ├── Container Deployment (Docker対応・Kubernetes予定)
-    ├── Web Framework (FastAPI・Jinja2 Template)
-    └── Database (SQLite/MongoDB・Motor 3.3.2ドライバ)
+├── AI Models 
+│   ├── Large Language Models (Azure OpenAI)✅実装済み
+│   ├── Fallback Models (Anthropic 0.5.0)✅実装済み
+│   └── ReAct Execution (Decision Reasoning・Tool Chain)❌ 未完成
+├── Agent Frameworks 
+│   ├── Orchestration (LangChain Tool System)✅実装済み
+│   ├── Memory Management (LangChain・会話履歴・ChromaDB 0.4.22)❌ 未完成
+│   └── Tool Integration (17個Tool連携・Tool Calling)✅実装済み
+├── SaaS External Tools 
+│   ├── Search APIs (Tavily 0.3.0+・バックアップDuckDuckGo)✅実装済み
+│   ├── Payment APIs (Stripe統合検討中・PayPal・Square対応)❌ 未完成
+│   └── Communication APIs (検討中: Mail・Slack・Teams)❌ 未完成
+└── Runtime Infrastructure 
+    ├── Local Development (Python AsyncIO・Concurrent処理)✅実装済み
+    ├── Container Deployment (Docker対応)❌ 未完成
+    ├── Web Framework (FastAPI・Jinja2 Template)❌ 未完成
+    └── Database (SQLite/MongoDB)❌ 未完成
 ```
 
-**将来拡張予定:**
-- Safety & Alignment検証 (Guardrails.ai検討)
-- Communication APIs (Mail・Slack・Teams統合検討)
 
-#### Model Manager - AIモデル統合管理
+####  AI Models Agent Frameworks - AIモデル統合管理
 - **目的**: 複数AIモデル統合管理・Web検索対応・コスト最適化
 - **実装状況**: Azure OpenAI GPT-4o-mini 統合済み・Tavily検索対応
 - **主機能**: マルチモデル切替・セーフティチェック・APIコスト管理・ReAct実行パターン
@@ -248,7 +235,7 @@ AI Processing Stack
 
 **業務実績データ**
 - **タイプ**: 売上・在庫・顧客・業務KPI・財務指標
-- **ストレージ**: SQLite + 時系列DB
+- **ストレージ**: SQLite
 - **用途**: リアルタイム監視・トレンド分析・経営判断支援
 
 ### 2. API層 [部分実装]
@@ -269,23 +256,16 @@ AI Processing Stack
 **AI安全性能基準（実装済み）**
 - **レスポンス検証**: API成功/エラーチェック・タイムアウト監視（5.0秒）
 - **アクション制限**: 禁止パターンマッチング（override_safety, bypass_payment等）
-- **冗長性確保**: マルチモデルファallback（Azure OpenAI → OpenAI → Anthropic）
-- **ガードレール機能**: 有効（設定でenable_guardrails制御）
 
 **将来拡張目標（未実装）**
 - 🔄 **信頼性スコアリング**: 決定前LLM信頼性評価体制
-- 🔄 **安心度閾値**: ai_safety_threshold設定値活用（現在: 0.95）
+- 🔄 **ガードレール機能**: 有効（設定でenable_guardrails制御）
 
 **パフォーマンス基準**
 - **API応答時間**: 平均2秒以内 (顧客体験保証)
 - **並行処理**: AsyncIO対応・同時接続50本以上
 - **データ処理**: リアルタイムKPI計算・1秒以内
 
-**セキュリティ仕様**
-- **許可アクション**: select_product, process_payment, dispense_product, customer_service
-- **禁止パターン**: override_safety, bypass_payment, unlimited_dispense
-- **データ検証レベル**: strict (入力値完全バリデーション)
-- **認証方式**: JWTトークン + APIキー (本番移行時)
 
 ### 環境設定仕様
 
@@ -303,9 +283,7 @@ OPENAI_API_KEY=your_openai_api_key_here                # Azure OpenAI用
 OPENAI_API_BASE=https://your-resource.openai.azure.com/ # Azure OpenAI用
 TAVILY_API_KEY=your_tavily_api_key_here                # 検索API用
 
-# セキュリティ設定 (ENCRYPTION_KEYは暗号化機能で必須)
-JWT_SECRET_KEY=your_jwt_secret_key_here                # 必須 (認証用)
-ENCRYPTION_KEY=your_encryption_key_here               # 必須 (データ暗号化用)
+
 
 # データ収集・検証設定
 ENABLE_DATA_COLLECTION=True                           # データ収集有効
@@ -322,6 +300,9 @@ PAYPAL_CLIENT_ID=your_paypal_client_id_here
 AI_SAFETY_THRESHOLD=0.95                              # 🔄 AI安全性閾値 (将来実装)
 ENABLE_GUARDRAILS=True                               # 🔄 AIガードレール制御 (将来実装)
 ENABLE_DECISION_MONITORING=True                      # 🔄 判定監視 (将来実装)
+# セキュリティ設定 (ENCRYPTION_KEYは暗号化機能で必須)
+JWT_SECRET_KEY=your_jwt_secret_key_here                # 必須 (認証用)
+ENCRYPTION_KEY=your_encryption_key_here               # 必須 (データ暗号化用)
 ```
 
 **Agent目的設定パラメータ**
@@ -341,11 +322,6 @@ search_timeout: 30                                    # 検索タイムアウト
 search_max_retries: 3                                 # 検索再試行回数
 ```
 
-**システム起動検証プロセス**
-- ✅ 必須キー検証: ANTHROPIC_API_KEY + ENCRYPTION_KEY (必須検証)
-- ✅ オプション設定確認: Azure OpenAI, Stripe等 (未設定警告)
-- ✅ ガードレール設定確認: enable_guardrails (推奨警告)
-- ✅ .env.example準拠チェック: 設定値書式検証
 
 ### 3. 会計システム [実装済み]
 
@@ -513,26 +489,17 @@ Python AsyncIO + Uvicorn
 
 **本番デプロイメント環境**
 ```
-Docker + Kubernetes (計画)
-├── PostgreSQL/MySQL (本番DB)
-├── Redis (キャッシュ・セッション)
-├── MongoDB (NoSQLデータ)
-├── Nginx (リバースプロキシ)
-└── 水平スケーリング対応
+未定
 ```
 
 **インフラ要件**
 - **CPU**: 4コア以上 (AI処理並行実行)
 - **RAM**: 8GB以上 (モデルロード・並行処理)
-- **Storage**: 50GB以上 (ログ・データ蓄積)
+- **Storage**: 10GB以上 (ログ・データ蓄積)
 - **Network**: 安定したインターネット接続 (AI API呼び出し)
 
 **スケーリング戦略**
-- **水平スケーリング**: Agent別コンテナ化
-- **垂直スケーリング**: AIモデルGPU対応検討
-- **データ分割**: 時系列データ・地理的分割
+未定
 
 ### CI/CD状況 [未構築]
-- **計画中のテスト自動化**: GitHub Actionsベース・セキュリティスキャン
-- **要件計画**: 全テスト通過・セキュリティチェッククリア
-- **計画中**: pip-audit・safety・secrets検知
+未定
