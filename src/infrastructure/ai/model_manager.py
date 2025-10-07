@@ -7,8 +7,8 @@ from dataclasses import dataclass
 from enum import Enum
 from typing import Any, Dict, List, Optional, Union
 
-from src.config.security import secure_config
-from src.config.settings import settings
+from src.shared.config.security import secure_config
+from src.shared.config.settings import settings
 
 logger = logging.getLogger(__name__)
 
@@ -290,7 +290,28 @@ class OpenAIModel(BaseAIModel):
 
             # 応答の処理
             content = response.choices[0].message.content if response.choices else ""
-            tokens_used = response.usage.total_tokens if response.usage else 0
+
+            # トークン使用量の詳細取得
+            tokens_used = 0
+            prompt_tokens = 0
+            completion_tokens = 0
+
+            if response.usage:
+                usage = response.usage
+                tokens_used = getattr(usage, "total_tokens", 0)
+                prompt_tokens = getattr(
+                    usage, "prompt_tokens", getattr(usage, "input_tokens", 0)
+                )
+                completion_tokens = getattr(
+                    usage, "completion_tokens", getattr(usage, "output_tokens", 0)
+                )
+
+            # レスポンスオブジェクトにusage情報を追加（テストで使用）
+            response._usage_info = {
+                "total_tokens": tokens_used,
+                "input_tokens": prompt_tokens,
+                "output_tokens": completion_tokens,
+            }
 
             self.total_requests += 1
             self.last_used = time.time()
@@ -414,7 +435,28 @@ class AzureOpenAIModel(BaseAIModel):
 
             # 応答の処理
             content = response.choices[0].message.content if response.choices else ""
-            tokens_used = response.usage.total_tokens if response.usage else 0
+
+            # トークン使用量の詳細取得
+            tokens_used = 0
+            prompt_tokens = 0
+            completion_tokens = 0
+
+            if response.usage:
+                usage = response.usage
+                tokens_used = getattr(usage, "total_tokens", 0)
+                prompt_tokens = getattr(
+                    usage, "prompt_tokens", getattr(usage, "input_tokens", 0)
+                )
+                completion_tokens = getattr(
+                    usage, "completion_tokens", getattr(usage, "output_tokens", 0)
+                )
+
+            # レスポンスオブジェクトにusage情報を追加（テストで使用）
+            response._usage_info = {
+                "total_tokens": tokens_used,
+                "input_tokens": prompt_tokens,
+                "output_tokens": completion_tokens,
+            }
 
             self.total_requests += 1
             self.last_used = time.time()
@@ -686,6 +728,11 @@ class ModelManager:
         if model_name in self.models and model_name not in self.fallback_models:
             self.fallback_models.append(model_name)
             logger.info(f"フォールバックモデルに {model_name} を追加しました")
+
+    @staticmethod
+    def create_ai_message(role: str, content: str) -> AIMessage:
+        """AIMessageインスタンスを作成する静的メソッド"""
+        return AIMessage(role=role, content=content)
 
 
 # グローバルインスタンス

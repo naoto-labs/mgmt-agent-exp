@@ -2,26 +2,37 @@ import asyncio
 import logging
 import signal
 import sys
-from typing import Optional, Dict, Any, List
-from datetime import datetime, timedelta
 from contextlib import asynccontextmanager
+from datetime import datetime, timedelta
+from typing import Any, Dict, List, Optional
 
-from src.config.settings import settings, validate_startup_settings
-from src.config.security import secure_config, setup_secure_logging
-from src.ai.model_manager import model_manager
-from src.services.payment_service import payment_service
-from src.services.inventory_service import inventory_service
-from src.services.conversation_service import conversation_service
-from src.agents.search_agent import search_agent
-# from src.agents.customer_agent import customer_agent  # 循環インポートを避けるため削除
-from src.accounting.journal_entry import journal_processor
-from src.accounting.management_accounting import management_analyzer
-from src.analytics.event_tracker import event_tracker
-# from src.api.vending import router as vending_router  # 循環インポートを避けるため削除
-# from src.api.tablet import router as tablet_router    # 循環インポートを避けるため削除
-# from src.api.procurement import router as procurement_router  # 循環インポートを避けるため削除
+from src.application.services.conversation_service import conversation_service
+from src.application.services.inventory_service import inventory_service
+from src.application.services.payment_service import payment_service
+from src.domain.accounting.journal_entry import journal_processor
+from src.domain.accounting.management_accounting import management_analyzer
+from src.domain.analytics.event_tracker import EventSeverity, EventType, event_tracker
+
+# 循環インポートを避けるため、遅延ロード
+model_manager = None
+
+
+def get_orchestrator_model_manager():
+    """遅延ロードでmodel_managerを取得"""
+    global model_manager
+    if model_manager is None:
+        # 循環インポートを避けるため直接インポート
+        from src.infrastructure.ai.model_manager import model_manager as mm
+
+        model_manager = mm
+    return model_manager
+
+
+from src.shared.config.security import secure_config, setup_secure_logging
+from src.shared.config.settings import settings, validate_startup_settings
 
 logger = logging.getLogger(__name__)
+
 
 class SystemHealthStatus:
     """システム健全性ステータス"""
@@ -39,6 +50,7 @@ class SystemHealthStatus:
     def get_critical_issues(self) -> List[str]:
         """重大な問題を取得"""
         return [issue for issue in self.issues if "critical" in issue.lower()]
+
 
 class SystemOrchestrator:
     """システムオーケストレーター"""
@@ -133,7 +145,9 @@ class SystemOrchestrator:
             available_models = sum(1 for healthy in health_results.values() if healthy)
             total_models = len(health_results)
 
-            logger.info(f"AIモデルヘルスチェック: {available_models}/{total_models} が利用可能")
+            logger.info(
+                f"AIモデルヘルスチェック: {available_models}/{total_models} が利用可能"
+            )
 
             if available_models == 0:
                 logger.warning("利用可能なAIモデルがありません")
@@ -148,11 +162,11 @@ class SystemOrchestrator:
         """データベース接続を初期化"""
         try:
             # 会話サービスがストレージを初期化
-            if hasattr(conversation_service, 'load_sessions_from_storage'):
+            if hasattr(conversation_service, "load_sessions_from_storage"):
                 conversation_service.load_sessions_from_storage()
 
             # イベント追跡システムがストレージを準備
-            if hasattr(event_tracker, '_ensure_storage_dir'):
+            if hasattr(event_tracker, "_ensure_storage_dir"):
                 event_tracker._ensure_storage_dir()
 
             logger.info("データベース接続初期化完了")
@@ -174,13 +188,13 @@ class SystemOrchestrator:
 
             for service_name, service in services:
                 # 各サービスが適切に初期化されているかチェック
-                if hasattr(service, 'get_payment_stats'):  # 決済サービスの場合
+                if hasattr(service, "get_payment_stats"):  # 決済サービスの場合
                     stats = service.get_payment_stats()
                     logger.info(f"{service_name} 統計: {stats}")
-                elif hasattr(service, 'get_inventory_summary'):  # 在庫サービスの場合
+                elif hasattr(service, "get_inventory_summary"):  # 在庫サービスの場合
                     summary = service.get_inventory_summary()
                     logger.info(f"{service_name} サマリ: {summary.total_slots}スロット")
-                elif hasattr(service, 'get_conversation_stats'):  # 会話サービスの場合
+                elif hasattr(service, "get_conversation_stats"):  # 会話サービスの場合
                     stats = service.get_conversation_stats()
                     logger.info(f"{service_name} 統計: {stats}")
 
@@ -194,21 +208,8 @@ class SystemOrchestrator:
     async def _initialize_agents(self) -> bool:
         """エージェント層を初期化"""
         try:
-            # エージェントの初期化状態を確認
-            agents = [
-                ("検索エージェント", search_agent),
-                ("顧客エージェント", customer_agent),
-            ]
-
-            for agent_name, agent in agents:
-                # 各エージェントが適切に初期化されているかチェック
-                if hasattr(agent, 'get_search_stats'):  # 検索エージェントの場合
-                    stats = agent.get_search_stats()
-                    logger.info(f"{agent_name} 統計: {stats}")
-                elif hasattr(agent, 'model_manager'):  # 顧客エージェントの場合
-                    logger.info(f"{agent_name} AIモデル連携確認済み")
-
-            logger.info("エージェント層初期化完了")
+            # 循環インポートを避けるためエージェント初期化をスキップ
+            logger.info("エージェント層初期化スキップ（循環インポート防止）")
             return True
 
         except Exception as e:
@@ -228,7 +229,7 @@ class SystemOrchestrator:
                 "orchestrator",
                 "システム起動完了",
                 EventSeverity.LOW,
-                {"startup_time": datetime.now().isoformat()}
+                {"startup_time": datetime.now().isoformat()},
             )
 
             logger.info("イベント追跡システム初期化完了")
@@ -241,19 +242,8 @@ class SystemOrchestrator:
     async def _initialize_api_routers(self) -> bool:
         """APIルーターを初期化"""
         try:
-            # APIルーターが適切に設定されているかチェック
-            routers = [
-                ("販売API", vending_router),
-                ("タブレットAPI", tablet_router),
-                ("調達API", procurement_router),
-            ]
-
-            for router_name, router in routers:
-                if hasattr(router, 'routes'):
-                    route_count = len(router.routes)
-                    logger.info(f"{router_name}: {route_count}エンドポイント")
-
-            logger.info("APIルーター初期化完了")
+            # 循環インポートを避けるためAPIルーター初期化をスキップ
+            logger.info("APIルーター初期化スキップ（循環インポート防止）")
             return True
 
         except Exception as e:
@@ -287,7 +277,7 @@ class SystemOrchestrator:
                     logger.error(f"{component_name}健全性チェックエラー: {e}")
                     component_results[component_name] = {
                         "status": "error",
-                        "error": str(e)
+                        "error": str(e),
                     }
 
             # 全体ステータスの決定
@@ -297,17 +287,24 @@ class SystemOrchestrator:
             critical_issues = []
             for component, result in component_results.items():
                 if result.get("status") in ["error", "critical"]:
-                    critical_issues.append(f"{component}: {result.get('error', '不明なエラー')}")
+                    critical_issues.append(
+                        f"{component}: {result.get('error', '不明なエラー')}"
+                    )
 
             if critical_issues:
                 self.health_status.overall_status = "critical"
                 self.health_status.issues = critical_issues
-            elif any(result.get("status") == "warning" for result in component_results.values()):
+            elif any(
+                result.get("status") == "warning"
+                for result in component_results.values()
+            ):
                 self.health_status.overall_status = "warning"
             else:
                 self.health_status.overall_status = "healthy"
 
-            logger.info(f"システム健全性チェック完了: {self.health_status.overall_status}")
+            logger.info(
+                f"システム健全性チェック完了: {self.health_status.overall_status}"
+            )
             return self.health_status
 
         except Exception as e:
@@ -331,7 +328,7 @@ class SystemOrchestrator:
                 "status": "healthy",
                 "available_models": available_models,
                 "total_models": len(health_results),
-                "primary_model": stats.get("primary_model")
+                "primary_model": stats.get("primary_model"),
             }
 
         except Exception as e:
@@ -353,7 +350,10 @@ class SystemOrchestrator:
             # 在庫サービスチェック
             try:
                 inventory_summary = inventory_service.get_inventory_summary()
-                if inventory_summary.out_of_stock_slots > inventory_summary.total_slots * 0.5:
+                if (
+                    inventory_summary.out_of_stock_slots
+                    > inventory_summary.total_slots * 0.5
+                ):
                     issues.append("在庫切れ商品が多すぎる")
             except Exception as e:
                 issues.append(f"在庫サービスエラー: {e}")
@@ -381,7 +381,10 @@ class SystemOrchestrator:
             except Exception as e:
                 return {"status": "warning", "error": f"イベント追跡エラー: {e}"}
 
-            return {"status": "healthy", "details": {"conversations": conversation_stats, "events": event_stats}}
+            return {
+                "status": "healthy",
+                "details": {"conversations": conversation_stats, "events": event_stats},
+            }
 
         except Exception as e:
             return {"status": "error", "error": str(e)}
@@ -393,7 +396,10 @@ class SystemOrchestrator:
             health_score = event_tracker.get_system_health_score()
 
             if health_score < 0.8:
-                return {"status": "warning", "message": f"システム健全性スコアが低い: {health_score}"}
+                return {
+                    "status": "warning",
+                    "message": f"システム健全性スコアが低い: {health_score}",
+                }
 
             return {"status": "healthy", "health_score": health_score}
 
@@ -411,7 +417,9 @@ class SystemOrchestrator:
 
                 # 重大な問題がある場合はログに記録
                 if health_status.get_critical_issues():
-                    logger.critical(f"重大なシステム問題検出: {health_status.get_critical_issues()}")
+                    logger.critical(
+                        f"重大なシステム問題検出: {health_status.get_critical_issues()}"
+                    )
 
                 # 監視間隔待機
                 await asyncio.sleep(interval_seconds)
@@ -436,7 +444,7 @@ class SystemOrchestrator:
                 "orchestrator",
                 "システムシャットダウン開始",
                 EventSeverity.LOW,
-                {"shutdown_time": datetime.now().isoformat()}
+                {"shutdown_time": datetime.now().isoformat()},
             )
 
             # 各コンポーネントのクリーンアップ
@@ -455,7 +463,11 @@ class SystemOrchestrator:
                     logger.warning(f"クリーンアップステップ失敗: {step_name} - {e}")
 
             # 最終的なシステム状態を記録
-            uptime = datetime.now() - self.startup_time if self.startup_time else timedelta(0)
+            uptime = (
+                datetime.now() - self.startup_time
+                if self.startup_time
+                else timedelta(0)
+            )
             logger.info(f"システムシャットダウン完了（稼働時間: {uptime})")
 
             return True
@@ -499,18 +511,24 @@ class SystemOrchestrator:
 
     def get_system_status(self) -> Dict[str, Any]:
         """システム状態を取得"""
-        uptime = datetime.now() - self.startup_time if self.startup_time else timedelta(0)
+        uptime = (
+            datetime.now() - self.startup_time if self.startup_time else timedelta(0)
+        )
 
         return {
             "is_running": self.is_running,
-            "startup_time": self.startup_time.isoformat() if self.startup_time else None,
+            "startup_time": self.startup_time.isoformat()
+            if self.startup_time
+            else None,
             "uptime_seconds": uptime.total_seconds(),
             "shutdown_requested": self.shutdown_requested,
             "health_status": {
                 "overall": self.health_status.overall_status,
-                "last_check": self.health_status.last_check.isoformat() if self.health_status.last_check else None,
-                "issues": self.health_status.issues
-            }
+                "last_check": self.health_status.last_check.isoformat()
+                if self.health_status.last_check
+                else None,
+                "issues": self.health_status.issues,
+            },
         }
 
     async def run_diagnostics(self) -> Dict[str, Any]:
@@ -523,15 +541,19 @@ class SystemOrchestrator:
                 "system_info": self.get_system_status(),
                 "component_health": self.health_status.components,
                 "performance_metrics": await self._get_performance_metrics(),
-                "recommendations": []
+                "recommendations": [],
             }
 
             # 診断に基づく推奨事項を生成
             if not self.health_status.is_healthy():
-                diagnostics["recommendations"].append("システム健全性に問題があります。詳細なログを確認してください。")
+                diagnostics["recommendations"].append(
+                    "システム健全性に問題があります。詳細なログを確認してください。"
+                )
 
             if self.health_status.get_critical_issues():
-                diagnostics["recommendations"].append("重大な問題が検出されました。即時対応が必要です。")
+                diagnostics["recommendations"].append(
+                    "重大な問題が検出されました。即時対応が必要です。"
+                )
 
             logger.info("システム診断完了")
             return diagnostics
@@ -546,17 +568,20 @@ class SystemOrchestrator:
             return {
                 "event_count_24h": len(event_tracker.get_recent_events(24)),
                 "conversation_count": len(conversation_service.sessions),
-                "inventory_slots": len(inventory_service.vending_machine_slots) + len(inventory_service.storage_slots),
+                "inventory_slots": len(inventory_service.vending_machine_slots)
+                + len(inventory_service.storage_slots),
                 "journal_entries": len(journal_processor.journal_entries),
-                "search_history": len(search_agent.search_history)
+                "search_history": 0,  # エージェント非依存時の固定値
             }
 
         except Exception as e:
             logger.error(f"パフォーマンス指標取得エラー: {e}")
             return {}
 
+
 # グローバルインスタンス
 orchestrator = SystemOrchestrator()
+
 
 # 便利な関数
 async def initialize_and_run():
@@ -585,6 +610,7 @@ async def initialize_and_run():
     else:
         logger.error("システム起動に失敗しました")
         sys.exit(1)
+
 
 if __name__ == "__main__":
     # システム起動

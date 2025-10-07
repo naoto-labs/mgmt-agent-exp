@@ -275,7 +275,7 @@ class RestockPlan(BaseModel):
 # サンプル在庫データ（開発・テスト用）
 def create_sample_inventory_slots() -> List[InventorySlot]:
     """サンプル在庫スロットデータ作成"""
-    from src.models.product import SAMPLE_PRODUCTS
+    from src.domain.models.product import SAMPLE_PRODUCTS
 
     slots = []
     for i, product in enumerate(SAMPLE_PRODUCTS):

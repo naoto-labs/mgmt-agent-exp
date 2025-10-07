@@ -59,6 +59,7 @@ cffi==2.0.0
 charset-normalizer==3.4.3
     # via requests
 chromadb==1.1.0
+    # via langchain-chroma
     # via mgmt-agent-exp
 click==8.3.0
     # via black
@@ -127,6 +128,7 @@ httptools==0.6.4
 httpx==0.28.1
     # via anthropic
     # via chromadb
+    # via langgraph-sdk
     # via langsmith
     # via mgmt-agent-exp
     # via openai
@@ -171,22 +173,38 @@ langchain==0.3.27
     # via mgmt-agent-exp
 langchain-anthropic==0.3.21
     # via mgmt-agent-exp
+langchain-chroma==0.2.6
+    # via mgmt-agent-exp
 langchain-community==0.3.30
     # via mgmt-agent-exp
-langchain-core==0.3.76
+langchain-core==0.3.78
     # via langchain
     # via langchain-anthropic
+    # via langchain-chroma
     # via langchain-community
     # via langchain-openai
     # via langchain-text-splitters
-langchain-openai==0.3.33
+    # via langgraph
+    # via langgraph-checkpoint
+    # via langgraph-prebuilt
+langchain-openai==0.3.34
     # via mgmt-agent-exp
 langchain-text-splitters==0.3.11
     # via langchain
-langsmith==0.4.31
+langgraph==0.6.8
+    # via mgmt-agent-exp
+langgraph-checkpoint==2.1.1
+    # via langgraph
+    # via langgraph-prebuilt
+langgraph-prebuilt==0.6.4
+    # via langgraph
+langgraph-sdk==0.2.9
+    # via langgraph
+langsmith==0.4.32
     # via langchain
     # via langchain-community
     # via langchain-core
+    # via mgmt-agent-exp
 mako==1.3.10
     # via alembic
 markdown-it-py==4.0.0
@@ -220,6 +238,7 @@ mypy-extensions==1.1.0
 numpy==2.3.3
     # via chromadb
     # via contourpy
+    # via langchain-chroma
     # via langchain-community
     # via matplotlib
     # via onnxruntime
@@ -251,7 +270,10 @@ opentelemetry-semantic-conventions==0.58b0
     # via opentelemetry-sdk
 orjson==3.11.3
     # via chromadb
+    # via langgraph-sdk
     # via langsmith
+ormsgpack==1.10.0
+    # via langgraph-checkpoint
 overrides==7.7.0
     # via chromadb
 packaging==25.0
@@ -303,6 +325,7 @@ pydantic==2.11.9
     # via langchain
     # via langchain-anthropic
     # via langchain-core
+    # via langgraph
     # via langsmith
     # via mgmt-agent-exp
     # via openai
@@ -470,6 +493,8 @@ websocket-client==1.8.0
 websockets==15.0.1
     # via mgmt-agent-exp
     # via uvicorn
+xxhash==3.6.0
+    # via langgraph
 yarl==1.20.1
     # via aiohttp
 zipp==3.23.0

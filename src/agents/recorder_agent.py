@@ -85,7 +85,7 @@ class RecorderAgent:
         # 分析用LLM（オプション）- .envからAPIキーを明示的に読み取り
         if enable_vector_store:
             try:
-                from src.config.security import secure_config
+                from src.shared.config.security import secure_config
 
                 if secure_config.openai_api_key:
                     self.analysis_llm = ChatOpenAI(

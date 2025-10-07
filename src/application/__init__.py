@@ -9,7 +9,7 @@ from .services.conversation_service import ConversationService
 
 # Core Services
 from .services.inventory_service import inventory_service
-from .services.orchestrator import TransactionOrchestrator
+from .services.orchestrator import SystemOrchestrator
 from .services.payment_service import PaymentService
 
 __all__ = [
@@ -17,5 +17,5 @@ __all__ = [
     "inventory_service",
     "ConversationService",
     "PaymentService",
-    "TransactionOrchestrator",
+    "SystemOrchestrator",
 ]

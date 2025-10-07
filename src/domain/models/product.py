@@ -1,29 +1,37 @@
-from pydantic import BaseModel, Field, validator
-from typing import Optional, List, Dict, Any
+import uuid
 from datetime import datetime
 from enum import Enum
-import uuid
+from typing import Any, Dict, List, Optional
+
+from pydantic import BaseModel, Field, field_validator
+
 
 class ProductCategory(str, Enum):
     """商品カテゴリ"""
+
     DRINK = "drink"
     SNACK = "snack"
     FOOD = "food"
     OTHER = "other"
 
+
 class ProductStatus(str, Enum):
     """商品ステータス"""
+
     ACTIVE = "active"
     INACTIVE = "inactive"
     OUT_OF_STOCK = "out_of_stock"
     DISCONTINUED = "discontinued"
 
+
 class ProductSize(str, Enum):
     """商品サイズ"""
+
     SMALL = "small"
     MEDIUM = "medium"
     LARGE = "large"
     EXTRA_LARGE = "extra_large"
+
 
 class Product(BaseModel):
     """商品モデル"""
@@ -65,26 +73,30 @@ class Product(BaseModel):
 
     class Config:
         """Pydantic設定"""
-        use_enum_values = True
-        json_encoders = {
-            datetime: lambda v: v.isoformat()
-        }
 
-    @validator("profit_margin", always=True)
-    def calculate_profit_margin(cls, v, values):
+        use_enum_values = True
+        json_encoders = {datetime: lambda v: v.isoformat()}
+
+    @field_validator("profit_margin")
+    @classmethod
+    def calculate_profit_margin(cls, v, info):
         """利益率の自動計算"""
-        if v is None and "price" in values and "cost" in values:
-            price = values["price"]
-            cost = values["cost"]
-            if price > 0:
-                return (price - cost) / price
+        if v is None:
+            data = info.data
+            if "price" in data and "cost" in data:
+                price = data["price"]
+                cost = data["cost"]
+                if price > 0:
+                    return (price - cost) / price
         return v
 
-    @validator("status", always=True)
-    def update_status_based_on_stock(cls, v, values):
+    @field_validator("status")
+    @classmethod
+    def update_status_based_on_stock(cls, v, info):
         """在庫に基づくステータス更新"""
-        if "stock_quantity" in values:
-            stock = values["stock_quantity"]
+        data = info.data
+        if "stock_quantity" in data:
+            stock = data["stock_quantity"]
             if stock == 0:
                 return ProductStatus.OUT_OF_STOCK
             elif stock > 0:
@@ -93,10 +105,7 @@ class Product(BaseModel):
 
     def is_available(self) -> bool:
         """商品が利用可能かチェック"""
-        return (
-            self.status == ProductStatus.ACTIVE and
-            self.stock_quantity > 0
-        )
+        return self.status == ProductStatus.ACTIVE and self.stock_quantity > 0
 
     def can_restock(self) -> bool:
         """補充可能かチェック"""
@@ -108,7 +117,7 @@ class Product(BaseModel):
             return 0
         return min(
             self.max_stock_quantity - self.stock_quantity,
-            self.max_stock_quantity // 2  # 最大在庫の50%を目安に補充
+            self.max_stock_quantity // 2,  # 最大在庫の50%を目安に補充
         )
 
     def update_sales_data(self, quantity_sold: int = 1):
@@ -153,11 +162,13 @@ class Product(BaseModel):
             "return_rate": self.return_rate,
             "is_available": self.is_available(),
             "can_restock": self.can_restock(),
-            "restock_quantity": self.get_restock_quantity()
+            "restock_quantity": self.get_restock_quantity(),
         }
+
 
 class ProductCategoryInfo(BaseModel):
     """商品カテゴリ情報"""
+
     category: ProductCategory
     name: str
     description: str
@@ -167,32 +178,33 @@ class ProductCategoryInfo(BaseModel):
     class Config:
         use_enum_values = True
 
+
 # 商品カテゴリの定義
 PRODUCT_CATEGORIES = {
     ProductCategory.DRINK: ProductCategoryInfo(
         category=ProductCategory.DRINK,
         name="飲料",
         description="各種飲料水、ジュース、コーヒー等",
-        display_order=1
+        display_order=1,
     ),
     ProductCategory.SNACK: ProductCategoryInfo(
         category=ProductCategory.SNACK,
         name="スナック",
         description="ポテトチップス、チョコレート、キャンディー等",
-        display_order=2
+        display_order=2,
     ),
     ProductCategory.FOOD: ProductCategoryInfo(
         category=ProductCategory.FOOD,
         name="食品",
         description="カップ麺、サンドイッチ、弁当等",
-        display_order=3
+        display_order=3,
     ),
     ProductCategory.OTHER: ProductCategoryInfo(
         category=ProductCategory.OTHER,
         name="その他",
         description="その他の商品",
-        display_order=4
-    )
+        display_order=4,
+    ),
 }
 
 # サンプル商品データ（開発・テスト用）
@@ -208,7 +220,7 @@ SAMPLE_PRODUCTS = [
         weight_grams=500,
         calories=42,
         sku="CC-001",
-        barcode="4902102000012"
+        barcode="4902102000012",
     ),
     Product(
         name="ポテトチップス うすしお味",
@@ -222,7 +234,7 @@ SAMPLE_PRODUCTS = [
         calories=536,
         ingredients=["じゃがいも", "植物油", "食塩"],
         sku="PC-001",
-        barcode="4901330500019"
+        barcode="4901330500019",
     ),
     Product(
         name="カップヌードル",
@@ -237,6 +249,6 @@ SAMPLE_PRODUCTS = [
         ingredients=["小麦粉", "パーム油", "食塩", "醤油"],
         allergens=["小麦", "大豆"],
         sku="CN-001",
-        barcode="4902105000016"
-    )
+        barcode="4902105000016",
+    ),
 ]

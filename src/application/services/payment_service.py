@@ -6,8 +6,8 @@ from datetime import datetime, timedelta
 from enum import Enum
 from typing import Any, Dict, List, Optional
 
-from src.config.settings import settings
-from src.models.transaction import PaymentDetails, PaymentMethod, Transaction
+from src.shared.config.settings import settings
+from src.domain.models.transaction import PaymentDetails, PaymentMethod, Transaction
 
 logger = logging.getLogger(__name__)
 
@@ -397,7 +397,7 @@ class PaymentService:
                         logger.info(f"売上累積更新: +{amount}円, 合計:{self.total_revenue:.2f}円")
                         # Record journal entries
                         try:
-                            from src.accounting.journal_entry import journal_processor
+                            from src.domain.accounting.journal_entry import journal_processor
                             from datetime import date
                             journal_processor.add_entry("4001", date.today(), amount, "credit", f"Sales revenue - {method} - {result.payment_id}")
                             journal_processor.add_entry("1105", date.today(), amount, "debit", f"Cash received - {method} - {result.payment_id}")
@@ -412,7 +412,7 @@ class PaymentService:
                         logger.info(f"クーポン売上累積更新: +{amount}円, 合計:{self.total_revenue:.2f}円")
                         # Record journal entries
                         try:
-                            from src.accounting.journal_entry import journal_processor
+                            from src.domain.accounting.journal_entry import journal_processor
                             from datetime import date
                             journal_processor.add_entry("4001", date.today(), amount, "credit", f"Sales revenue - {method} - {result.payment_id}")
                             journal_processor.add_entry("1105", date.today(), amount, "debit", f"Cash received - {method} - {result.payment_id}")
@@ -431,7 +431,7 @@ class PaymentService:
 
                 # Record journal entries
                 try:
-                    from src.accounting.journal_entry import journal_processor
+                    from src.domain.accounting.journal_entry import journal_processor
                     from datetime import date
                     journal_processor.add_entry("4001", date.today(), amount, "credit", f"Sales revenue - {method} - {result.payment_id}")
                     journal_processor.add_entry("1105", date.today(), amount, "debit", f"Cash/Bank received - {method} - {result.payment_id}")

@@ -6,7 +6,7 @@ import logging
 from typing import Any, Dict, List, Optional
 
 from src.agents.search_agent import search_agent
-from src.config.settings import settings
+from src.shared.config.settings import settings
 from src.tools.shared_tools import BaseTool, ToolResult
 
 logger = logging.getLogger(__name__)

@@ -4,13 +4,17 @@ from typing import Any, Dict, List, Optional
 
 from fastapi import APIRouter, Body, Depends, HTTPException, Query
 
-from src.accounting.journal_entry import journal_processor
-from src.analytics.event_tracker import EventSeverity, EventType, event_tracker
-from src.config.settings import settings
-from src.models.product import SAMPLE_PRODUCTS, Product
-from src.models.transaction import PaymentMethod, Transaction, create_sample_transaction
-from src.services.inventory_service import inventory_service
-from src.services.payment_service import payment_service
+from src.application.services.inventory_service import inventory_service
+from src.application.services.payment_service import payment_service
+from src.domain.accounting.journal_entry import journal_processor
+from src.domain.analytics.event_tracker import EventSeverity, EventType, event_tracker
+from src.domain.models.product import SAMPLE_PRODUCTS, Product
+from src.domain.models.transaction import (
+    PaymentMethod,
+    Transaction,
+    create_sample_transaction,
+)
+from src.shared.config.settings import settings
 
 logger = logging.getLogger(__name__)
 

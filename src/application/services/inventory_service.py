@@ -4,15 +4,15 @@ from typing import Optional, Dict, Any, List, Tuple
 from datetime import datetime, timedelta
 from dataclasses import dataclass
 
-from src.models.inventory import (
+from src.domain.models.inventory import (
     InventorySlot,
     InventoryStatus,
     InventoryLocation,
     InventorySummary,
     RestockPlan
 )
-from src.models.product import Product
-from src.config.settings import settings
+from src.domain.models.product import Product
+from src.shared.config.settings import settings
 
 logger = logging.getLogger(__name__)
 
@@ -111,7 +111,7 @@ class InventoryService:
                 product = get_product_by_id(product_id)
                 cost_per_unit = product.price * 0.7 if product else 100  # Assume cost is 70% of selling price
                 total_cost = quantity * cost_per_unit
-                from src.accounting.journal_entry import journal_processor
+                from src.domain.accounting.journal_entry import journal_processor
                 from datetime import date
                 journal_processor.add_entry("5001", date.today(), total_cost, "debit", f"COGS - {product_id} x{quantity}")
             except Exception as e:
@@ -407,7 +407,7 @@ inventory_service = InventoryService()
 
 def get_product_by_id(product_id: str) -> Optional[Product]:
     """商品IDで商品を取得"""
-    from src.models.product import SAMPLE_PRODUCTS
+    from src.domain.models.product import SAMPLE_PRODUCTS
     for p in SAMPLE_PRODUCTS:
         if p.product_id == product_id:
             return p

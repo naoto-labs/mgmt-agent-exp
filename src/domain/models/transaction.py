@@ -243,7 +243,7 @@ class TransactionSummary(BaseModel):
 # サンプル取引データ（開発・テスト用）
 def create_sample_transaction() -> Transaction:
     """サンプル取引データ作成"""
-    from src.models.product import SAMPLE_PRODUCTS
+    from src.domain.models.product import SAMPLE_PRODUCTS
 
     items = [
         TransactionItem(

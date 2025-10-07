@@ -10,11 +10,11 @@ import math
 import random
 from datetime import date
 
-from src.accounting.journal_entry import journal_processor
-from src.models.product import SAMPLE_PRODUCTS
-from src.models.transaction import PaymentMethod
-from src.services.inventory_service import inventory_service
-from src.services.payment_service import payment_service
+from src.application.services.inventory_service import inventory_service
+from src.application.services.payment_service import payment_service
+from src.domain.accounting.journal_entry import journal_processor
+from src.domain.models.product import SAMPLE_PRODUCTS
+from src.domain.models.transaction import PaymentMethod
 
 logger = logging.getLogger(__name__)
 

@@ -1,18 +1,20 @@
 import asyncio
 import json
 import logging
-from typing import Optional, Dict, Any, List, Callable
-from datetime import datetime, timedelta
-from dataclasses import dataclass, field
-from enum import Enum
 import os
+from dataclasses import dataclass, field
+from datetime import datetime, timedelta
+from enum import Enum
+from typing import Any, Callable, Dict, List, Optional
 
-from src.config.settings import settings
+from src.shared.config.settings import settings
 
 logger = logging.getLogger(__name__)
 
+
 class EventType(str, Enum):
     """イベントタイプ"""
+
     # 販売関連
     SALE = "sale"
     PAYMENT = "payment"
@@ -40,16 +42,20 @@ class EventType(str, Enum):
     ERROR = "error"
     WARNING = "warning"
 
+
 class EventSeverity(str, Enum):
     """イベント深刻度"""
+
     LOW = "low"
     MEDIUM = "medium"
     HIGH = "high"
     CRITICAL = "critical"
 
+
 @dataclass
 class SystemEvent:
     """システムイベント"""
+
     event_id: str
     event_type: EventType
     severity: EventSeverity
@@ -73,8 +79,9 @@ class SystemEvent:
             "data": self.data,
             "user_id": self.user_id,
             "session_id": self.session_id,
-            "machine_id": self.machine_id
+            "machine_id": self.machine_id,
         }
+
 
 class EventTracker:
     """イベント追跡クラス"""
@@ -94,11 +101,16 @@ class EventTracker:
         """イベントIDを生成"""
         return f"evt_{datetime.now().strftime('%Y%m%d_%H%M%S')}_{id(self) % 10000}"
 
-    def track_event(self, event_type: EventType, source: str, message: str,
-                   severity: EventSeverity = EventSeverity.MEDIUM,
-                   data: Optional[Dict[str, Any]] = None,
-                   user_id: Optional[str] = None,
-                   session_id: Optional[str] = None) -> SystemEvent:
+    def track_event(
+        self,
+        event_type: EventType,
+        source: str,
+        message: str,
+        severity: EventSeverity = EventSeverity.MEDIUM,
+        data: Optional[Dict[str, Any]] = None,
+        user_id: Optional[str] = None,
+        session_id: Optional[str] = None,
+    ) -> SystemEvent:
         """イベントを記録"""
         event = SystemEvent(
             event_id=self._generate_event_id(),
@@ -109,7 +121,7 @@ class EventTracker:
             message=message,
             data=data or {},
             user_id=user_id,
-            session_id=session_id
+            session_id=session_id,
         )
 
         # イベントをリストに追加
@@ -117,7 +129,7 @@ class EventTracker:
 
         # イベント数の制限
         if len(self.events) > self.max_events:
-            self.events = self.events[-self.max_events:]
+            self.events = self.events[-self.max_events :]
 
         # イベントハンドラーを実行
         self._trigger_event_handlers(event)
@@ -144,11 +156,11 @@ class EventTracker:
         """イベントをストレージに保存"""
         try:
             # 日別ファイルに保存
-            date_str = event.timestamp.strftime('%Y%m%d')
+            date_str = event.timestamp.strftime("%Y%m%d")
             file_path = f"{self.storage_dir}/events_{date_str}.jsonl"
 
-            with open(file_path, 'a', encoding='utf-8') as f:
-                f.write(json.dumps(event.to_dict(), ensure_ascii=False) + '\n')
+            with open(file_path, "a", encoding="utf-8") as f:
+                f.write(json.dumps(event.to_dict(), ensure_ascii=False) + "\n")
 
         except Exception as e:
             logger.error(f"イベント保存エラー: {e}")
@@ -169,10 +181,13 @@ class EventTracker:
             except ValueError:
                 pass
 
-    def get_events(self, event_type: Optional[EventType] = None,
-                   start_time: Optional[datetime] = None,
-                   end_time: Optional[datetime] = None,
-                   limit: int = 100) -> List[SystemEvent]:
+    def get_events(
+        self,
+        event_type: Optional[EventType] = None,
+        start_time: Optional[datetime] = None,
+        end_time: Optional[datetime] = None,
+        limit: int = 100,
+    ) -> List[SystemEvent]:
         """イベントを取得"""
         filtered_events = self.events
 
@@ -225,23 +240,35 @@ class EventTracker:
             "events_by_severity": events_by_severity,
             "recent_events_24h": len(recent_events),
             "recent_events_by_type": recent_by_type,
-            "oldest_event": self.events[0].timestamp.isoformat() if self.events else None,
-            "newest_event": self.events[-1].timestamp.isoformat() if self.events else None
+            "oldest_event": self.events[0].timestamp.isoformat()
+            if self.events
+            else None,
+            "newest_event": self.events[-1].timestamp.isoformat()
+            if self.events
+            else None,
         }
 
-    def get_daily_sales_data(self, start_date: datetime, end_date: datetime) -> List[Dict[str, Any]]:
+    def get_daily_sales_data(
+        self, start_date: datetime, end_date: datetime
+    ) -> List[Dict[str, Any]]:
         """日別売上データを取得"""
         daily_data = {}
 
         # 売上イベントを抽出
-        sales_events = [e for e in self.events
-                       if e.event_type == EventType.SALE and
-                       start_date <= e.timestamp <= end_date]
+        sales_events = [
+            e
+            for e in self.events
+            if e.event_type == EventType.SALE and start_date <= e.timestamp <= end_date
+        ]
 
         for event in sales_events:
             date_key = event.timestamp.date().isoformat()
             if date_key not in daily_data:
-                daily_data[date_key] = {"date": date_key, "revenue": 0, "transaction_count": 0}
+                daily_data[date_key] = {
+                    "date": date_key,
+                    "revenue": 0,
+                    "transaction_count": 0,
+                }
 
             # データから金額を取得（簡易版）
             revenue = event.data.get("amount", 0)
@@ -250,7 +277,9 @@ class EventTracker:
 
         return list(daily_data.values())
 
-    def search_events(self, query: str, event_type: Optional[EventType] = None) -> List[SystemEvent]:
+    def search_events(
+        self, query: str, event_type: Optional[EventType] = None
+    ) -> List[SystemEvent]:
         """イベントを検索"""
         results = []
 
@@ -269,9 +298,10 @@ class EventTracker:
         """エラーイベントを取得"""
         cutoff_time = datetime.now() - timedelta(hours=hours)
         error_events = [
-            e for e in self.events
-            if e.severity in [EventSeverity.HIGH, EventSeverity.CRITICAL] and
-            e.timestamp >= cutoff_time
+            e
+            for e in self.events
+            if e.severity in [EventSeverity.HIGH, EventSeverity.CRITICAL]
+            and e.timestamp >= cutoff_time
         ]
         return sorted(error_events, key=lambda x: x.timestamp, reverse=True)
 
@@ -286,8 +316,11 @@ class EventTracker:
             return 1.0
 
         # エラーイベントの割合を計算
-        error_events = [e for e in recent_events
-                       if e.severity in [EventSeverity.HIGH, EventSeverity.CRITICAL]]
+        error_events = [
+            e
+            for e in recent_events
+            if e.severity in [EventSeverity.HIGH, EventSeverity.CRITICAL]
+        ]
 
         error_rate = len(error_events) / len(recent_events)
 
@@ -296,24 +329,31 @@ class EventTracker:
 
         return health_score
 
-    def export_events(self, start_date: Optional[datetime] = None,
-                     end_date: Optional[datetime] = None,
-                     format: str = "json") -> str:
+    def export_events(
+        self,
+        start_date: Optional[datetime] = None,
+        end_date: Optional[datetime] = None,
+        format: str = "json",
+    ) -> str:
         """イベントをエクスポート"""
         events = self.get_events(None, start_date, end_date, limit=10000)
 
         if format.lower() == "json":
             events_data = [event.to_dict() for event in events]
 
-            return json.dumps({
-                "events": events_data,
-                "total_events": len(events_data),
-                "export_period": {
-                    "start": start_date.isoformat() if start_date else None,
-                    "end": end_date.isoformat() if end_date else None
+            return json.dumps(
+                {
+                    "events": events_data,
+                    "total_events": len(events_data),
+                    "export_period": {
+                        "start": start_date.isoformat() if start_date else None,
+                        "end": end_date.isoformat() if end_date else None,
+                    },
+                    "exported_at": datetime.now().isoformat(),
                 },
-                "exported_at": datetime.now().isoformat()
-            }, ensure_ascii=False, indent=2)
+                ensure_ascii=False,
+                indent=2,
+            )
 
         else:
             raise ValueError(f"未対応のエクスポート形式: {format}")
@@ -330,61 +370,85 @@ class EventTracker:
 
         return removed_count
 
+
 # グローバルインスタンス
 event_tracker = EventTracker()
 
+
 # 便利なイベント記録関数
-def track_sale_event(transaction_id: str, amount: float, product_name: str = "",
-                    user_id: Optional[str] = None):
+def track_sale_event(
+    transaction_id: str,
+    amount: float,
+    product_name: str = "",
+    user_id: Optional[str] = None,
+):
     """売上イベントを記録"""
     message = f"商品販売: {product_name} - 金額: ¥{amount:,}"
-    data = {"transaction_id": transaction_id, "amount": amount, "product_name": product_name}
+    data = {
+        "transaction_id": transaction_id,
+        "amount": amount,
+        "product_name": product_name,
+    }
 
     return event_tracker.track_event(
-        EventType.SALE,
-        "vending_service",
-        message,
-        EventSeverity.LOW,
-        data,
-        user_id
+        EventType.SALE, "vending_service", message, EventSeverity.LOW, data, user_id
     )
 
-def track_payment_event(payment_id: str, amount: float, method: str, success: bool,
-                       user_id: Optional[str] = None):
+
+def track_payment_event(
+    payment_id: str,
+    amount: float,
+    method: str,
+    success: bool,
+    user_id: Optional[str] = None,
+):
     """決済イベントを記録"""
     severity = EventSeverity.LOW if success else EventSeverity.MEDIUM
-    message = f"決済処理: {method} - 金額: ¥{amount:,} - {'成功' if success else '失敗'}"
-    data = {"payment_id": payment_id, "amount": amount, "method": method, "success": success}
+    message = (
+        f"決済処理: {method} - 金額: ¥{amount:,} - {'成功' if success else '失敗'}"
+    )
+    data = {
+        "payment_id": payment_id,
+        "amount": amount,
+        "method": method,
+        "success": success,
+    }
 
     return event_tracker.track_event(
-        EventType.PAYMENT,
-        "payment_service",
-        message,
-        severity,
-        data,
-        user_id
+        EventType.PAYMENT, "payment_service", message, severity, data, user_id
     )
 
-def track_inventory_event(event_type: EventType, product_name: str, quantity: int,
-                         slot_id: str = "", user_id: Optional[str] = None):
+
+def track_inventory_event(
+    event_type: EventType,
+    product_name: str,
+    quantity: int,
+    slot_id: str = "",
+    user_id: Optional[str] = None,
+):
     """在庫イベントを記録"""
     message = f"在庫操作: {product_name} - 数量: {quantity}"
     data = {"product_name": product_name, "quantity": quantity, "slot_id": slot_id}
 
     return event_tracker.track_event(
-        event_type,
-        "inventory_service",
-        message,
-        EventSeverity.LOW,
-        data,
-        user_id
+        event_type, "inventory_service", message, EventSeverity.LOW, data, user_id
     )
 
-def track_customer_interaction(session_id: str, customer_id: str, interaction_type: str,
-                              message: str = "", user_id: Optional[str] = None):
+
+def track_customer_interaction(
+    session_id: str,
+    customer_id: str,
+    interaction_type: str,
+    message: str = "",
+    user_id: Optional[str] = None,
+):
     """顧客対話を記録"""
     full_message = f"顧客対話: {interaction_type} - {message[:50]}..."
-    data = {"session_id": session_id, "interaction_type": interaction_type, "message": message}
+    data = {
+        "session_id": session_id,
+        "interaction_type": interaction_type,
+        "message": message,
+    }
 
     return event_tracker.track_event(
         EventType.CUSTOMER_INTERACTION,
@@ -393,32 +457,31 @@ def track_customer_interaction(session_id: str, customer_id: str, interaction_ty
         EventSeverity.LOW,
         data,
         customer_id,
-        session_id
+        session_id,
     )
 
-def track_ai_event(event_type: EventType, model_name: str, message: str,
-                  data: Optional[Dict[str, Any]] = None):
+
+def track_ai_event(
+    event_type: EventType,
+    model_name: str,
+    message: str,
+    data: Optional[Dict[str, Any]] = None,
+):
     """AI関連イベントを記録"""
     full_message = f"AIイベント: {model_name} - {message}"
     event_data = data or {}
     event_data["model_name"] = model_name
 
     return event_tracker.track_event(
-        event_type,
-        "ai_model_manager",
-        full_message,
-        EventSeverity.MEDIUM,
-        event_data
+        event_type, "ai_model_manager", full_message, EventSeverity.MEDIUM, event_data
     )
 
-def track_system_event(event_type: EventType, message: str,
-                      severity: EventSeverity = EventSeverity.MEDIUM,
-                      data: Optional[Dict[str, Any]] = None):
+
+def track_system_event(
+    event_type: EventType,
+    message: str,
+    severity: EventSeverity = EventSeverity.MEDIUM,
+    data: Optional[Dict[str, Any]] = None,
+):
     """システムイベントを記録"""
-    return event_tracker.track_event(
-        event_type,
-        "system",
-        message,
-        severity,
-        data
-    )
+    return event_tracker.track_event(event_type, "system", message, severity, data)

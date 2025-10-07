@@ -4,7 +4,7 @@ from typing import List, Optional
 from pydantic import validator
 from pydantic_settings import BaseSettings
 
-from src.config.security import secure_config
+from src.shared.config.security import secure_config
 
 
 class VendingMachineSettings(BaseSettings):

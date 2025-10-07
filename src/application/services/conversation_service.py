@@ -4,9 +4,9 @@ from typing import Optional, Dict, Any, List
 from datetime import datetime
 from dataclasses import dataclass
 
-from src.models.product import Product
-from src.models.transaction import Transaction
-from src.config.settings import settings
+from src.domain.models.product import Product
+from src.domain.models.transaction import Transaction
+from src.shared.config.settings import settings
 
 logger = logging.getLogger(__name__)
 

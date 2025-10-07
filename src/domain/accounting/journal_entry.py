@@ -1,39 +1,45 @@
 import logging
-from typing import Optional, Dict, Any, List
-from datetime import datetime, date
 from dataclasses import dataclass
+from datetime import date, datetime
 from enum import Enum
+from typing import Any, Dict, List, Optional
 
-from src.models.transaction import Transaction, TransactionType
-from src.models.product import Product
-from src.config.settings import settings
+from src.domain.models.product import Product
+from src.domain.models.transaction import Transaction, TransactionType
+from src.shared.config.settings import settings
 
 logger = logging.getLogger(__name__)
 
+
 class AccountCode(str, Enum):
     """勘定科目コード"""
+
     # 資産
-    CASH = "1001"           # 現金
-    INVENTORY = "1101"      # 商品
+    CASH = "1001"  # 現金
+    INVENTORY = "1101"  # 商品
 
     # 負債
     ACCOUNTS_PAYABLE = "2001"  # 買掛金
 
     # 収益
-    SALES_REVENUE = "4001"     # 売上高
+    SALES_REVENUE = "4001"  # 売上高
 
     # 費用
-    COST_OF_GOODS_SOLD = "5001"    # 仕入高
-    OPERATING_EXPENSES = "6001"    # 販売費及び一般管理費
+    COST_OF_GOODS_SOLD = "5001"  # 仕入高
+    OPERATING_EXPENSES = "6001"  # 販売費及び一般管理費
+
 
 class DebitCredit(str, Enum):
     """借方・貸方"""
+
     DEBIT = "debit"
     CREDIT = "credit"
+
 
 @dataclass
 class AccountingEntry:
     """会計エントリ"""
+
     account_code: str
     account_name: str
     debit_amount: float = 0.0
@@ -52,9 +58,11 @@ class AccountingEntry:
         """金額を取得"""
         return max(self.debit_amount, self.credit_amount)
 
+
 @dataclass
 class JournalEntry:
     """仕訳エントリ"""
+
     entry_id: str
     date: date
     description: str
@@ -74,7 +82,10 @@ class JournalEntry:
 
     def get_total_amount(self) -> float:
         """総金額を取得"""
-        return sum(entry.get_amount() for entry in self.entries) / 2  # 借貸同額なので半分
+        return (
+            sum(entry.get_amount() for entry in self.entries) / 2
+        )  # 借貸同額なので半分
+
 
 class ChartOfAccounts:
     """勘定科目表"""
@@ -86,7 +97,7 @@ class ChartOfAccounts:
             AccountCode.ACCOUNTS_PAYABLE: "買掛金",
             AccountCode.SALES_REVENUE: "売上高",
             AccountCode.COST_OF_GOODS_SOLD: "仕入高",
-            AccountCode.OPERATING_EXPENSES: "販売費及び一般管理費"
+            AccountCode.OPERATING_EXPENSES: "販売費及び一般管理費",
         }
 
     def get_account_name(self, code: str) -> str:
@@ -96,6 +107,7 @@ class ChartOfAccounts:
     def get_all_accounts(self) -> Dict[str, str]:
         """全勘定科目を取得"""
         return self.accounts.copy()
+
 
 class JournalEntryProcessor:
     """仕訳処理クラス"""
@@ -125,18 +137,22 @@ class JournalEntryProcessor:
             entries = [
                 AccountingEntry(
                     account_code=AccountCode.CASH.value,
-                    account_name=self.chart_of_accounts.get_account_name(AccountCode.CASH.value),
+                    account_name=self.chart_of_accounts.get_account_name(
+                        AccountCode.CASH.value
+                    ),
                     debit_amount=amount,
                     credit_amount=0,
-                    description=f"商品売上 - {transaction.transaction_id}"
+                    description=f"商品売上 - {transaction.transaction_id}",
                 ),
                 AccountingEntry(
                     account_code=AccountCode.SALES_REVENUE.value,
-                    account_name=self.chart_of_accounts.get_account_name(AccountCode.SALES_REVENUE.value),
+                    account_name=self.chart_of_accounts.get_account_name(
+                        AccountCode.SALES_REVENUE.value
+                    ),
                     debit_amount=0,
                     credit_amount=amount,
-                    description=f"商品売上 - {transaction.transaction_id}"
-                )
+                    description=f"商品売上 - {transaction.transaction_id}",
+                ),
             ]
 
             # 仕訳エントリを作成
@@ -145,7 +161,7 @@ class JournalEntryProcessor:
                 date=transaction.created_at.date(),
                 description=f"商品売上 - 取引ID: {transaction.transaction_id}",
                 entries=entries,
-                reference_id=transaction.transaction_id
+                reference_id=transaction.transaction_id,
             )
 
             # バランスチェック
@@ -162,7 +178,9 @@ class JournalEntryProcessor:
             logger.error(f"売上仕訳記録エラー: {e}")
             raise
 
-    def record_purchase(self, product: Product, quantity: int, supplier_name: str, order_id: str) -> List[JournalEntry]:
+    def record_purchase(
+        self, product: Product, quantity: int, supplier_name: str, order_id: str
+    ) -> List[JournalEntry]:
         """仕入仕訳を記録"""
         logger.info(f"仕入仕訳記録開始: 商品={product.name}, 数量={quantity}")
 
@@ -177,18 +195,22 @@ class JournalEntryProcessor:
             purchase_entries = [
                 AccountingEntry(
                     account_code=AccountCode.COST_OF_GOODS_SOLD.value,
-                    account_name=self.chart_of_accounts.get_account_name(AccountCode.COST_OF_GOODS_SOLD.value),
+                    account_name=self.chart_of_accounts.get_account_name(
+                        AccountCode.COST_OF_GOODS_SOLD.value
+                    ),
                     debit_amount=total_cost,
                     credit_amount=0,
-                    description=f"商品仕入 - {supplier_name}"
+                    description=f"商品仕入 - {supplier_name}",
                 ),
                 AccountingEntry(
                     account_code=AccountCode.ACCOUNTS_PAYABLE.value,
-                    account_name=self.chart_of_accounts.get_account_name(AccountCode.ACCOUNTS_PAYABLE.value),
+                    account_name=self.chart_of_accounts.get_account_name(
+                        AccountCode.ACCOUNTS_PAYABLE.value
+                    ),
                     debit_amount=0,
                     credit_amount=total_cost,
-                    description=f"商品仕入 - {supplier_name}"
-                )
+                    description=f"商品仕入 - {supplier_name}",
+                ),
             ]
 
             purchase_journal = JournalEntry(
@@ -196,25 +218,29 @@ class JournalEntryProcessor:
                 date=date.today(),
                 description=f"商品仕入 - 仕入先: {supplier_name}, 商品: {product.name}",
                 entries=purchase_entries,
-                reference_id=order_id
+                reference_id=order_id,
             )
 
             # 2. 在庫計上：借方：商品、貸方：仕入高
             inventory_entries = [
                 AccountingEntry(
                     account_code=AccountCode.INVENTORY.value,
-                    account_name=self.chart_of_accounts.get_account_name(AccountCode.INVENTORY.value),
+                    account_name=self.chart_of_accounts.get_account_name(
+                        AccountCode.INVENTORY.value
+                    ),
                     debit_amount=total_cost,
                     credit_amount=0,
-                    description=f"在庫計上 - {product.name}"
+                    description=f"在庫計上 - {product.name}",
                 ),
                 AccountingEntry(
                     account_code=AccountCode.COST_OF_GOODS_SOLD.value,
-                    account_name=self.chart_of_accounts.get_account_name(AccountCode.COST_OF_GOODS_SOLD.value),
+                    account_name=self.chart_of_accounts.get_account_name(
+                        AccountCode.COST_OF_GOODS_SOLD.value
+                    ),
                     debit_amount=0,
                     credit_amount=total_cost,
-                    description=f"在庫計上 - {product.name}"
-                )
+                    description=f"在庫計上 - {product.name}",
+                ),
             ]
 
             inventory_journal = JournalEntry(
@@ -222,13 +248,15 @@ class JournalEntryProcessor:
                 date=date.today(),
                 description=f"在庫計上 - 商品: {product.name}, 数量: {quantity}",
                 entries=inventory_entries,
-                reference_id=order_id
+                reference_id=order_id,
             )
 
             # バランスチェック
             for journal in [purchase_journal, inventory_journal]:
                 if not journal.is_balanced():
-                    raise ValueError(f"仕訳の借貸バランスが取れていません: {journal.entry_id}")
+                    raise ValueError(
+                        f"仕訳の借貸バランスが取れていません: {journal.entry_id}"
+                    )
 
             # 仕訳を保存
             journal_entries = [purchase_journal, inventory_journal]
@@ -241,9 +269,13 @@ class JournalEntryProcessor:
             logger.error(f"仕入仕訳記録エラー: {e}")
             raise
 
-    def record_inventory_adjustment(self, product: Product, adjustment_quantity: int, reason: str) -> JournalEntry:
+    def record_inventory_adjustment(
+        self, product: Product, adjustment_quantity: int, reason: str
+    ) -> JournalEntry:
         """在庫調整仕訳を記録"""
-        logger.info(f"在庫調整仕訳記録開始: 商品={product.name}, 調整数量={adjustment_quantity}")
+        logger.info(
+            f"在庫調整仕訳記録開始: 商品={product.name}, 調整数量={adjustment_quantity}"
+        )
 
         try:
             # 調整金額を計算
@@ -258,36 +290,44 @@ class JournalEntryProcessor:
                 entries = [
                     AccountingEntry(
                         account_code=AccountCode.INVENTORY.value,
-                        account_name=self.chart_of_accounts.get_account_name(AccountCode.INVENTORY.value),
+                        account_name=self.chart_of_accounts.get_account_name(
+                            AccountCode.INVENTORY.value
+                        ),
                         debit_amount=adjustment_amount,
                         credit_amount=0,
-                        description=f"在庫増加調整 - {reason}"
+                        description=f"在庫増加調整 - {reason}",
                     ),
                     AccountingEntry(
                         account_code=AccountCode.COST_OF_GOODS_SOLD.value,
-                        account_name=self.chart_of_accounts.get_account_name(AccountCode.COST_OF_GOODS_SOLD.value),
+                        account_name=self.chart_of_accounts.get_account_name(
+                            AccountCode.COST_OF_GOODS_SOLD.value
+                        ),
                         debit_amount=0,
                         credit_amount=adjustment_amount,
-                        description=f"在庫増加調整 - {reason}"
-                    )
+                        description=f"在庫増加調整 - {reason}",
+                    ),
                 ]
             else:
                 # 在庫減少：借方：仕入高（再振替）、貸方：商品
                 entries = [
                     AccountingEntry(
                         account_code=AccountCode.COST_OF_GOODS_SOLD.value,
-                        account_name=self.chart_of_accounts.get_account_name(AccountCode.COST_OF_GOODS_SOLD.value),
+                        account_name=self.chart_of_accounts.get_account_name(
+                            AccountCode.COST_OF_GOODS_SOLD.value
+                        ),
                         debit_amount=adjustment_amount,
                         credit_amount=0,
-                        description=f"在庫減少調整 - {reason}"
+                        description=f"在庫減少調整 - {reason}",
                     ),
                     AccountingEntry(
                         account_code=AccountCode.INVENTORY.value,
-                        account_name=self.chart_of_accounts.get_account_name(AccountCode.INVENTORY.value),
+                        account_name=self.chart_of_accounts.get_account_name(
+                            AccountCode.INVENTORY.value
+                        ),
                         debit_amount=0,
                         credit_amount=adjustment_amount,
-                        description=f"在庫減少調整 - {reason}"
-                    )
+                        description=f"在庫減少調整 - {reason}",
+                    ),
                 ]
 
             journal_entry = JournalEntry(
@@ -295,7 +335,7 @@ class JournalEntryProcessor:
                 date=date.today(),
                 description=f"在庫調整 - 商品: {product.name}, 理由: {reason}",
                 entries=entries,
-                reference_id=product.product_id
+                reference_id=product.product_id,
             )
 
             # バランスチェック
@@ -312,7 +352,9 @@ class JournalEntryProcessor:
             logger.error(f"在庫調整仕訳記録エラー: {e}")
             raise
 
-    def record_expense(self, expense_type: str, amount: float, description: str) -> JournalEntry:
+    def record_expense(
+        self, expense_type: str, amount: float, description: str
+    ) -> JournalEntry:
         """費用仕訳を記録"""
         logger.info(f"費用仕訳記録開始: {expense_type}, 金額={amount}")
 
@@ -324,25 +366,29 @@ class JournalEntryProcessor:
             entries = [
                 AccountingEntry(
                     account_code=AccountCode.OPERATING_EXPENSES.value,
-                    account_name=self.chart_of_accounts.get_account_name(AccountCode.OPERATING_EXPENSES.value),
+                    account_name=self.chart_of_accounts.get_account_name(
+                        AccountCode.OPERATING_EXPENSES.value
+                    ),
                     debit_amount=amount,
                     credit_amount=0,
-                    description=f"{expense_type} - {description}"
+                    description=f"{expense_type} - {description}",
                 ),
                 AccountingEntry(
                     account_code=AccountCode.CASH.value,
-                    account_name=self.chart_of_accounts.get_account_name(AccountCode.CASH.value),
+                    account_name=self.chart_of_accounts.get_account_name(
+                        AccountCode.CASH.value
+                    ),
                     debit_amount=0,
                     credit_amount=amount,
-                    description=f"{expense_type} - {description}"
-                )
+                    description=f"{expense_type} - {description}",
+                ),
             ]
 
             journal_entry = JournalEntry(
                 entry_id=self._generate_entry_id(),
                 date=date.today(),
                 description=f"{expense_type} - {description}",
-                entries=entries
+                entries=entries,
             )
 
             # バランスチェック
@@ -359,7 +405,9 @@ class JournalEntryProcessor:
             logger.error(f"費用仕訳記録エラー: {e}")
             raise
 
-    def get_journal_entries(self, start_date: Optional[date] = None, end_date: Optional[date] = None) -> List[JournalEntry]:
+    def get_journal_entries(
+        self, start_date: Optional[date] = None, end_date: Optional[date] = None
+    ) -> List[JournalEntry]:
         """期間指定で仕訳を取得"""
         if not start_date:
             start_date = date.min
@@ -367,13 +415,19 @@ class JournalEntryProcessor:
             end_date = date.today()
 
         filtered_entries = [
-            entry for entry in self.journal_entries
+            entry
+            for entry in self.journal_entries
             if start_date <= entry.date <= end_date
         ]
 
         return sorted(filtered_entries, key=lambda x: x.date)
 
-    def get_account_balance(self, account_code: str, start_date: Optional[date] = None, end_date: Optional[date] = None) -> float:
+    def get_account_balance(
+        self,
+        account_code: str,
+        start_date: Optional[date] = None,
+        end_date: Optional[date] = None,
+    ) -> float:
         """勘定科目の残高を取得"""
         entries = self.get_journal_entries(start_date, end_date)
 
@@ -385,7 +439,9 @@ class JournalEntryProcessor:
 
         return balance
 
-    def get_trial_balance(self, end_date: Optional[date] = None) -> Dict[str, Dict[str, float]]:
+    def get_trial_balance(
+        self, end_date: Optional[date] = None
+    ) -> Dict[str, Dict[str, float]]:
         """試算表を取得"""
         if not end_date:
             end_date = date.today()
@@ -398,17 +454,23 @@ class JournalEntryProcessor:
             for acc_entry in entry.entries:
                 code = acc_entry.account_code
                 if code not in account_balances:
-                    account_balances[code] = {"debit": 0.0, "credit": 0.0, "balance": 0.0}
+                    account_balances[code] = {
+                        "debit": 0.0,
+                        "credit": 0.0,
+                        "balance": 0.0,
+                    }
 
                 account_balances[code]["debit"] += acc_entry.debit_amount
                 account_balances[code]["credit"] += acc_entry.credit_amount
-                account_balances[code]["balance"] += acc_entry.debit_amount - acc_entry.credit_amount
+                account_balances[code]["balance"] += (
+                    acc_entry.debit_amount - acc_entry.credit_amount
+                )
 
         return {
             "accounts": account_balances,
             "total_debit": sum(acc["debit"] for acc in account_balances.values()),
             "total_credit": sum(acc["credit"] for acc in account_balances.values()),
-            "as_of_date": end_date.isoformat()
+            "as_of_date": end_date.isoformat(),
         }
 
     def export_journal_entries(self, format: str = "json") -> str:
@@ -425,22 +487,27 @@ class JournalEntryProcessor:
                             "account_name": acc_entry.account_name,
                             "debit_amount": acc_entry.debit_amount,
                             "credit_amount": acc_entry.credit_amount,
-                            "description": acc_entry.description
+                            "description": acc_entry.description,
                         }
                         for acc_entry in entry.entries
                     ],
                     "reference_id": entry.reference_id,
-                    "created_at": entry.created_at.isoformat()
+                    "created_at": entry.created_at.isoformat(),
                 }
                 for entry in self.journal_entries
             ]
 
             import json
-            return json.dumps({
-                "journal_entries": entries_data,
-                "total_entries": len(entries_data),
-                "exported_at": datetime.now().isoformat()
-            }, ensure_ascii=False, indent=2)
+
+            return json.dumps(
+                {
+                    "journal_entries": entries_data,
+                    "total_entries": len(entries_data),
+                    "exported_at": datetime.now().isoformat(),
+                },
+                ensure_ascii=False,
+                indent=2,
+            )
 
         else:
             raise ValueError(f"未対応のエクスポート形式: {format}")
@@ -454,23 +521,17 @@ class JournalEntryProcessor:
         entries = self.get_journal_entries(month_start, today)
 
         summary = {
-            "period": {
-                "start": month_start.isoformat(),
-                "end": today.isoformat()
-            },
+            "period": {"start": month_start.isoformat(), "end": today.isoformat()},
             "total_entries": len(entries),
             "account_balances": {},
-            "top_accounts": []
+            "top_accounts": [],
         }
 
         # 勘定科目別残高
         for code, name in self.chart_of_accounts.get_all_accounts().items():
             balance = self.get_account_balance(code, month_start, today)
             if balance != 0:
-                summary["account_balances"][code] = {
-                    "name": name,
-                    "balance": balance
-                }
+                summary["account_balances"][code] = {"name": name, "balance": balance}
 
         # 上位勘定科目（残高順）
         balances = [
@@ -482,7 +543,14 @@ class JournalEntryProcessor:
 
         return summary
 
-    def add_entry(self, account_number: str, date: date, amount: float, entry_type: str, description: str):
+    def add_entry(
+        self,
+        account_number: str,
+        date: date,
+        amount: float,
+        entry_type: str,
+        description: str,
+    ):
         """エントリを追加（単一勘定）"""
         try:
             debit_amount = amount if entry_type == "debit" else 0.0
@@ -493,7 +561,7 @@ class JournalEntryProcessor:
                 account_name=self.chart_of_accounts.get_account_name(account_number),
                 debit_amount=debit_amount,
                 credit_amount=credit_amount,
-                description=description
+                description=description,
             )
 
             journal_entry = JournalEntry(
@@ -501,7 +569,7 @@ class JournalEntryProcessor:
                 date=date,
                 description=description,
                 entries=[entry],
-                reference_id=None
+                reference_id=None,
             )
 
             self.journal_entries.append(journal_entry)
@@ -510,6 +578,7 @@ class JournalEntryProcessor:
         except Exception as e:
             logger.error(f"エントリ追加エラー: {e}")
             raise
+
 
 # グローバルインスタンス
 journal_processor = JournalEntryProcessor()

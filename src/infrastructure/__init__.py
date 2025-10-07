@@ -7,8 +7,15 @@ Infrastructure Layer - Technical Implementations
 # API Infrastructure
 from . import ai, api
 
-# AI Model Management
-from .ai.model_manager import model_manager
+
+# AI Model Management (循環インポート防止のため遅延インポート)
+def get_model_manager():
+    """model_managerを遅延インポートして取得"""
+    from .ai.model_manager import model_manager
+
+    return model_manager
+
+
 from .api.procurement import router as procurement_router
 from .api.tablet import router as tablet_router
 
@@ -16,8 +23,6 @@ from .api.tablet import router as tablet_router
 from .api.vending import router as vending_router
 
 __all__ = [
-    # AI Infrastructure
-    "model_manager",
     # API Infrastructure
     "vending_router",
     "tablet_router",

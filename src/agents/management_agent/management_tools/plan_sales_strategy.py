@@ -11,9 +11,6 @@ from typing import Any, Dict, List
 from src.agents.management_agent.management_tools.get_business_metrics import (
     get_business_metrics,
 )
-from src.agents.shared_tools.tools.market_tools.search_products import (
-    search_products,
-)
 
 logger = logging.getLogger(__name__)
 

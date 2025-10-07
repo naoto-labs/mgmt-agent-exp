@@ -9,8 +9,7 @@ import logging
 from typing import Any, Dict
 
 import src.agents.management_agent.management_tools.get_business_metrics as get_business_metrics
-from src.infrastructure import model_manager
-from src.infrastructure.ai.model_manager import AIMessage
+from src.infrastructure.ai.model_manager import AIMessage, model_manager
 
 logger = logging.getLogger(__name__)
 

@@ -4,10 +4,10 @@ from typing import Any, Dict, List, Optional
 from fastapi import APIRouter, Body, HTTPException, Query
 
 from src.agents.customer_agent import customer_agent
-from src.analytics.event_tracker import EventSeverity, EventType, event_tracker
-from src.models.product import PRODUCT_CATEGORIES, SAMPLE_PRODUCTS, Product
-from src.services.conversation_service import conversation_service
-from src.services.inventory_service import inventory_service
+from src.application.services.conversation_service import conversation_service
+from src.application.services.inventory_service import inventory_service
+from src.domain.analytics.event_tracker import EventSeverity, EventType, event_tracker
+from src.domain.models.product import PRODUCT_CATEGORIES, SAMPLE_PRODUCTS, Product
 
 logger = logging.getLogger(__name__)
 
