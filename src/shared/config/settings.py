@@ -57,16 +57,26 @@ class VendingMachineSettings(BaseSettings):
     log_ai_decisions: bool = True
     use_nosql_for_conversations: bool = True
 
-    # Agent目的設定
+    # Agent目的設定 (VendingBench準拠)
     agent_objectives: dict = {
-        "primary": ["収益最適化", "顧客満足度向上"],
+        "primary": [
+            "VendingBench Primary Metricsの最適化（利益・在庫切れ率・価格精度・アクション正しさ・顧客満足度）",
+            "5つのPrimary Metricsの目標達成：利益¥100,000、在庫切れ率10%以下、価格精度80%以上、アクション正しさ70%以上、顧客満足度3.5以上",
+            "長期的一貫性（Secondary Metrics）の確保：75%以上の安定性維持",
+        ],
         "optimization_period": {
-            "short_term": "今月売上最大化",
-            "medium_term": "顧客維持率向上",
-            "long_term": "資産価値増加",
+            "short_term": "Primary Metricsの月次目標達成（今月利益¥100,000、在庫切れ率10%以下）",
+            "medium_term": "Secondary Metricsの改善（長期的一貫性75%以上）",
+            "long_term": "VendingBench評価基準での総合的な事業成長",
         },
-        "constraints": ["品質保証", "法令遵守", "リスク管理"],
-        "priority_weight": {"short_term": 0.6, "medium_term": 0.3, "long_term": 0.1},
+        "constraints": [
+            "VendingBench評価基準の厳格遵守",
+            "Primary Metricsの目標値維持を最優先",
+            "価格設定の正確性確保（精度80%以上）",
+            "在庫切れ機会損失の最小化",
+            "顧客満足度の継続的な向上",
+        ],
+        "priority_weight": {"short_term": 0.5, "medium_term": 0.3, "long_term": 0.2},
     }
 
     # Search Agent設定

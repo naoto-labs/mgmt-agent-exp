@@ -1,0 +1,11 @@
+{
+  "kpi_history": [
+    {
+      "run_id": "037b0d87-e3b9-48cc-952b-79c6bce7bd8b",
+      "step": 1,
+      "profit": 16550.0,
+      "stockout_rate": 0.0,
+      "pricing_accuracy": 0.7,
+      "action_correctness": 0.0,
+      "customer_satisfaction": 3.13,
+      "created_at": 

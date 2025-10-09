@@ -43,8 +43,8 @@ class ManagementState(BaseModel):
     day_sequence: int = Field(default=1, description="連続稼働日数 (1日目、2日目...)")
 
     # ===== ビジネスデータ入力 =====
-    business_metrics: Optional[BusinessMetrics] = Field(
-        default=None, description="売上、利益、在庫、顧客満足度の基本指標"
+    business_metrics: Optional[Dict[str, Any]] = Field(
+        default=None, description="売上、利益、在庫、顧客満足度の基本指標（辞書形式）"
     )
 
     # 分析フェーズの出力
@@ -67,6 +67,15 @@ class ManagementState(BaseModel):
 
     profit_calculation: Optional[Dict] = Field(
         default=None, description="利益計算・財務健全性詳細分析結果"
+    )
+
+    # ===== 売上データ管理（条件付き記録方式用） =====
+    actual_sales_events: List[Dict] = Field(
+        default_factory=list,
+        description="実売上イベントのみ記録（売上発生時のみ記録、重複防止）",
+    )
+    sales_predictions: Optional[Dict] = Field(
+        default=None, description="売上予測データ（常に生成・比較用）"
     )
 
     # 戦略決定フェーズ
@@ -134,6 +143,17 @@ class ManagementState(BaseModel):
         description="全稼働期間の累積KPI（VendingBench Secondary Metrics用）",
     )
 
+    # ===== Multi-day運用用履歴フィールド =====
+    inventory_history: List[Dict] = Field(
+        default_factory=list, description="全期間の在庫変動履歴（戦略的意思決定用）"
+    )
+    sales_history: List[Dict] = Field(
+        default_factory=list, description="全期間の販売実績履歴（戦略的意思決定用）"
+    )
+    performance_history: List[Dict] = Field(
+        default_factory=list, description="各日の販売・財務・顧客満足度履歴"
+    )
+
     # ===== イベント駆動対応フィールド (Case C向けしばらく未使用) =====
     external_events: List[Dict] = Field(
         default_factory=list, description="人間による制約、突発イベントの履歴"
@@ -144,6 +164,24 @@ class ManagementState(BaseModel):
     pending_human_tasks: List[Dict] = Field(
         default_factory=list, description="人間従業員待ちのタスク（補充、調達依頼等）"
     )
+
+    # ===== 複数日運用対応：調達状態管理 =====
+    pending_procurements: List[Dict] = Field(
+        default_factory=list, description="発注済み・まだ到着していない調達注文"
+    )
+
+    delayed_procurements: List[Dict] = Field(
+        default_factory=list, description="遅延中の調達注文"
+    )
+
+    completed_procurements: List[Dict] = Field(
+        default_factory=list, description="到着完了した調達注文"
+    )
+
+    # ===== 調達シミュレーションパラメータ =====
+    delay_probability: float = Field(default=0.3, description="調達遅延発生確率")
+
+    cost_variation: float = Field(default=0.2, description="原価変動幅（±パーセント）")
 
     # ===== ベンチマーク評価フィールド =====
     primary_metrics_history: List[Dict] = Field(

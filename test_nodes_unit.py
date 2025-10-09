@@ -868,6 +868,12 @@ async def test_profit_calculation_node():
     print("\n" + "=" * 50)
     print("=== Testing: profit_calculation_node ===")
     try:
+        # テスト前に会計データをクリア（他のテストの影響除去）
+        from src.domain.accounting.journal_entry import journal_processor
+
+        journal_processor.journal_entries.clear()
+        print("✓ Accounting data cleared for clean test")
+
         from src.agents.management_agent import management_agent
         from src.agents.management_agent.models import ManagementState
 
@@ -879,6 +885,17 @@ async def test_profit_calculation_node():
             current_step="customer_interaction",
             business_metrics=test_data,
             financial_analysis=test_data,  # sales_plan_nodeの出力
+            # **条件付き記録方式用にsales_predictionsフィールドを事前投入**
+            sales_predictions={
+                "total_events": 100,
+                "successful_sales": 5,  # 売上イベント有りと想定（実売上記録対象）
+                "total_revenue": 5000,
+                "conversion_rate": 0.05,
+                "average_budget": 230,
+                "simulation_timestamp": datetime.now().isoformat(),
+                "conditions": "dry_run=True (予測専用)",
+            },
+            actual_sales_events=[],  # 初期状態では空
         )
 
         print("✓ Pre-conditioned state created")

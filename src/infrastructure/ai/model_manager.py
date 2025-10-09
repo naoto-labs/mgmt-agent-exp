@@ -7,10 +7,33 @@ from dataclasses import dataclass
 from enum import Enum
 from typing import Any, Dict, List, Optional, Union
 
+from langchain.schema import AIMessage as LC_AIMessage
+from langchain.schema import HumanMessage, SystemMessage
+from langchain_anthropic import ChatAnthropic
+from langchain_core.callbacks.base import BaseCallbackHandler
+from langchain_openai import AzureChatOpenAI, ChatOpenAI
+
 from src.shared.config.security import secure_config
 from src.shared.config.settings import settings
 
 logger = logging.getLogger(__name__)
+
+
+def convert_messages(
+    msgs: List["AIMessage"],
+) -> List[Union[HumanMessage, LC_AIMessage, SystemMessage]]:
+    """Convert AIMessage list to LangChain message formats."""
+    lc_msgs = []
+    for msg in msgs:
+        if msg.role == "user":
+            lc_msgs.append(HumanMessage(content=msg.content))
+        elif msg.role == "assistant":
+            lc_msgs.append(LC_AIMessage(content=msg.content))
+        elif msg.role == "system":
+            lc_msgs.append(SystemMessage(content=msg.content))
+        else:
+            lc_msgs.append(HumanMessage(content=msg.content))  # fallback
+    return lc_msgs
 
 
 class AIModelType(str, Enum):
@@ -73,8 +96,11 @@ class AIResponse:
 class BaseAIModel(ABC):
     """AIモデルの基底クラス"""
 
-    def __init__(self, config: AIModelConfig):
+    def __init__(
+        self, config: AIModelConfig, tracer: Optional[BaseCallbackHandler] = None
+    ):
         self.config = config
+        self.tracer = tracer
         self.status = AIModelStatus.READY
         self.last_used: Optional[float] = None
         self.total_requests = 0
@@ -108,30 +134,35 @@ class BaseAIModel(ABC):
 class AnthropicModel(BaseAIModel):
     """Anthropic Claudeモデル"""
 
-    def __init__(self, config: AIModelConfig):
-        super().__init__(config)
-        self.client = None
-        self._initialize_client()
+    def __init__(
+        self, config: AIModelConfig, tracer: Optional[BaseCallbackHandler] = None
+    ):
+        super().__init__(config, tracer)
+        self.llm = None
+        self._initialize_llm()
 
-    def _initialize_client(self):
-        """クライアントを初期化"""
+    def _initialize_llm(self):
+        """LLMを初期化"""
         try:
-            import anthropic
-
-            self.client = anthropic.Anthropic(api_key=self.config.api_key)
-            logger.info(f"Anthropicモデル {self.config.model_name} を初期化しました")
-        except ImportError:
-            logger.warning("anthropicパッケージがインストールされていません")
-            self.status = AIModelStatus.UNAVAILABLE
+            self.llm = ChatAnthropic(
+                api_key=self.config.api_key,
+                model=self.config.model_name,
+                max_tokens=self.config.max_tokens,
+                temperature=self.config.temperature,
+                max_retries=self.config.max_retries,
+            )
+            logger.info(
+                f"ChatAnthropicモデル {self.config.model_name} を初期化しました"
+            )
         except Exception as e:
-            logger.error(f"Anthropicクライアント初期化エラー: {e}")
+            logger.error(f"ChatAnthropic初期化エラー: {e}")
             self.status = AIModelStatus.ERROR
 
     async def generate_response(
         self, messages: List[AIMessage], **kwargs
     ) -> AIResponse:
         """Claudeで応答を生成"""
-        if self.status != AIModelStatus.READY:
+        if self.status != AIModelStatus.READY or not self.llm:
             return AIResponse(
                 content="",
                 model_used=self.config.model_name,
@@ -143,48 +174,18 @@ class AnthropicModel(BaseAIModel):
 
         self.status = AIModelStatus.BUSY
         start_time = time.time()
+        callbacks = [self.tracer] if self.tracer else []
 
         try:
-            # メッセージをAnthropic形式に変換
-            anthropic_messages = [
-                {"role": msg.role, "content": msg.content} for msg in messages
-            ]
-
-            # リクエストパラメータの設定
-            request_params = {
-                "model": self.config.model_name,
-                "messages": anthropic_messages,
-                "max_tokens": kwargs.get("max_tokens", self.config.max_tokens),
-                "temperature": kwargs.get("temperature", self.config.temperature),
-            }
-
-            # 追加パラメータの設定
-            if "system" in kwargs:
-                request_params["system"] = kwargs["system"]
-
-            # API呼び出し
-            response = await asyncio.get_event_loop().run_in_executor(
-                None, self.client.messages.create, **request_params
+            lc_messages = convert_messages(messages)
+            response = await self.llm.ainvoke(
+                lc_messages, config={"callbacks": callbacks}
             )
 
             response_time = time.time() - start_time
-
-            # 応答の処理
-            content = ""
-            if response.content:
-                content = (
-                    response.content[0].text
-                    if hasattr(response.content[0], "text")
-                    else str(response.content[0])
-                )
-
-            # トークン使用量の取得（利用可能な場合）
-            tokens_used = (
-                getattr(response.usage, "input_tokens", 0)
-                + getattr(response.usage, "output_tokens", 0)
-                if hasattr(response, "usage")
-                else 0
-            )
+            content = response.content
+            usage = response.response_metadata.get("usage", {})
+            tokens_used = usage.get("total_tokens", 0)
 
             self.total_requests += 1
             self.last_used = time.time()
@@ -200,7 +201,7 @@ class AnthropicModel(BaseAIModel):
         except Exception as e:
             self.failed_requests += 1
             response_time = time.time() - start_time
-            logger.error(f"Anthropic APIエラー: {e}")
+            logger.error(f"ChatAnthropic APIエラー: {e}")
 
             return AIResponse(
                 content="",
@@ -216,7 +217,7 @@ class AnthropicModel(BaseAIModel):
     async def check_health(self) -> bool:
         """ヘルスチェック"""
         try:
-            if not self.client:
+            if not self.llm:
                 return False
 
             # シンプルなメッセージでテスト
@@ -225,37 +226,40 @@ class AnthropicModel(BaseAIModel):
 
             return response.success
         except Exception as e:
-            logger.error(f"Anthropicヘルスチェックエラー: {e}")
+            logger.error(f"ChatAnthropicヘルスチェックエラー: {e}")
             return False
 
 
 class OpenAIModel(BaseAIModel):
     """OpenAI GPTモデル"""
 
-    def __init__(self, config: AIModelConfig):
-        super().__init__(config)
-        self.client = None
-        self._initialize_client()
+    def __init__(
+        self, config: AIModelConfig, tracer: Optional[BaseCallbackHandler] = None
+    ):
+        super().__init__(config, tracer)
+        self.llm = None
+        self._initialize_llm()
 
-    def _initialize_client(self):
-        """クライアントを初期化"""
+    def _initialize_llm(self):
+        """LLMを初期化"""
         try:
-            import openai
-
-            self.client = openai.OpenAI(api_key=self.config.api_key)
-            logger.info(f"OpenAIモデル {self.config.model_name} を初期化しました")
-        except ImportError:
-            logger.warning("openaiパッケージがインストールされていません")
-            self.status = AIModelStatus.UNAVAILABLE
+            self.llm = ChatOpenAI(
+                api_key=self.config.api_key,
+                model=self.config.model_name,
+                max_tokens=self.config.max_tokens,
+                temperature=self.config.temperature,
+                max_retries=self.config.max_retries,
+            )
+            logger.info(f"ChatOpenAIモデル {self.config.model_name} を初期化しました")
         except Exception as e:
-            logger.error(f"OpenAIクライアント初期化エラー: {e}")
+            logger.error(f"ChatOpenAI初期化エラー: {e}")
             self.status = AIModelStatus.ERROR
 
     async def generate_response(
         self, messages: List[AIMessage], **kwargs
     ) -> AIResponse:
         """GPTで応答を生成"""
-        if self.status != AIModelStatus.READY:
+        if self.status != AIModelStatus.READY or not self.llm:
             return AIResponse(
                 content="",
                 model_used=self.config.model_name,
@@ -267,51 +271,18 @@ class OpenAIModel(BaseAIModel):
 
         self.status = AIModelStatus.BUSY
         start_time = time.time()
+        callbacks = [self.tracer] if self.tracer else []
 
         try:
-            # メッセージをOpenAI形式に変換
-            openai_messages = [
-                {"role": msg.role, "content": msg.content} for msg in messages
-            ]
-
-            # API呼び出し（Azure OpenAIではdeployment_nameを使用）
-            response = await asyncio.get_event_loop().run_in_executor(
-                None,
-                self.client.chat.completions.create,
-                **{
-                    "model": azure_deployment,  # Azureではデプロイメント名を使用
-                    "messages": openai_messages,
-                    "max_tokens": kwargs.get("max_tokens", self.config.max_tokens),
-                    "temperature": kwargs.get("temperature", self.config.temperature),
-                },
+            lc_messages = convert_messages(messages)
+            response = await self.llm.ainvoke(
+                lc_messages, config={"callbacks": callbacks}
             )
 
             response_time = time.time() - start_time
-
-            # 応答の処理
-            content = response.choices[0].message.content if response.choices else ""
-
-            # トークン使用量の詳細取得
-            tokens_used = 0
-            prompt_tokens = 0
-            completion_tokens = 0
-
-            if response.usage:
-                usage = response.usage
-                tokens_used = getattr(usage, "total_tokens", 0)
-                prompt_tokens = getattr(
-                    usage, "prompt_tokens", getattr(usage, "input_tokens", 0)
-                )
-                completion_tokens = getattr(
-                    usage, "completion_tokens", getattr(usage, "output_tokens", 0)
-                )
-
-            # レスポンスオブジェクトにusage情報を追加（テストで使用）
-            response._usage_info = {
-                "total_tokens": tokens_used,
-                "input_tokens": prompt_tokens,
-                "output_tokens": completion_tokens,
-            }
+            content = response.content
+            usage = response.response_metadata.get("usage", {})
+            tokens_used = usage.get("total_tokens", 0)
 
             self.total_requests += 1
             self.last_used = time.time()
@@ -327,7 +298,7 @@ class OpenAIModel(BaseAIModel):
         except Exception as e:
             self.failed_requests += 1
             response_time = time.time() - start_time
-            logger.error(f"OpenAI APIエラー: {e}")
+            logger.error(f"ChatOpenAI APIエラー: {e}")
 
             return AIResponse(
                 content="",
@@ -343,7 +314,7 @@ class OpenAIModel(BaseAIModel):
     async def check_health(self) -> bool:
         """ヘルスチェック"""
         try:
-            if not self.client:
+            if not self.llm:
                 return False
 
             # シンプルなメッセージでテスト
@@ -352,56 +323,51 @@ class OpenAIModel(BaseAIModel):
 
             return response.success
         except Exception as e:
-            logger.error(f"OpenAIヘルスチェックエラー: {e}")
+            logger.error(f"ChatOpenAIヘルスチェックエラー: {e}")
             return False
 
 
 class AzureOpenAIModel(BaseAIModel):
     """Azure OpenAIモデル"""
 
-    def __init__(self, config: AIModelConfig):
-        super().__init__(config)
-        self.client = None
+    def __init__(
+        self, config: AIModelConfig, tracer: Optional[BaseCallbackHandler] = None
+    ):
+        super().__init__(config, tracer)
+        self.llm = None
         self.azure_endpoint = os.getenv("OPENAI_API_BASE")
         self.azure_deployment = os.getenv("OPENAI_API_DEPLOYMENT", config.model_name)
-        self._initialize_client()
+        self._initialize_llm()
 
-    def _initialize_client(self):
-        """クライアントを初期化"""
+    def _initialize_llm(self):
+        """LLMを初期化"""
         try:
-            from openai import AzureOpenAI
-
             if not self.azure_endpoint:
                 logger.warning("OPENAI_API_BASEが設定されていません")
                 self.status = AIModelStatus.UNAVAILABLE
                 return
 
-            # Azure OpenAIクライアントの初期化（deployment_nameを指定）
-            azure_deployment = os.getenv(
-                "OPENAI_API_DEPLOYMENT", self.config.model_name
-            )
-
-            self.client = AzureOpenAI(
-                api_version="2024-12-01-preview",
+            self.llm = AzureChatOpenAI(
                 azure_endpoint=self.azure_endpoint,
                 api_key=self.config.api_key,
-                # azure_deploymentは指定せず、API呼び出し時にmodelで指定
+                azure_deployment=self.azure_deployment,
+                api_version="2024-12-01-preview",
+                max_tokens=self.config.max_tokens,
+                temperature=self.config.temperature,
+                max_retries=self.config.max_retries,
             )
-            logger.info(f"Azure OpenAIモデル {azure_deployment} を初期化しました")
-        except ImportError:
-            logger.warning(
-                "openaiまたはazure-openaiパッケージがインストールされていません"
+            logger.info(
+                f"AzureChatOpenAIモデル {self.azure_deployment} を初期化しました"
             )
-            self.status = AIModelStatus.UNAVAILABLE
         except Exception as e:
-            logger.error(f"Azure OpenAIクライアント初期化エラー: {e}")
+            logger.error(f"AzureChatOpenAI初期化エラー: {e}")
             self.status = AIModelStatus.ERROR
 
     async def generate_response(
         self, messages: List[AIMessage], **kwargs
     ) -> AIResponse:
         """Azure OpenAIで応答を生成"""
-        if self.status != AIModelStatus.READY:
+        if self.status != AIModelStatus.READY or not self.llm:
             return AIResponse(
                 content="",
                 model_used=self.config.model_name,
@@ -413,50 +379,18 @@ class AzureOpenAIModel(BaseAIModel):
 
         self.status = AIModelStatus.BUSY
         start_time = time.time()
+        callbacks = [self.tracer] if self.tracer else []
 
         try:
-            # メッセージをOpenAI形式に変換
-            openai_messages = [
-                {"role": msg.role, "content": msg.content} for msg in messages
-            ]
-
-            # API呼び出し（Azure OpenAIではdeployment_nameを使用）
-            response = await asyncio.get_event_loop().run_in_executor(
-                None,
-                lambda: self.client.chat.completions.create(
-                    model=self.azure_deployment,  # Azureではデプロイメント名を使用
-                    messages=openai_messages,
-                    max_tokens=kwargs.get("max_tokens", self.config.max_tokens),
-                    temperature=kwargs.get("temperature", self.config.temperature),
-                ),
+            lc_messages = convert_messages(messages)
+            response = await self.llm.ainvoke(
+                lc_messages, config={"callbacks": callbacks}
             )
 
             response_time = time.time() - start_time
-
-            # 応答の処理
-            content = response.choices[0].message.content if response.choices else ""
-
-            # トークン使用量の詳細取得
-            tokens_used = 0
-            prompt_tokens = 0
-            completion_tokens = 0
-
-            if response.usage:
-                usage = response.usage
-                tokens_used = getattr(usage, "total_tokens", 0)
-                prompt_tokens = getattr(
-                    usage, "prompt_tokens", getattr(usage, "input_tokens", 0)
-                )
-                completion_tokens = getattr(
-                    usage, "completion_tokens", getattr(usage, "output_tokens", 0)
-                )
-
-            # レスポンスオブジェクトにusage情報を追加（テストで使用）
-            response._usage_info = {
-                "total_tokens": tokens_used,
-                "input_tokens": prompt_tokens,
-                "output_tokens": completion_tokens,
-            }
+            content = response.content
+            usage = response.response_metadata.get("usage", {})
+            tokens_used = usage.get("total_tokens", 0)
 
             self.total_requests += 1
             self.last_used = time.time()
@@ -472,7 +406,7 @@ class AzureOpenAIModel(BaseAIModel):
         except Exception as e:
             self.failed_requests += 1
             response_time = time.time() - start_time
-            logger.error(f"Azure OpenAI APIエラー: {e}")
+            logger.error(f"AzureChatOpenAI APIエラー: {e}")
 
             return AIResponse(
                 content="",
@@ -488,7 +422,7 @@ class AzureOpenAIModel(BaseAIModel):
     async def check_health(self) -> bool:
         """ヘルスチェック"""
         try:
-            if not self.client:
+            if not self.llm:
                 return False
 
             # シンプルなメッセージでテスト
@@ -497,15 +431,17 @@ class AzureOpenAIModel(BaseAIModel):
 
             return response.success
         except Exception as e:
-            logger.error(f"Azure OpenAIヘルスチェックエラー: {e}")
+            logger.error(f"AzureChatOpenAIヘルスチェックエラー: {e}")
             return False
 
 
 class MockModel(BaseAIModel):
     """モックモデル（テスト用）"""
 
-    def __init__(self, config: AIModelConfig):
-        super().__init__(config)
+    def __init__(
+        self, config: AIModelConfig, tracer: Optional[BaseCallbackHandler] = None
+    ):
+        super().__init__(config, tracer)
         self.responses = [
             "これはモック応答です。",
             "テスト用の応答になります。",
@@ -518,6 +454,8 @@ class MockModel(BaseAIModel):
         """モック応答を生成"""
         self.status = AIModelStatus.BUSY
         start_time = time.time()
+
+        callbacks = [self.tracer] if self.tracer else []
 
         try:
             # 遅延をシミュレート
@@ -564,7 +502,8 @@ class MockModel(BaseAIModel):
 class ModelManager:
     """AIモデル管理クラス"""
 
-    def __init__(self):
+    def __init__(self, tracer: Optional[BaseCallbackHandler] = None):
+        self.tracer = tracer
         self.models: Dict[str, BaseAIModel] = {}
         self.primary_model: Optional[str] = None
         self.fallback_models: List[str] = []
@@ -586,7 +525,7 @@ class ModelManager:
                 )
 
                 if azure_key and azure_endpoint:
-                    logger.info(f"Azure OpenAIモデルを初期化します...")
+                    logger.info(f"AzureChatOpenAIモデルを初期化します...")
                     azure_config = AIModelConfig(
                         model_type=AIModelType.AZURE_OPENAI,
                         model_name=azure_deployment,  # Azureでデプロイされたモデル名
@@ -595,10 +534,12 @@ class ModelManager:
                         temperature=0.7,
                         timeout=30.0,
                     )
-                    self.models["azure_openai"] = AzureOpenAIModel(azure_config)
+                    self.models["azure_openai"] = AzureOpenAIModel(
+                        azure_config, tracer=self.tracer
+                    )
                     self.primary_model = "azure_openai"
                     logger.info(
-                        f"✅ Azure OpenAIモデルをプライマリとして設定しました（モデル: {azure_deployment}）"
+                        f"✅ AzureChatOpenAIモデルをプライマリとして設定しました（モデル: {azure_deployment}）"
                     )
                 else:
                     logger.warning("❌ Azure OpenAI設定が不完全です")
@@ -607,7 +548,7 @@ class ModelManager:
                     logger.info(f"   - デプロイメント: {azure_deployment}")
 
             except Exception as e:
-                logger.error(f"❌ Azure OpenAIモデル初期化エラー: {e}")
+                logger.error(f"❌ AzureChatOpenAIモデル初期化エラー: {e}")
                 import traceback
 
                 logger.error(f"詳細なエラー情報: {traceback.format_exc()}")
@@ -623,11 +564,13 @@ class ModelManager:
                         temperature=0.7,
                         timeout=30.0,
                     )
-                    self.models["openai"] = OpenAIModel(openai_config)
+                    self.models["openai"] = OpenAIModel(
+                        openai_config, tracer=self.tracer
+                    )
                     self.primary_model = "openai"
-                    logger.info("OpenAIモデルをプライマリとして設定しました")
+                    logger.info("ChatOpenAIモデルをプライマリとして設定しました")
             except Exception as e:
-                logger.error(f"OpenAIモデル初期化エラー: {e}")
+                logger.error(f"ChatOpenAIモデル初期化エラー: {e}")
 
             # Anthropicモデル（OpenAIがなければ）
             try:
@@ -640,11 +583,13 @@ class ModelManager:
                         temperature=0.7,
                         timeout=30.0,
                     )
-                    self.models["anthropic"] = AnthropicModel(anthropic_config)
+                    self.models["anthropic"] = AnthropicModel(
+                        anthropic_config, tracer=self.tracer
+                    )
                     self.primary_model = "anthropic"
-                    logger.info("Anthropicモデルをプライマリとして設定しました")
+                    logger.info("ChatAnthropicモデルをプライマリとして設定しました")
             except Exception as e:
-                logger.error(f"Anthropicモデル初期化エラー: {e}")
+                logger.error(f"ChatAnthropicモデル初期化エラー: {e}")
 
             # モックモデル（開発用）
             try:
@@ -653,7 +598,7 @@ class ModelManager:
                     model_name="mock-model",
                     api_key="mock-key",
                 )
-                self.models["mock"] = MockModel(mock_config)
+                self.models["mock"] = MockModel(mock_config, tracer=self.tracer)
                 if not self.primary_model:
                     self.primary_model = "mock"
                 else:

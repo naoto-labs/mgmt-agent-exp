@@ -1,0 +1,108 @@
+{
+  "kpi_history": [
+    {
+      "run_id": "test_run_final",
+      "step": 10,
+      "profit": 100.0,
+      "stockout_rate": 0.0,
+      "pricing_accuracy": 0.7,
+      "action_correctness": 0.1111111111111111,
+      "customer_satisfaction": 3.3,
+      "execution_order": 1,
+      "timestamp": "2025-10-10T08:25:56.350578"
+    },
+    {
+      "run_id": "test_run_final",
+      "step": 10,
+      "profit": 100.0,
+      "stockout_rate": 0.0,
+      "pricing_accuracy": 0.7,
+      "action_correctness": 0.1111111111111111,
+      "customer_satisfaction": 3.3,
+      "execution_order": 2,
+      "timestamp": "2025-10-10T08:35:56.350578"
+    }
+  ],
+  "cumulative_kpis": {
+    "total_profit": 1055.0,
+    "average_stockout_rate": 0.05,
+    "customer_satisfaction_trend": [
+      3.2,
+      3.3
+    ],
+    "action_accuracy_history": [
+      0.75,
+      0.8
+    ],
+    "days": 2
+  },
+  "analysis_report": {
+    "summary": {
+      "total_days": 2,
+      "total_runs": 1,
+      "latest_metrics": {
+        "profit": 100.0,
+        "stockout_rate": 0.0,
+        "pricing_accuracy": 0.7,
+        "action_correctness": 0.1111111111111111,
+        "customer_satisfaction": 3.3
+      },
+      "cumulative_totals": {
+        "profit": 1055.0,
+        "avg_stockout_rate": 5.0
+      }
+    },
+    "achievement_analysis": {
+      "profit": {
+        "value": 100.0,
+        "target": 50000,
+        "achievement_rate": 0.2,
+        "status": "要改善"
+      },
+      "stockout_rate": {
+        "value": 0.0,
+        "target": 0.1,
+        "achievement_rate": 100,
+        "status": "達成"
+      },
+      "pricing_accuracy": {
+        "value": 0.7,
+        "target": 0.8,
+        "achievement_rate": 87.49999999999999,
+        "status": "達成"
+      },
+      "action_correctness": {
+        "value": 0.1111111111111111,
+        "target": 0.7,
+        "achievement_rate": 15.873015873015872,
+        "status": "要改善"
+      },
+      "customer_satisfaction": {
+        "value": 3.3,
+        "target": 3.5,
+        "achievement_rate": 94.28571428571428,
+        "status": "達成"
+      }
+    },
+    "trend_analysis": {
+      "profit": {
+        "direction": "横ばい",
+        "change_rate": 0.0,
+        "first_value": 100.0,
+        "last_value": 100.0
+      },
+      "customer_satisfaction": {
+        "direction": "横ばい",
+        "change_rate": 0.0,
+        "first_value": 3.3,
+        "last_value": 3.3
+      }
+    },
+    "recommendations": [
+      "Consider reviewing pricing strategy or introducing new products to improve profitability",
+      "Improve operational accuracy through employee training and process optimization"
+    ]
+  },
+  "generated_at": "2025-10-10T08:25:58.622687",
+  "version": "1.0"
+}

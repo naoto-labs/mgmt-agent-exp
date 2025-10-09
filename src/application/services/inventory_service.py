@@ -1,31 +1,34 @@
 import asyncio
 import logging
-from typing import Optional, Dict, Any, List, Tuple
-from datetime import datetime, timedelta
 from dataclasses import dataclass
+from datetime import datetime, timedelta
+from typing import Any, Dict, List, Optional, Tuple
 
 from src.domain.models.inventory import (
+    InventoryLocation,
     InventorySlot,
     InventoryStatus,
-    InventoryLocation,
     InventorySummary,
-    RestockPlan
+    RestockPlan,
 )
 from src.domain.models.product import Product
 from src.shared.config.settings import settings
 
 logger = logging.getLogger(__name__)
 
+
 @dataclass
 class InventoryAlert:
     """在庫アラート"""
+
     slot_id: str
     product_id: str
     product_name: str
     alert_type: str  # "low_stock", "out_of_stock", "expired", "overstock"
-    severity: str    # "low", "medium", "high", "critical"
+    severity: str  # "low", "medium", "high", "critical"
     message: str
     timestamp: datetime
+
 
 class InventoryService:
     """在庫管理サービス"""
@@ -61,41 +64,70 @@ class InventoryService:
 
     def get_slot(self, slot_id: str) -> Optional[InventorySlot]:
         """スロットを取得"""
-        return (
-            self.vending_machine_slots.get(slot_id) or
-            self.storage_slots.get(slot_id)
+        return self.vending_machine_slots.get(slot_id) or self.storage_slots.get(
+            slot_id
         )
 
     def get_product_slots(self, product_id: str) -> List[InventorySlot]:
         """商品の全スロットを取得"""
-        all_slots = list(self.vending_machine_slots.values()) + list(self.storage_slots.values())
+        all_slots = list(self.vending_machine_slots.values()) + list(
+            self.storage_slots.values()
+        )
         return [slot for slot in all_slots if slot.product_id == product_id]
 
     def get_total_inventory(self, product_id: str) -> Dict[str, Any]:
         """商品の総在庫を取得"""
         slots = self.get_product_slots(product_id)
 
-        vending_stock = sum(slot.current_quantity for slot in slots if slot.location == InventoryLocation.VENDING_MACHINE)
-        storage_stock = sum(slot.current_quantity for slot in slots if slot.location == InventoryLocation.STORAGE)
+        vending_stock = sum(
+            slot.current_quantity
+            for slot in slots
+            if slot.location == InventoryLocation.VENDING_MACHINE
+        )
+        storage_stock = sum(
+            slot.current_quantity
+            for slot in slots
+            if slot.location == InventoryLocation.STORAGE
+        )
 
         return {
             "product_id": product_id,
             "vending_machine_stock": vending_stock,
             "storage_stock": storage_stock,
             "total_stock": vending_stock + storage_stock,
-            "slot_count": len(slots)
+            "slot_count": len(slots),
         }
 
     def is_product_available(self, product_id: str) -> bool:
         """商品が利用可能かチェック"""
         slots = self.get_product_slots(product_id)
-        return any(slot.is_available() for slot in slots)
+        available_slots = [slot for slot in slots if slot.is_available()]
+
+        logger.debug(
+            f"在庫チェック - {product_id}: 総スロット数={len(slots)}, 利用可能スロット数={len(available_slots)}"
+        )
+        if slots:
+            logger.debug(f"在庫詳細 - {product_id}:")
+            for slot in slots:
+                logger.debug(
+                    f"  スロット {slot.slot_id}: quantity={slot.current_quantity}, max={slot.max_quantity}, location={slot.location}, available={slot.is_available()}"
+                )
+
+        is_available = len(available_slots) > 0
+        logger.debug(
+            f"在庫チェック結果 - {product_id}: {'利用可能' if is_available else '利用不可'}"
+        )
+        return is_available
 
     def dispense_product(self, product_id: str, quantity: int = 1) -> Tuple[bool, str]:
         """商品を排出"""
         # 自販機内のスロットから優先的に排出
-        vending_slots = [slot for slot in self.get_product_slots(product_id)
-                        if slot.location == InventoryLocation.VENDING_MACHINE and slot.is_available()]
+        vending_slots = [
+            slot
+            for slot in self.get_product_slots(product_id)
+            if slot.location == InventoryLocation.VENDING_MACHINE
+            and slot.is_available()
+        ]
 
         if not vending_slots:
             return False, "商品が利用できません"
@@ -109,11 +141,21 @@ class InventoryService:
             # Record COGS in journal
             try:
                 product = get_product_by_id(product_id)
-                cost_per_unit = product.price * 0.7 if product else 100  # Assume cost is 70% of selling price
+                cost_per_unit = (
+                    product.price * 0.7 if product else 100
+                )  # Assume cost is 70% of selling price
                 total_cost = quantity * cost_per_unit
-                from src.domain.accounting.journal_entry import journal_processor
                 from datetime import date
-                journal_processor.add_entry("5001", date.today(), total_cost, "debit", f"COGS - {product_id} x{quantity}")
+
+                from src.domain.accounting.journal_entry import journal_processor
+
+                journal_processor.add_entry(
+                    "5001",
+                    date.today(),
+                    total_cost,
+                    "debit",
+                    f"COGS - {product_id} x{quantity}",
+                )
             except Exception as e:
                 logger.error(f"Journal entry for COGS error: {e}")
 
@@ -138,18 +180,86 @@ class InventoryService:
         else:
             return False, "在庫の補充に失敗しました"
 
-    def transfer_to_vending_machine(self, product_id: str, quantity: int) -> Tuple[bool, str]:
+    def restock_to_storage(
+        self, product_id: str, quantity: int, cost_per_unit: float = None
+    ) -> Tuple[bool, str]:
+        """STORAGE場所への補充（調達商品の保管）"""
+        # STORAGEスロットを取得または作成
+        storage_slots = [
+            slot
+            for slot in self.storage_slots.values()
+            if slot.product_id == product_id
+        ]
+
+        # STORAGEスロットが存在しない場合は作成
+        if not storage_slots:
+            # 新しいSTORAGEスロットを作成
+            from src.domain.models.inventory import InventoryLocation, InventorySlot
+            from src.domain.models.product import SAMPLE_PRODUCTS
+
+            product = next(
+                (p for p in SAMPLE_PRODUCTS if p.product_id == product_id), None
+            )
+            if not product:
+                return False, f"商品情報が見つかりません: {product_id}"
+
+            slot_id = f"STORAGE_{product_id}_{len(self.storage_slots) + 1}"
+            storage_slot = InventorySlot(
+                machine_id="STORAGE",
+                location=InventoryLocation.STORAGE,
+                product_id=product_id,
+                product_name=product.name,
+                price=product.price,
+                current_quantity=0,
+                max_quantity=1000,  # STORAGEは大容量
+                min_quantity=0,
+                slot_number=len(self.storage_slots) + 1,
+            )
+            self.add_slot(storage_slot)
+            storage_slots = [storage_slot]
+
+        # 補充可能なスロットを探す
+        target_slot = None
+        for slot in storage_slots:
+            if slot.can_restock():
+                target_slot = slot
+                break
+
+        if not target_slot:
+            return False, "STORAGEに空き容量がありません"
+
+        # 補充を実行
+        if target_slot.restock(quantity):
+            logger.info(f"STORAGE補充成功: {target_slot.product_name} +{quantity}")
+            self._check_alerts(target_slot)
+            return (
+                True,
+                f"STORAGEに{target_slot.product_name}を{quantity}個保管しました",
+            )
+        else:
+            return False, "STORAGEへの保管に失敗しました"
+
+    def transfer_to_vending_machine(
+        self, product_id: str, quantity: int
+    ) -> Tuple[bool, str]:
         """保管庫から自販機へ商品を移動"""
         # 保管庫のスロットを確認
-        storage_slots = [slot for slot in self.get_product_slots(product_id)
-                        if slot.location == InventoryLocation.STORAGE and slot.current_quantity >= quantity]
+        storage_slots = [
+            slot
+            for slot in self.get_product_slots(product_id)
+            if slot.location == InventoryLocation.STORAGE
+            and slot.current_quantity >= quantity
+        ]
 
         if not storage_slots:
             return False, "保管庫に十分な在庫がありません"
 
         # 自販機の空きスロットを確認
-        vending_slots = [slot for slot in self.get_product_slots(product_id)
-                        if slot.location == InventoryLocation.VENDING_MACHINE and slot.can_restock()]
+        vending_slots = [
+            slot
+            for slot in self.get_product_slots(product_id)
+            if slot.location == InventoryLocation.VENDING_MACHINE and slot.can_restock()
+        ]
 
         if not vending_slots:
             return False, "自販機に空きスロットがありません"
@@ -166,15 +276,21 @@ class InventoryService:
             source_slot.restock(quantity)
             return False, "自販機への商品移動に失敗しました"
 
-        logger.info(f"在庫移動成功: {source_slot.product_name} x{quantity} (保管庫→自販機)")
+        logger.info(
+            f"在庫移動成功: {source_slot.product_name} x{quantity} (保管庫→自販機)"
+        )
         return True, f"{source_slot.product_name}を{quantity}個自販機へ移動しました"
 
     def get_inventory_summary(self) -> InventorySummary:
         """在庫サマリを取得"""
-        all_slots = list(self.vending_machine_slots.values()) + list(self.storage_slots.values())
+        all_slots = list(self.vending_machine_slots.values()) + list(
+            self.storage_slots.values()
+        )
         return InventorySummary.from_slots("VM001", all_slots)
 
-    def get_low_stock_slots(self, threshold: Optional[int] = None) -> List[InventorySlot]:
+    def get_low_stock_slots(
+        self, threshold: Optional[int] = None
+    ) -> List[InventorySlot]:
         """低在庫スロットを取得"""
         if threshold is None:
             threshold = 5  # デフォルトの閾値
@@ -255,9 +371,15 @@ class InventoryService:
 
     def _should_remove_alert(self, alert: InventoryAlert, slot: InventorySlot) -> bool:
         """アラートを削除すべきかチェック"""
-        if alert.alert_type == "out_of_stock" and slot.status != InventoryStatus.OUT_OF_STOCK:
+        if (
+            alert.alert_type == "out_of_stock"
+            and slot.status != InventoryStatus.OUT_OF_STOCK
+        ):
             return True
-        elif alert.alert_type == "low_stock" and slot.current_quantity > slot.min_quantity:
+        elif (
+            alert.alert_type == "low_stock"
+            and slot.current_quantity > slot.min_quantity
+        ):
             return True
         elif alert.alert_type == "expired" and not slot.is_expired():
             return True
@@ -284,7 +406,7 @@ class InventoryService:
                 alert_type="out_of_stock",
                 severity="critical",
                 message=f"{slot.product_name}の在庫が切れました",
-                timestamp=datetime.now()
+                timestamp=datetime.now(),
             )
         elif slot.needs_restock():
             return InventoryAlert(
@@ -294,7 +416,7 @@ class InventoryService:
                 alert_type="low_stock",
                 severity="medium",
                 message=f"{slot.product_name}の在庫が少なくなっています（残り{slot.current_quantity}個）",
-                timestamp=datetime.now()
+                timestamp=datetime.now(),
             )
         elif slot.is_expired():
             return InventoryAlert(
@@ -304,7 +426,7 @@ class InventoryService:
                 alert_type="expired",
                 severity="high",
                 message=f"{slot.product_name}の有効期限が切れています",
-                timestamp=datetime.now()
+                timestamp=datetime.now(),
             )
 
         return None
@@ -332,7 +454,7 @@ class InventoryService:
             "by_severity": by_severity,
             "by_type": by_type,
             "critical_count": by_severity.get("critical", 0),
-            "high_count": by_severity.get("high", 0)
+            "high_count": by_severity.get("high", 0),
         }
 
     def get_inventory_report(self) -> Dict[str, Any]:
@@ -345,11 +467,14 @@ class InventoryService:
             "alerts": alerts,
             "vending_machine_slots": len(self.vending_machine_slots),
             "storage_slots": len(self.storage_slots),
-            "total_products": len(set(
-                slot.product_id for slot in
-                list(self.vending_machine_slots.values()) + list(self.storage_slots.values())
-            )),
-            "generated_at": datetime.now().isoformat()
+            "total_products": len(
+                set(
+                    slot.product_id
+                    for slot in list(self.vending_machine_slots.values())
+                    + list(self.storage_slots.values())
+                )
+            ),
+            "generated_at": datetime.now().isoformat(),
         }
 
     def optimize_inventory_levels(self) -> Dict[str, Any]:
@@ -362,19 +487,23 @@ class InventoryService:
                 optimal_level = self._calculate_optimal_stock_level(slot)
 
                 if slot.current_quantity < optimal_level * 0.5:
-                    recommendations.append({
-                        "slot_id": slot.slot_id,
-                        "product_name": slot.product_name,
-                        "current_quantity": slot.current_quantity,
-                        "recommended_quantity": optimal_level,
-                        "action": "restock",
-                        "priority": "high" if slot.current_quantity == 0 else "medium"
-                    })
+                    recommendations.append(
+                        {
+                            "slot_id": slot.slot_id,
+                            "product_name": slot.product_name,
+                            "current_quantity": slot.current_quantity,
+                            "recommended_quantity": optimal_level,
+                            "action": "restock",
+                            "priority": "high"
+                            if slot.current_quantity == 0
+                            else "medium",
+                        }
+                    )
 
         return {
             "recommendations": recommendations,
             "total_recommendations": len(recommendations),
-            "generated_at": datetime.now().isoformat()
+            "generated_at": datetime.now().isoformat(),
         }
 
     def _calculate_optimal_stock_level(self, slot: InventorySlot) -> int:
@@ -386,7 +515,7 @@ class InventoryService:
         """場所別在庫を取得"""
         return {
             "vending_machine": list(self.vending_machine_slots.values()),
-            "storage": list(self.storage_slots.values())
+            "storage": list(self.storage_slots.values()),
         }
 
     def get_expiring_products(self, days_ahead: int = 7) -> List[InventorySlot]:
@@ -395,19 +524,59 @@ class InventoryService:
         future_date = datetime.now() + timedelta(days=days_ahead)
 
         for slot in self.vending_machine_slots.values():
-            if (slot.expiry_date and
-                slot.expiry_date <= future_date and
-                slot.current_quantity > 0):
+            if (
+                slot.expiry_date
+                and slot.expiry_date <= future_date
+                and slot.current_quantity > 0
+            ):
                 expiring_slots.append(slot)
 
         return expiring_slots
 
+    def get_product_price(self, product_id: str) -> Optional[float]:
+        """商品の現在の価格を取得"""
+        product = get_product_by_id(product_id)
+        if product:
+            logger.debug(f"商品価格取得: {product.name} - ¥{product.price}")
+            return product.price
+        logger.warning(f"商品が見つからないため価格を取得できません: {product_id}")
+        return None
+
+    def update_product_price(self, product_id: str, new_price: float) -> bool:
+        """商品の価格を更新"""
+        product = get_product_by_id(product_id)
+        if not product:
+            logger.error(f"価格更新失敗: 商品が見つかりません - {product_id}")
+            return False
+
+        try:
+            old_price = product.price
+            product.update_price(new_price)
+            logger.info(f"価格更新成功: {product.name} - ¥{old_price} -> ¥{new_price}")
+            return True
+        except ValueError as e:
+            logger.error(f"価格更新失敗: {e}")
+            return False
+
+    def get_all_product_prices(self) -> Dict[str, float]:
+        """全商品の価格を取得"""
+        prices = {}
+        from src.domain.models.product import SAMPLE_PRODUCTS
+
+        for product in SAMPLE_PRODUCTS:
+            prices[product.product_id] = product.price
+        logger.debug(f"全商品価格取得: {len(prices)}件")
+        return prices
+
+
 # グローバルインスタンス
 inventory_service = InventoryService()
+
 
 def get_product_by_id(product_id: str) -> Optional[Product]:
     """商品IDで商品を取得"""
     from src.domain.models.product import SAMPLE_PRODUCTS
+
     for p in SAMPLE_PRODUCTS:
         if p.product_id == product_id:
             return p

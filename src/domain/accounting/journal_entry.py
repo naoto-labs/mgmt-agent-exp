@@ -155,10 +155,18 @@ class JournalEntryProcessor:
                 ),
             ]
 
+            # created_atがdatetimeなら.date()、dateならそのまま
+            entry_date = (
+                transaction.created_at.date()
+                if hasattr(transaction.created_at, "date")
+                and callable(getattr(transaction.created_at, "date"))
+                else transaction.created_at
+            )
+
             # 仕訳エントリを作成
             journal_entry = JournalEntry(
                 entry_id=self._generate_entry_id(),
-                date=transaction.created_at.date(),
+                date=entry_date,
                 description=f"商品売上 - 取引ID: {transaction.transaction_id}",
                 entries=entries,
                 reference_id=transaction.transaction_id,
@@ -543,6 +551,14 @@ class JournalEntryProcessor:
 
         return summary
 
+    def is_duplicate_entry(self, transaction_id: str) -> bool:
+        """トランザクションIDによる重複チェック"""
+        for entry in self.journal_entries:
+            if entry.reference_id == transaction_id:
+                logger.warning(f"重複トランザクション検知: {transaction_id}")
+                return True
+        return False
+
     def add_entry(
         self,
         account_number: str,
@@ -550,9 +566,15 @@ class JournalEntryProcessor:
         amount: float,
         entry_type: str,
         description: str,
+        transaction_id: Optional[str] = None,
     ):
-        """エントリを追加（単一勘定）"""
+        """エントリを追加（単一勘定）- 重複チェック付き"""
         try:
+            # トランザクションIDがある場合は重複チェック
+            if transaction_id and self.is_duplicate_entry(transaction_id):
+                logger.warning(f"重複エントリのためスキップ: {transaction_id}")
+                return None
+
             debit_amount = amount if entry_type == "debit" else 0.0
             credit_amount = amount if entry_type == "credit" else 0.0
 
@@ -569,11 +591,14 @@ class JournalEntryProcessor:
                 date=date,
                 description=description,
                 entries=[entry],
-                reference_id=None,
+                reference_id=transaction_id,  # トランザクションIDを記録
             )
 
             self.journal_entries.append(journal_entry)
-            logger.debug(f"エントリ追加完了: {journal_entry.entry_id}")
+            logger.debug(
+                f"エントリ追加完了: {journal_entry.entry_id} (ID: {transaction_id})"
+            )
+            return journal_entry
 
         except Exception as e:
             logger.error(f"エントリ追加エラー: {e}")

@@ -4,7 +4,25 @@ import sys
 sys.path.append(os.path.join(os.getcwd(), "src"))
 import asyncio
 
+# 連続調達シミュレーションのインポート
+from continuous_procurement_simulation import (
+    run_procurement_simulation_demo,
+    simulate_continuous_procurement_cycle,
+)
 from src.agents.management_agent import ManagementState, management_agent
+
+# LCEL準拠拡張可能パイプライン実行用
+from src.agents.management_agent.agent import (
+    MetricsEvaluatingStateGraph,
+    RunnableManagementPipeline,
+)
+from src.agents.management_agent.evaluation_metrics import (
+    create_benchmarks_table,
+    eval_step_metrics,
+    evaluate_primary_metrics,
+    evaluate_secondary_metrics,
+)
+from src.agents.management_agent.metrics_tracker import VendingBenchMetricsTracker
 
 
 def validate_state_after_node(
@@ -38,6 +56,19 @@ def validate_state_after_node(
         print(f"    ❌ Node '{node_name}' validation FAILED")
 
     return all_valid
+
+
+def clear_test_case_data(conn):
+    """test_case_aテストのデータをクリアする"""
+    cursor = conn.cursor()
+    try:
+        # test_case_a prefixの全データを削除
+        cursor.execute("DELETE FROM benchmarks WHERE run_id LIKE 'test_case_a_%'")
+        deleted_count = cursor.rowcount
+        conn.commit()
+        print(f"✓ Cleared {deleted_count} test_case_a benchmark records")
+    except Exception as e:
+        print(f"Warning: Could not clear test data: {e}")
 
 
 async def test_case_a():
@@ -101,25 +132,386 @@ async def test_case_a():
 
             from src.agents.management_agent import BusinessMetrics
 
-            # テスト用の現実的なビジネスデータを事前投入
+            print("🟡 Setting up test data in actual system...")
+
+            # テストデータを実際のシステムにセットアップ
+            from datetime import date
+
+            from src.application.services.inventory_service import inventory_service
+            from src.domain.accounting.journal_entry import journal_processor
+            from src.domain.models.inventory import InventoryLocation, InventorySlot
+            from src.domain.models.product import Product, ProductCategory, ProductSize
+
+            # テスト用の商品データを作成（BusinessMetricsと一致させる）
+            test_products = [
+                Product(
+                    product_id="cola_regular",
+                    name="コカ・コーラ レギュラー",
+                    description="美味しい炭酸飲料",
+                    category=ProductCategory.DRINK,
+                    price=150.0,
+                    cost=100.0,
+                    stock_quantity=0,  # 在庫は別途InventorySlotで管理
+                    max_stock_quantity=50,
+                    min_stock_quantity=5,
+                    size=ProductSize.MEDIUM,
+                ),
+                Product(
+                    product_id="cola_diet",
+                    name="コカ・コーラ ダイエット",
+                    description="カロリーオフの炭酸飲料",
+                    category=ProductCategory.DRINK,
+                    price=150.0,
+                    cost=100.0,
+                    stock_quantity=0,
+                    max_stock_quantity=50,
+                    min_stock_quantity=5,
+                    size=ProductSize.MEDIUM,
+                ),
+                Product(
+                    product_id="water_mineral",
+                    name="ミネラルウォーター",
+                    description="爽やかなミネラルウォーター",
+                    category=ProductCategory.DRINK,
+                    price=120.0,
+                    cost=80.0,
+                    stock_quantity=0,
+                    max_stock_quantity=50,
+                    min_stock_quantity=5,
+                    size=ProductSize.MEDIUM,
+                ),
+                Product(
+                    product_id="energy_drink",
+                    name="エナジードリンク",
+                    description="元気が出るドリンク",
+                    category=ProductCategory.DRINK,
+                    price=180.0,
+                    cost=120.0,
+                    stock_quantity=0,
+                    max_stock_quantity=50,
+                    min_stock_quantity=5,
+                    size=ProductSize.MEDIUM,
+                ),
+                Product(
+                    product_id="snack_chips",
+                    name="ポテトチップス",
+                    description="サクサクのスナック",
+                    category=ProductCategory.SNACK,
+                    price=180.0,
+                    cost=120.0,
+                    stock_quantity=0,
+                    max_stock_quantity=50,
+                    min_stock_quantity=5,
+                    size=ProductSize.MEDIUM,
+                ),
+                Product(
+                    product_id="snack_chocolate",
+                    name="チョコレートバー",
+                    description="甘いチョコレート",
+                    category=ProductCategory.SNACK,
+                    price=160.0,
+                    cost=110.0,
+                    stock_quantity=0,
+                    max_stock_quantity=50,
+                    min_stock_quantity=5,
+                    size=ProductSize.MEDIUM,
+                ),
+            ]
+
+            # グローバル変数に商品データを登録（get_product_by_id関数用）
+            # 既存のSAMPLE_PRODUCTSを一時的に置き換え（テスト用）
+            import src.domain.models.product as product_module
+            from src.application.services.inventory_service import get_product_by_id
+
+            original_sample_products = product_module.SAMPLE_PRODUCTS
+            product_module.SAMPLE_PRODUCTS = test_products
+
+            # 在庫スロットをセットアップ（max_quantityの1/3程度の在庫で開始、補充プロセスを適正タイミングで開始）
+            initial_stock_quantity = int(50 / 3)  # max_quantityの1/3 ≈ 16個
+            test_inventory_slots = [
+                InventorySlot(
+                    machine_id="VM001",
+                    location=InventoryLocation.VENDING_MACHINE,
+                    product_id="cola_regular",
+                    product_name="コカ・コーラ レギュラー",
+                    price=150.0,
+                    current_quantity=initial_stock_quantity,  # max/3で一定量の在庫から開始
+                    max_quantity=50,
+                    min_quantity=5,
+                    slot_number=1,
+                ),
+                InventorySlot(
+                    machine_id="VM001",
+                    location=InventoryLocation.VENDING_MACHINE,
+                    product_id="cola_diet",
+                    product_name="コカ・コーラ ダイエット",
+                    price=150.0,
+                    current_quantity=initial_stock_quantity,
+                    max_quantity=50,
+                    min_quantity=5,
+                    slot_number=2,
+                ),
+                InventorySlot(
+                    machine_id="VM001",
+                    location=InventoryLocation.VENDING_MACHINE,
+                    product_id="water_mineral",
+                    product_name="ミネラルウォーター",
+                    price=120.0,
+                    current_quantity=initial_stock_quantity,
+                    max_quantity=50,
+                    min_quantity=5,
+                    slot_number=3,
+                ),
+                InventorySlot(
+                    machine_id="VM001",
+                    location=InventoryLocation.VENDING_MACHINE,
+                    product_id="energy_drink",
+                    product_name="エナジードリンク",
+                    price=180.0,
+                    current_quantity=initial_stock_quantity,
+                    max_quantity=50,
+                    min_quantity=5,
+                    slot_number=4,
+                ),
+                InventorySlot(
+                    machine_id="VM001",
+                    location=InventoryLocation.VENDING_MACHINE,
+                    product_id="snack_chips",
+                    product_name="ポテトチップス",
+                    price=180.0,
+                    current_quantity=initial_stock_quantity,
+                    max_quantity=50,
+                    min_quantity=5,
+                    slot_number=5,
+                ),
+                InventorySlot(
+                    machine_id="VM001",
+                    location=InventoryLocation.VENDING_MACHINE,
+                    product_id="snack_chocolate",
+                    product_name="チョコレートバー",
+                    price=160.0,
+                    current_quantity=initial_stock_quantity,
+                    max_quantity=50,
+                    min_quantity=5,
+                    slot_number=6,
+                ),
+            ]
+
+            # STORAGE在庫スロットも作成（補充プロセスで使用）
+            storage_stock_quantity = 100  # STORAGEには100個ずつストック
+            test_storage_slots = [
+                InventorySlot(
+                    machine_id="STORAGE",
+                    location=InventoryLocation.STORAGE,
+                    product_id="cola_regular",
+                    product_name="コカ・コーラ レギュラー",
+                    price=150.0,
+                    current_quantity=storage_stock_quantity,
+                    max_quantity=200,  # STORAGEはより多く保持可能
+                    min_quantity=20,
+                    slot_number=1,
+                ),
+                InventorySlot(
+                    machine_id="STORAGE",
+                    location=InventoryLocation.STORAGE,
+                    product_id="cola_diet",
+                    product_name="コカ・コーラ ダイエット",
+                    price=150.0,
+                    current_quantity=storage_stock_quantity,
+                    max_quantity=200,
+                    min_quantity=20,
+                    slot_number=2,
+                ),
+                InventorySlot(
+                    machine_id="STORAGE",
+                    location=InventoryLocation.STORAGE,
+                    product_id="water_mineral",
+                    product_name="ミネラルウォーター",
+                    price=120.0,
+                    current_quantity=storage_stock_quantity,
+                    max_quantity=200,
+                    min_quantity=20,
+                    slot_number=3,
+                ),
+                InventorySlot(
+                    machine_id="STORAGE",
+                    location=InventoryLocation.STORAGE,
+                    product_id="energy_drink",
+                    product_name="エナジードリンク",
+                    price=180.0,
+                    current_quantity=storage_stock_quantity,
+                    max_quantity=200,
+                    min_quantity=20,
+                    slot_number=4,
+                ),
+                InventorySlot(
+                    machine_id="STORAGE",
+                    location=InventoryLocation.STORAGE,
+                    product_id="snack_chips",
+                    product_name="ポテトチップス",
+                    price=180.0,
+                    current_quantity=storage_stock_quantity,
+                    max_quantity=200,
+                    min_quantity=20,
+                    slot_number=5,
+                ),
+                InventorySlot(
+                    machine_id="STORAGE",
+                    location=InventoryLocation.STORAGE,
+                    product_id="snack_chocolate",
+                    product_name="チョコレートバー",
+                    price=160.0,
+                    current_quantity=storage_stock_quantity,
+                    max_quantity=200,
+                    min_quantity=20,
+                    slot_number=6,
+                ),
+            ]
+
+            # 在庫サービスにスロットを追加
+            for slot in test_inventory_slots + test_storage_slots:
+                inventory_service.add_slot(slot)
+
+            print("✓ Set up test inventory slots in inventory_service")
+            print(f"  - VENDING_MACHINE slots: {len(test_inventory_slots)}")
+            print(f"  - STORAGE slots: {len(test_storage_slots)}")
+
+            # 売上データを会計システムに記録（950,000円の売上データを作成）
+            print("  Setting up test sales data in journal processor...")
+
+            # 月間販売データをシミュレート（30日分の売上）
+            from datetime import datetime, timedelta
+
+            base_date = date.today() - timedelta(days=30)
+            total_sales_target = 50000  # 過去実績を低く設定して挑戦性を高める
+            daily_sales_target = total_sales_target / 30
+
+            for day in range(30):
+                sales_date = base_date + timedelta(days=day)
+                daily_sales = daily_sales_target
+
+                # その日の売上を記録（簡易的な取引として）
+                try:
+                    from src.domain.accounting.journal_entry import journal_processor
+                    from src.domain.models.transaction import (
+                        PaymentDetails,
+                        PaymentMethod,
+                        Transaction,
+                        TransactionItem,
+                        TransactionType,
+                    )
+
+                    # 取引オブジェクトを作成 (created_atはdatetime型である必要がある)
+                    items = [
+                        TransactionItem(
+                            product_id="cola_regular",
+                            product_name="コカ・コーラ レギュラー",
+                            quantity=int(daily_sales / 150),  # 平均単価150円で数量計算
+                            unit_price=150.0,
+                            total_price=daily_sales,
+                        )
+                    ]
+
+                    transaction = Transaction(
+                        transaction_id=f"test_txn_{day}_{datetime.now().strftime('%H%M%S')}",
+                        machine_id="VM001",  # 必須フィールド
+                        transaction_type=TransactionType.PURCHASE,  # SALEではなくPURCHASE
+                        items=items,
+                        subtotal=daily_sales,
+                        total_amount=daily_sales,
+                        payment_details=PaymentDetails(
+                            method=PaymentMethod.CASH, amount=daily_sales
+                        ),
+                        created_at=datetime.combine(
+                            sales_date, datetime.min.time()
+                        ),  # dateをdatetimeに変換
+                    )
+
+                    # 売上仕訳を記録
+                    journal_processor.record_sale(transaction)
+
+                except Exception as e:
+                    print(
+                        f"  Warning: Failed to record daily sales for {sales_date}: {e}"
+                    )
+                    # Simple fallback entry
+                    try:
+                        journal_processor.add_entry(
+                            account_number="4001",  # SALES_REVENUE
+                            date=sales_date,
+                            amount=daily_sales,
+                            entry_type="credit",  # credit for revenue
+                            description=f"Test sales day {day + 1}",
+                        )
+                        journal_processor.add_entry(
+                            account_number="1001",  # CASH
+                            date=sales_date,
+                            amount=daily_sales,
+                            entry_type="debit",  # debit for asset increase
+                            description=f"Test sales day {day + 1}",
+                        )
+                    except Exception as e2:
+                        print(f"  Error: Failed to record fallback sales data: {e2}")
+
+            print("✓ Added test sales data to journal_processor")
+
+            # 売上原価データを記録（利益率を32%にするため、売上の約68%をコストとして記録）
+            # 月間売上95万円の68% = 約64.6万円のコスト
+            print("  Setting up test cost data in journal processor...")
+
+            total_cost_target = (
+                total_sales_target * 0.75
+            )  # 75%をコストとして（利益率25%）
+            daily_cost_target = total_cost_target / 30
+
+            for day in range(30):
+                cost_date = base_date + timedelta(days=day)
+                daily_cost = daily_cost_target
+
+                # 売上原価を仕入として記録（5001: Cost of Goods Sold）
+                try:
+                    journal_processor.add_entry(
+                        account_number="5001",  # COST_OF_GOODS_SOLD
+                        date=cost_date,
+                        amount=daily_cost,
+                        entry_type="debit",  # debit for expense increase
+                        description=f"Test cost of goods day {day + 1} - supply purchase",
+                    )
+                    # 支払いを記録（1001: Cash - debit to reduce cash）
+                    journal_processor.add_entry(
+                        account_number="1001",  # CASH
+                        date=cost_date,
+                        amount=daily_cost,
+                        entry_type="credit",  # credit to reduce cash (payment)
+                        description=f"Test payment for goods day {day + 1}",
+                    )
+                except Exception as e:
+                    print(
+                        f"  Warning: Failed to record daily cost for {cost_date}: {e}"
+                    )
+
+            print("✓ Added test cost data to journal_processor")
+
+            # システムから実際の計算結果を取得（ハードコーディング禁止）
+            from src.agents.management_agent.management_tools.get_business_metrics import (
+                get_business_metrics,
+            )
+
+            actual_metrics = get_business_metrics()
+
+            # 実際のシステム計算結果を使用（sales_plan_nodeへの入力と完全一致）
             test_metrics = BusinessMetrics(
-                sales=950000,  # 月間95万円 (目標95%達成)
-                profit_margin=0.32,  # 32%利益率
-                inventory_level={  # 自販機の典型的な商品配置
-                    "cola_regular": 23,
-                    "cola_diet": 18,
-                    "water_mineral": 28,
-                    "energy_drink": 9,
-                    "snack_chips": 5,
-                    "snack_chocolate": 11,
-                },
-                customer_satisfaction=4.1,
-                timestamp="2024-01-15T10:00:00.000Z",
+                sales=actual_metrics["sales"],
+                profit_margin=actual_metrics["profit_margin"],
+                inventory_level=actual_metrics["inventory_level"],
+                customer_satisfaction=actual_metrics["customer_satisfaction"],
+                timestamp=datetime.now().isoformat(),
             )
 
             # 初期状態にビジネスデータを投入
             enriched_initial_state = initial_state.model_copy()
-            enriched_initial_state.business_metrics = test_metrics
+            # LangGraphシリアライズ対応: BusinessMetricsオブジェクトをdictに変換して代入
+            enriched_initial_state.business_metrics = test_metrics.model_dump()
 
             print(f"✓ Enriched initial state with test data")
             print(f"  - Sales: ¥{test_metrics.sales:,}")
@@ -127,58 +519,41 @@ async def test_case_a():
             print(
                 f"  - Customer Satisfaction: {test_metrics.customer_satisfaction}/5.0"
             )
-
-            # LCELチェーン実行 (全9ノードを自動で順次実行)
-            print(f"🚀 Executing LCEL pipeline: {management_agent.chain}")
-            final_state = await management_agent.chain.ainvoke(enriched_initial_state)
-
-            print("✓ LCEL pipeline execution completed")
-            print(f"  Final step: {final_state.current_step}")
-            print(f"  Processing status: {final_state.processing_status}")
             print(
-                f"  Executed actions: {len(final_state.executed_actions) if final_state.executed_actions else 0}"
+                f"  - Inventory Slots: {len(inventory_service.vending_machine_slots)}"
+            )
+            print(f"  - Journal Entries: {len(journal_processor.journal_entries)}")
+
+            # VendingBenchステップ単位評価セットアップ
+            import sqlite3
+
+            print("🔧 Setting up VendingBench step-by-step evaluation...")
+            run_id = f"test_case_a_{datetime.now().strftime('%Y%m%d_%H%M%S')}"
+
+            # Metrics Tracker初期化
+            metrics_tracker = VendingBenchMetricsTracker(difficulty="normal")
+
+            # データベース接続とテーブル作成
+            db_path = "data/vending_bench.db"
+            conn = sqlite3.connect(db_path)
+            create_benchmarks_table(conn)
+
+            # テストデータをクリア（自身のセッションデータのみ）
+            clear_test_case_data(conn)
+
+            # LangGraphベースのパイプライン構築と実行（LCEL形式）
+            print("🚀 Initializing LangGraph pipeline with step-by-step evaluation...")
+            evaluating_graph = MetricsEvaluatingStateGraph(
+                management_agent, conn, run_id
             )
 
-            # Primary Metrics評価 - 実際の状態データから動的に計算
-            primary_metrics = evaluate_primary_metrics(final_state)
-            print(f"\n=== Primary Metrics Evaluation ===")
             print(
-                f"Profit: ¥{primary_metrics['profit']:,} ({primary_metrics['profit_status']})"
+                "✅ LangGraph pipeline initialized - executing full management flow..."
             )
+            final_state = await evaluating_graph.ainvoke(enriched_initial_state)
             print(
-                f"Stockout Rate: {primary_metrics['stockout_rate']:.1%} ({primary_metrics['stockout_status']})"
+                "✅ LangGraph pipeline execution completed - VendingBench evaluation integrated"
             )
-            print(
-                f"Pricing Accuracy: {primary_metrics['pricing_accuracy']:.1%} ({primary_metrics['pricing_status']})"
-            )
-            print(
-                f"Action Correctness: {primary_metrics['action_correctness']:.1%} ({primary_metrics['action_status']})"
-            )
-            print(
-                f"Customer Satisfaction: {primary_metrics['customer_satisfaction']:.1f}/5.0 ({primary_metrics['customer_status']})"
-            )
-
-            # Secondary Metrics評価
-            secondary_metrics = evaluate_secondary_metrics(final_state)
-            print(f"\n=== Secondary Metrics Evaluation ===")
-            print(
-                f"Long-term Consistency: {secondary_metrics['consistency']:.1%} ({secondary_metrics['consistency_status']})"
-            )
-
-            # 総合評価
-            print(f"\n=== Final Evaluation ===")
-            print(f"Final Status: {final_state.processing_status}")
-            print(f"Errors: {len(final_state.errors)}")
-
-            success = final_state.processing_status == "completed"
-            if success:
-                print(
-                    "🎉 Case A execution SUCCESS - VendingBench conformity confirmed!"
-                )
-            else:
-                print("⚠️ Case A execution completed with errors")
-
-            return success
 
         except Exception as e:
             print(f"✗ Manual node execution failed: {e}")
@@ -195,210 +570,73 @@ async def test_case_a():
         return False
 
 
-def evaluate_primary_metrics(final_state: "ManagementState") -> dict:
-    """VendingBench Primary Metrics評価 - 実際の状態データから動的に計算"""
-    metrics = {}
+async def test_continuous_procurement():
+    """連続調達シミュレーションテスト"""
+    print("=== Continuous Procurement Simulation Test ===")
 
-    # Profit - profit_calculationから取得（ハードコーディング禁止）
-    if final_state.profit_calculation:
-        profit_data = final_state.profit_calculation
-        profit = profit_data.get("profit_amount", 0)
-        # 文字列の場合、数値に変換
-        if isinstance(profit, str):
-            try:
-                profit = float(profit)
-            except ValueError:
-                profit = 0
-        target_profit = 100000  # 月間目標10万円
-        profit_status = "PASS" if profit >= target_profit else "FAIL"
-        metrics.update({"profit": round(profit, 2), "profit_status": profit_status})
-    else:
-        # business_metricsからのfallback（sales_processingの売上データから推定）
-        sales_revenue = 0
-        if (
-            final_state.sales_processing
-            and "total_revenue" in final_state.sales_processing
-        ):
-            sales_revenue = final_state.sales_processing["total_revenue"]
-            # 文字列の場合、数値に変換
-            if isinstance(sales_revenue, str):
-                try:
-                    sales_revenue = float(sales_revenue)
-                except ValueError:
-                    sales_revenue = 0
-
-        profit_margin = (
-            final_state.business_metrics.profit_margin
-            if final_state.business_metrics
-            else 0.3
-        )
-        # 文字列の場合、数値に変換
-        if isinstance(profit_margin, str):
-            try:
-                profit_margin = float(profit_margin)
-            except ValueError:
-                profit_margin = 0.3
-
-        profit = sales_revenue * profit_margin
-        target_profit = 100000
-        profit_status = "PASS" if profit >= target_profit else "FAIL"
-        metrics.update({"profit": round(profit, 2), "profit_status": profit_status})
-
-    # Stockout Rate - inventory_analysisから動的に計算
-    if final_state.inventory_analysis:
-        inventory_data = final_state.inventory_analysis
-        low_stock_items = inventory_data.get("low_stock_items", [])
-        critical_items = inventory_data.get("critical_items", [])
-        total_inventory_items = (
-            len(final_state.business_metrics.inventory_level)
-            if final_state.business_metrics
-            else 10
+    try:
+        # 短期間のテスト実行（3日間）
+        results = await simulate_continuous_procurement_cycle(
+            duration_days=3,  # テスト用に短めに設定
+            delay_probability=0.3,
+            cost_variation=0.1,
+            verbose=True,
         )
 
-        # 在庫切れリスクのある商品の割合を計算
-        at_risk_items = len(low_stock_items) + len(critical_items)
-        stockout_rate = min(at_risk_items / max(total_inventory_items, 1), 1.0)
-        stockout_status = "PASS" if stockout_rate <= 0.1 else "FAIL"  # 10%以下でPASS
-    else:
-        stockout_rate = 0.0  # 在庫分析がなければ0
-        stockout_status = "PASS"
-    metrics.update({"stockout_rate": stockout_rate, "stockout_status": stockout_status})
-
-    # Pricing Accuracy - pricing_decisionから動的に計算
-    if final_state.pricing_decision and final_state.pricing_decision.get(
-        "expected_impact"
-    ):
-        # pricing_decisionのimpact評価から精度を推定
-        impact_description = final_state.pricing_decision.get("expected_impact", "")
-        if "5%" in impact_description:
-            pricing_accuracy = 0.95  # 改善5%期待の場合
-        elif "維持" in impact_description:
-            pricing_accuracy = 0.85  # 安定維持の場合
+        # 基本的な検証
+        if len(results["procurement_orders"]) > 0:
+            print("✓ 調達発注が正常に生成されました")
         else:
-            pricing_accuracy = 0.80  # デフォルト
-    else:
-        # pricing実行があった場合の平均精度
-        pricing_accuracy = 0.70  # デフォルト値
-    pricing_status = "PASS" if pricing_accuracy >= 0.8 else "FAIL"
-    metrics.update(
-        {"pricing_accuracy": pricing_accuracy, "pricing_status": pricing_status}
-    )
+            print("✗ 調達発注が生成されませんでした")
+            return False
 
-    # Action Correctness - 実行されたアクション数を9ノードで評価
-    actions_count = (
-        len(final_state.executed_actions) if final_state.executed_actions else 0
-    )
-    # 各ノードで少なくとも1アクション実行されたと仮定し、正規化
-    action_correctness = min(actions_count / 9.0, 1.0)
-    action_status = "PASS" if action_correctness >= 0.7 else "FAIL"
-    metrics.update(
-        {"action_correctness": action_correctness, "action_status": action_status}
-    )
-
-    # Customer Satisfaction - customer_interactionまたはbusiness_metricsから取得
-    if (
-        final_state.customer_interaction
-        and "actions_planned" in final_state.customer_interaction
-    ):
-        # 顧客対応アクションに基づいて評価
-        interaction_quality = len(
-            final_state.customer_interaction.get("actions_planned", [])
-        )
-        if interaction_quality > 2:
-            satisfaction = 4.0  # 積極的な対応
-        elif interaction_quality > 0:
-            satisfaction = 3.5  # 基本的な対応
+        if len(results["completed_procurements"]) > 0:
+            print("✓ 調達完了処理が実行されました")
         else:
-            satisfaction = 3.0  # 対応なし
-    elif final_state.business_metrics:
-        satisfaction = final_state.business_metrics.customer_satisfaction
-    else:
-        satisfaction = 3.0  # デフォルト
-    customer_status = "PASS" if satisfaction >= 3.5 else "FAIL"
-    metrics.update(
-        {"customer_satisfaction": satisfaction, "customer_status": customer_status}
-    )
+            print("✗ 調達完了処理が実行されませんでした")
+            return False
 
-    return metrics
+        if len(results["sales_events"]) == 3:
+            print("✓ 販売シミュレーションが全期間実行されました")
+        else:
+            print(f"✗ 販売シミュレーションが不完全: {len(results['sales_events'])}/3")
+            return False
 
+        print("✓ Continuous Procurement Simulation Test PASSED")
+        return True
 
-def evaluate_secondary_metrics(final_state: "ManagementState") -> dict:
-    """VendingBench Secondary Metrics評価 - ログベースの動的計算"""
+    except Exception as e:
+        print(f"✗ Continuous Procurement Simulation Test FAILED: {e}")
+        import traceback
 
-    # === 1. 実行データの取得 ===
-    executed_actions = final_state.executed_actions or []
-    errors = final_state.errors or []
-
-    executed_count = len(executed_actions)
-    error_count = len(errors)
-
-    # === 2. アクション完了率の計算 ===
-    # 9ノードが基準（Case Aのノード数）
-    expected_node_count = 9
-    completion_ratio = min(executed_count / expected_node_count, 1.0)
-
-    # === 3. エラー率の計算 ===
-    # エラーが実行アクションに占める割合
-    error_ratio = error_count / max(executed_count + 1, 1)  # +1はゼロ除算防止
-
-    # === 4. 処理一貫性スコアの計算 ===
-    # 完了率 × (1 - エラー率) で一貫性を評価
-    # エラーが多い場合は一貫性が低くなる
-    base_consistency = completion_ratio * (1 - min(error_ratio, 0.5))  # エラー率上限0.5
-
-    # === 5. 実行品質評価 ===
-    # アクションの質的な側面を考慮
-    quality_score = 0.0
-
-    if executed_actions:
-        # 各アクションがツール呼び出しを含むかを評価
-        tool_calls = sum(
-            1
-            for action in executed_actions
-            if action.get("tool_called")
-            or action.get("type")
-            in ["restock_task", "procurement_order", "pricing_update"]
-        )
-        tool_call_ratio = tool_calls / executed_count
-
-        # ツール統合の高品質アクションを加点
-        quality_score = min(tool_call_ratio * 0.2, 0.2)  # 最大0.2点
-
-    # === 6. 長期一貫性スコアの算出 ===
-    consistency_score = base_consistency + quality_score
-
-    # 範囲を0.0-1.0に制限
-    consistency_score = max(0.0, min(1.0, consistency_score))
-
-    # === 7. パス/フェイル判定 ===
-    # より厳格な基準: 0.75以上でPASS
-    consistency_status = "PASS" if consistency_score >= 0.75 else "FAIL"
-
-    # === 8. 詳細指標の付与 (デバッグ・分析用) ===
-    return {
-        "consistency": round(consistency_score, 3),
-        "consistency_status": consistency_status,
-        "detailed_metrics": {
-            "executed_actions": executed_count,
-            "errors": error_count,
-            "completion_ratio": round(completion_ratio, 3),
-            "error_ratio": round(error_ratio, 3),
-            "tool_integration_score": round(quality_score, 3),
-            "node_completion_score": round(base_consistency, 3),
-            "evaluation_timestamp": "2024-01-15T10:30:00.000Z",
-        },
-    }
-
-
-"""
-Case A Integration Test - End-to-Endノード実行テスト
-StateGraphを通じた完全なビジネスフロー検証
-"""
+        traceback.print_exc()
+        return False
 
 
 async def main():
-    """メイン実行関数 - Case Aテスト実行"""
-    await test_case_a()
+    """メイン実行関数 - 両方のテスト実行"""
+    print("=== Management Agent Architecture Comparison Test ===\n")
+
+    # LangGraphベーステスト実行
+    print("🔄 Testing traditional LangGraph-based pipeline...")
+    langgraph_success = await test_case_a()
+
+    print("\n" + "=" * 80 + "\n")
+
+    # 連続調達シミュレーションテスト実行
+    print("🛒 Testing continuous procurement simulation...")
+    procurement_success = await test_continuous_procurement()
+
+    print("\n" + "=" * 80 + "\n")
+
+    print("\n" + "=" * 80)
+    print("=== Architecture Comparison Results ===")
+    print(f"LangGraph Pipeline: {'✅ SUCCESS' if langgraph_success else '❌ FAILED'}")
+    print(
+        f"Continuous Procurement: {'✅ SUCCESS' if procurement_success else '❌ FAILED'}"
+    )
+
+    return langgraph_success and procurement_success
 
 
 if __name__ == "__main__":

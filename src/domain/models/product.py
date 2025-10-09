@@ -103,6 +103,22 @@ class Product(BaseModel):
                 return ProductStatus.ACTIVE
         return v
 
+    def update_cost_data(self, new_cost: float = None):
+        """原価データを更新"""
+        if new_cost is not None:
+            if new_cost <= 0:
+                raise ValueError("原価は0より大きい値である必要があります")
+            old_cost = self.cost
+            self.cost = new_cost
+            self.updated_at = datetime.now()
+
+            # 利益率再計算
+            if self.price > 0:
+                self.profit_margin = (self.price - self.cost) / self.price
+
+            # 原価変更ログ
+            print(f"原価更新: {self.name} - ¥{old_cost} -> ¥{new_cost}")
+
     def is_available(self) -> bool:
         """商品が利用可能かチェック"""
         return self.status == ProductStatus.ACTIVE and self.stock_quantity > 0
@@ -133,6 +149,21 @@ class Product(BaseModel):
 
         # 在庫変更ログ（後でログシステムに統合）
         print(f"在庫更新: {self.name} - {old_quantity} -> {self.stock_quantity}")
+
+    def update_price(self, new_price: float):
+        """価格を更新"""
+        if new_price <= 0:
+            raise ValueError("価格は0より大きい値である必要があります")
+        old_price = self.price
+        self.price = new_price
+        self.updated_at = datetime.now()
+
+        # 利益率再計算
+        if self.cost > 0:
+            self.profit_margin = (self.price - self.cost) / self.price
+
+        # 価格変更ログ
+        print(f"価格更新: {self.name} - ¥{old_price} -> ¥{new_price}")
 
     def to_dict(self) -> Dict[str, Any]:
         """辞書形式に変換"""
