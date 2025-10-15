@@ -38,6 +38,7 @@ dependencies = [
     "langgraph>=0.6.8",
     "langchain-chroma>=0.2.6",
     "langsmith>=0.4.32",
+    "ipykernel>=7.0.1",
 ]
 
 [tool.rye]

@@ -1364,12 +1364,6 @@ class NodeBasedManagementAgent:
         """後方互換用chain構築 (使用推奨せず)"""
         return self._build_lcel_pipeline()
 
-    def _test_llm_connection_sync(self):
-        """LLM接続確認（同期版） - 循環インポートを回避するため削除"""
-        # このメソッドは循環インポートを避けるためコメントアウト
-        # 実際の接続確認は_asyncバージョンのみを使用
-        pass
-
     def _create_tools(self) -> List[StructuredTool]:
         """LangChainツールの作成 - Tool Registry使用"""
         from src.agents.management_agent.tools.tool_registry import create_tool_registry
@@ -5022,6 +5016,179 @@ JSON形式で以下の構造で回答してください：
                         "action_accuracy_history": [],
                     }
                 logger.debug("売上発生なし - 累積利益更新スキップ")
+
+            # **累積在庫切れ率の更新**
+            try:
+                from src.application.services.inventory_service import inventory_service
+
+                # 現在の在庫切れ率を計算
+                out_of_stock_slots = inventory_service.get_out_of_stock_slots()
+                all_vending_slots = list(
+                    inventory_service.vending_machine_slots.values()
+                )
+                current_stockout_rate = 0.0
+
+                if all_vending_slots:
+                    current_stockout_rate = len(out_of_stock_slots) / len(
+                        all_vending_slots
+                    )
+
+                # 累積KPIの初期化を確実に実行
+                if (
+                    "cumulative_kpis" not in state.__dict__
+                    or state.cumulative_kpis is None
+                ):
+                    state.cumulative_kpis = {
+                        "total_profit": 0,
+                        "average_stockout_rate": 0.0,
+                        "customer_satisfaction_trend": [],
+                        "action_accuracy_history": [],
+                    }
+
+                # 累積在庫切れ率を更新（移動平均）
+                prev_avg_stockout = state.cumulative_kpis.get(
+                    "average_stockout_rate", 0.0
+                )
+                day_count = len(state.cumulative_kpis.get("stockout_rate_history", []))
+
+                if day_count == 0:
+                    new_avg_stockout = current_stockout_rate
+                else:
+                    new_avg_stockout = (
+                        prev_avg_stockout * day_count + current_stockout_rate
+                    ) / (day_count + 1)
+
+                state.cumulative_kpis["average_stockout_rate"] = new_avg_stockout
+
+                # 在庫切れ率履歴を記録
+                if "stockout_rate_history" not in state.cumulative_kpis:
+                    state.cumulative_kpis["stockout_rate_history"] = []
+                state.cumulative_kpis["stockout_rate_history"].append(
+                    current_stockout_rate
+                )
+
+                logger.info(
+                    f"累積在庫切れ率更新: 現在={current_stockout_rate:.1%}, 累積平均={new_avg_stockout:.1%}"
+                )
+
+            except Exception as e:
+                logger.warning(f"累積在庫切れ率更新エラー: {e}")
+
+            # **累積アクション精度の更新**
+            try:
+                # 現在のアクション精度を計算（利用可能な在庫スロット率）
+                total_slots = len(inventory_service.vending_machine_slots)
+                available_slots = len(
+                    [
+                        slot
+                        for slot in inventory_service.vending_machine_slots.values()
+                        if slot.is_available()
+                    ]
+                )
+
+                current_action_accuracy = 0.0
+                if total_slots > 0:
+                    current_action_accuracy = available_slots / total_slots
+
+                # 累積KPIの初期化を確実に実行
+                if (
+                    "cumulative_kpis" not in state.__dict__
+                    or state.cumulative_kpis is None
+                ):
+                    state.cumulative_kpis = {
+                        "total_profit": 0,
+                        "average_stockout_rate": 0.0,
+                        "customer_satisfaction_trend": [],
+                        "action_accuracy_history": [],
+                    }
+
+                # 累積アクション精度を更新（移動平均）
+                prev_avg_accuracy = state.cumulative_kpis.get(
+                    "average_action_accuracy", 0.0
+                )
+                accuracy_count = len(
+                    state.cumulative_kpis.get("action_accuracy_history", [])
+                )
+
+                if accuracy_count == 0:
+                    new_avg_accuracy = current_action_accuracy
+                else:
+                    new_avg_accuracy = (
+                        prev_avg_accuracy * accuracy_count + current_action_accuracy
+                    ) / (accuracy_count + 1)
+
+                state.cumulative_kpis["average_action_accuracy"] = new_avg_accuracy
+
+                # アクション精度履歴を記録
+                if "action_accuracy_history" not in state.cumulative_kpis:
+                    state.cumulative_kpis["action_accuracy_history"] = []
+                state.cumulative_kpis["action_accuracy_history"].append(
+                    current_action_accuracy
+                )
+
+                logger.info(
+                    f"累積アクション精度更新: 現在={current_action_accuracy:.1%}, 累積平均={new_avg_accuracy:.1%}"
+                )
+
+            except Exception as e:
+                logger.warning(f"累積アクション精度更新エラー: {e}")
+
+            # **累積在庫切れ率の更新**
+            try:
+                from src.application.services.inventory_service import inventory_service
+
+                # 現在の在庫切れ率を計算
+                out_of_stock_slots = inventory_service.get_out_of_stock_slots()
+                all_vending_slots = list(
+                    inventory_service.vending_machine_slots.values()
+                )
+                current_stockout_rate = 0.0
+
+                if all_vending_slots:
+                    current_stockout_rate = len(out_of_stock_slots) / len(
+                        all_vending_slots
+                    )
+
+                # 累積KPIの初期化を確実に実行
+                if (
+                    "cumulative_kpis" not in state.__dict__
+                    or state.cumulative_kpis is None
+                ):
+                    state.cumulative_kpis = {
+                        "total_profit": 0,
+                        "average_stockout_rate": 0.0,
+                        "customer_satisfaction_trend": [],
+                        "action_accuracy_history": [],
+                    }
+
+                # 累積在庫切れ率を更新（移動平均）
+                prev_avg_stockout = state.cumulative_kpis.get(
+                    "average_stockout_rate", 0.0
+                )
+                day_count = len(state.cumulative_kpis.get("stockout_rate_history", []))
+
+                if day_count == 0:
+                    new_avg_stockout = current_stockout_rate
+                else:
+                    new_avg_stockout = (
+                        prev_avg_stockout * day_count + current_stockout_rate
+                    ) / (day_count + 1)
+
+                state.cumulative_kpis["average_stockout_rate"] = new_avg_stockout
+
+                # 在庫切れ率履歴を記録
+                if "stockout_rate_history" not in state.cumulative_kpis:
+                    state.cumulative_kpis["stockout_rate_history"] = []
+                state.cumulative_kpis["stockout_rate_history"].append(
+                    current_stockout_rate
+                )
+
+                logger.info(
+                    f"累積在庫切れ率更新: 現在={current_stockout_rate:.1%}, 累積平均={new_avg_stockout:.1%}"
+                )
+
+            except Exception as e:
+                logger.warning(f"累積在庫切れ率更新エラー: {e}")
 
             # profit_calculationの結果も追加（重複防止のためprofit_calculation_nodeで実行された場合はスキップ）
             if (

@@ -66,13 +66,6 @@ ai-vending-system/
 └── pyproject.toml               # パッケージ管理
 ```
 
-## アーキテクチャ原則
-
-1. **AIエージェント自律性**: AI Agentが自律的に意思決定・実行
-2. **AI安全性第一**: ガードレールと異常検出システム
-3. **拡張可能なデータ基盤**: 将来的なデータ充実に対応
-4. **モジュラー設計**: 新機能の容易な追加
-5. **総合監視**: AI意思決定プロセス・システム状態追跡
 
 ### 3-Agent + tool共有アーキテクチャ
 
@@ -142,28 +135,46 @@ ai-vending-system/
 - **request_procurement.py**: ✅ 実装済み - 商品発注依頼生成・サプライヤ連絡依頼。
 - **calculate_optimal_order.py**: ❌ 未完成(拡張案) - 在庫回転率・需要予測に基づく最適発注数量計算。過剰/不足在庫防止。
 
+# TODO
+単一ファイルから各ツールファイルへの転換
+実際の実装では、各階層フォルダにおけるtoolではなく、`agent.py`に記載の
+9つのノード関数が実装されている：
+
+- `inventory_check_node()` - 在庫確認（LLM統合）
+- `sales_plan_node()` - 売上計画（財務・売上分析）
+- `pricing_node()` - 価格戦略（LLM駆動ツール活用）
+- `automatic_restock_node()` - 在庫補充（LLM戦略分析）
+- `procurement_request_generation_node()` - 発注依頼（STORAGE在庫判断）
+- `sales_processing_node()` - 売上処理（シミュレーション統合）
+- `customer_interaction_node()` - 顧客対応（LLM戦略分析）
+- `profit_calculation_node()` - 利益計算（財務分析ツール活用）
+- `feedback_node()` - 戦略的フィードバック（包括的LLM分析）
+
 ### Analytics Agent Tools (監視・分析・ガバナンス特化)
 
 **analytics_agent/business_monitoring/**: ビジネスKPIの継続監視Tool群
-- **performance_monitor.py**: ❌ 未完成 -売上・収益・回転率などの実績データを継続監視、閾値逸脱を検知
+- **performance_monitor.py**: ❌ 未完成 -売上・収益・回転率などの実績データを継続監視、ビジネス継続のポリシーに応じた振る舞いかを定量評価。
 - **anomaly_detector.py**: ❌ 未完成 -売上急変・在庫異常・顧客苦情急増などの異常を統計的手法で検出。
-- **compliance_checker.py**: ❌ 未完成 -経費精算・消費税計算・会計基準遵守を確認、法令順守を確保。監査レポート生成。
+- **compliance_checker.py**: ❌ 未完成 -経費精算・消費税計算・会計基準遵守を確認、顧客対応における法令やモラル順守を評価。
 
 **analytics_agent/ai_governance/**: AI Agentの品質・安全監視Tool群
 - **decision_quality_monitor.py**: ❌ 未完成 -AI意思決定の正しさ・一貫性・成功率を評価、判断品質スコア算出。管理Agentへの改善フィードバック。
-- **safety_compliance_checker.py**: ❌ 未完成 -AIガードレールの遵守状況を確認、安全基準逸脱を検知。緊急停止トリガー機能。
-- **performance_tracker.py**: ❌ 未完成 -AI応答時間・成功率・学習進捗を監視、性能低下をアラート。最適化提案生成。
+- **safety_compliance_checker.py**: ❌ 未完成 -AIガードレールの遵守状況を確認、安全基準逸脱を検知。
+- **performance_tracker.py**: ❌ 未完成 -AI応答時間・成功率・コストを監視。性能低下をアラート。
 
 **analytics_agent/advisory/**: 業務分析・アドバイスTool群
-- **efficiency_analyzer.py**: ❌ 未完成 -業務プロセス効率・無駄削減機会を分析、改善提案を生成。KPI比較・ベンチマーク分析。
-- **cost_benefit_analyzer.py**: ❌ 未完成 -新施策・改善案の費用対効果を定量評価、投資判断支援。ROI計算・シナリオ分析。
+- **cost_benefit_analyzer.py**: ❌ 未完成 -店長（Management）Agentの新施策・改善案の費用対効果を定量評価、ビジネス環境において投資判断が妥当かを評価。
 
+# TODO
+すべて未設計&未検証。店長Agentのprofit_calculation_nodeを参考に構築。
 ### Recorder Agent Tools (学習・記録蓄積特化)
 
 **recorder_agent/learning_tools/**: データ蓄積・学習パターン生成Tool群
-- **session_recorder.py**: ✅ 実装済み - Agentの意思決定・行動・結果を時系列で記録、学習データ蓄積。詳細ログ分析用構造化保存。
-- **data_persistence.py**: ❌ 未完成 -学習データ・分析結果を永続化、検索・再利用可能な形で保存。長期学習データのメンテナンス。
-- **pattern_analyzer.py**: ❌ 未完成 -成功・失敗パターンを自動認識、将来判断の参考データに変換。機械学習モデルへの入力データ生成。
+- **session_recorder.py**: ❌ 未完成 - Agentの意思決定・行動・結果を時系列で記録、参照用データ蓄積。詳細ログ分析用構造化保存。
+
+
+# TODO
+すべて未設計&未検証。店長Agentのfeedback_nodeを参考に構築。そもそも不要な可能性も検討
 
 ### Shared Tools (全Agent共有・一部はManagement Agentに統合実装)
 
@@ -175,6 +186,9 @@ ai-vending-system/
 **shared_tools/market_tools/**: 市場・競合情報Tool群
 - **search_products.py**: ✅ 実装済み - 新商品・競合価格・トレンド情報をweb検索。外部データ統合・価格比較。
 - **supplier_research.py**: ❌ 未完成 - 仕入れ先情報・信頼性評価・価格比較。発注先選定支援・リスク評価。
+
+# TODO
+- 実際の`agent.py`では`create_tool_registry()`関数からツールを取得
 
 ## コンポーネント実装状況
 
@@ -214,9 +228,9 @@ AI Processing Stack
 
 
 ####  AI Models Agent Frameworks - AIモデル統合管理
-- **目的**: 複数AIモデル統合管理・Web検索対応・コスト最適化
-- **実装状況**: Azure OpenAI GPT-4o-mini 統合済み・Tavily検索対応
-- **主機能**: マルチモデル切替・セーフティチェック・APIコスト管理・ReAct実行パターン
+- **目的**: 複数AIモデル統合管理
+- **実装状況**: Azure OpenAI GPT-4o-mini ・Tavily検索対応
+- **主機能**: マルチモデル切替・セーフティチェック・APIコスト管理・直列WF・ReAct実行パターン
 
 #### 会話サービス - 会話履歴管理システム
 - **目的**: 顧客会話ログ管理・パーソナライズデータ提供・AI学習データ蓄積
@@ -246,10 +260,6 @@ AI Processing Stack
 - `procurement.py` - 調達API [実装済み]: 商品発注・仕入れ先管理
 - `dashboard.py` - ダッシュボードAPI [未実装]: 管理画面・レポート表示・データ分析
 
-**将来拡張API **
-- __人間介入・通知レイヤー__ (検討中):
-  - `alert_system.py`: 緊急アラート・異常通知API
-  - `human_override.py`: 人間による緊急介入API
 
 ### システム性能・セキュリティ仕様
 
@@ -297,7 +307,6 @@ PAYPAL_CLIENT_ID=your_paypal_client_id_here
 
 **将来準備設定 (.env.exampleに記載・使用ロジック未実装)**
 ```
-AI_SAFETY_THRESHOLD=0.95                              # 🔄 AI安全性閾値 (将来実装)
 ENABLE_GUARDRAILS=True                               # 🔄 AIガードレール制御 (将来実装)
 ENABLE_DECISION_MONITORING=True                      # 🔄 判定監視 (将来実装)
 # セキュリティ設定 (ENCRYPTION_KEYは暗号化機能で必須)
@@ -314,7 +323,7 @@ agent_objectives:
     medium_term: "顧客維持率向上"
     long_term: "資産価値増加"
   constraints: ["品質保証", "法令遵守", "リスク管理"]
-  priority_weight: {"short_term": 0.6, "medium_term": 0.3, "long_term": 0.1}
+
 
 # Search Agent追加設定
 real_web_search: True                                 # Web実検索有効
@@ -468,6 +477,27 @@ search_max_retries: 3                                 # 検索再試行回数
 - **場所**: `src/simulations/`
 - **対象**: 販売イベント・Agent動作シミュレーション
 - **実装状況**: 本番コードと分離・ルート散在スクリプト削除
+
+### スクリプトツール群 [整理完了]
+- **場所**: `scripts/`
+- **対象**: ビジネスシミュレーション・データ分析・継続検証スクリプト
+- **実装状況**: 本番環境検証・長期テスト用スクリプト整理完了
+
+**ビジネスシミュレーションスクリプト**
+- `continuous_multi_day_simulation.py`: 長期営業サイクル（複数日間）の自律運用シミュレーション・Agent協働検証
+- `continuous_procurement_simulation.py`: 自動調達システムの継続的動作テスト・在庫最適化検証
+
+**データ分析・可視化スクリプト**
+- `kpi_visualization.py`: KPIデータ収集・グラフ生成・パフォーマンスダッシュボード作成
+
+**実行方法と意義**
+- ビジネスシミュレーション: `python scripts/continuous_multi_day_simulation.py` で実行、意思決定品質・運用効率の長期検証
+- データ分析: `python scripts/kpi_visualization.py` でKPIレポート生成、経営判断支援・改善策立案
+
+**ビジネス価値**
+- リスク低減: 本番投入前の包括的システムテスト
+- 効率化: KPI自動追跡・異常早期検知
+- 継続改善: シミュレーションデータからの学習反映
 
 ## 開発ワークフロー
 

@@ -90,18 +90,19 @@ async def simulate_purchase_events(
     dry_run: bool = False,
 ) -> dict:
     """
-    購入イベントをシミュレート（価格考慮）
+    購入イベントをシミュレート（価格考慮・現実的な販売頻度）
 
     Args:
-        sales_lambda: 平均購入イベント数（ポアソン分布）
+        sales_lambda: 平均購入イベント数（ポアソン分布）- 現実的な値: 2.0-3.0
         verbose: 詳細出力するか
         period_name: 期間名（ログ用）
 
     Returns:
         シミュレーション結果辞書
     """
+    # 現実的な販売頻度に調整（1日2-5件程度）
     # 最低1イベントを保証してコンバージョン0を防ぐ
-    num_events = max(sample_poisson(sales_lambda), 1)
+    num_events = max(sample_poisson(min(sales_lambda, 3.0)), 1)  # 上限3.0に制限
     total_revenue = 0.0
     successful_sales = 0
 

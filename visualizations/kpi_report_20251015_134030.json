@@ -1,0 +1,625 @@
+{
+  "kpi_history": [
+    {
+      "run_id": "continuous_simulation_20251015_102616_initial",
+      "step": 1,
+      "profit": 0.0,
+      "stockout_rate": 0.0,
+      "pricing_accuracy": 0.7,
+      "action_correctness": 0.0,
+      "customer_satisfaction": 3.32,
+      "execution_order": 1,
+      "timestamp": "2025-10-15T13:40:27.161481"
+    },
+    {
+      "run_id": "continuous_simulation_20251015_102616_initial",
+      "step": 1,
+      "profit": 513.0,
+      "stockout_rate": 0.0,
+      "pricing_accuracy": 0.85,
+      "action_correctness": 0.5555555555555556,
+      "customer_satisfaction": 3.28,
+      "execution_order": 2,
+      "timestamp": "2025-10-15T13:50:27.161481"
+    },
+    {
+      "run_id": "continuous_simulation_20251015_102616_initial",
+      "step": 1,
+      "profit": 1236.0,
+      "stockout_rate": 0.0,
+      "pricing_accuracy": 0.85,
+      "action_correctness": 1.0,
+      "customer_satisfaction": 3.22,
+      "execution_order": 3,
+      "timestamp": "2025-10-15T14:00:27.161481"
+    },
+    {
+      "run_id": "continuous_simulation_20251015_102616_initial",
+      "step": 1,
+      "profit": 2208.0,
+      "stockout_rate": 0.3333333333333333,
+      "pricing_accuracy": 0.85,
+      "action_correctness": 1.0,
+      "customer_satisfaction": 3.14,
+      "execution_order": 4,
+      "timestamp": "2025-10-15T14:10:27.161481"
+    },
+    {
+      "run_id": "continuous_simulation_20251015_102616_initial",
+      "step": 1,
+      "profit": 3319.96,
+      "stockout_rate": 1.0,
+      "pricing_accuracy": 0.85,
+      "action_correctness": 1.0,
+      "customer_satisfaction": 3.11,
+      "execution_order": 5,
+      "timestamp": "2025-10-15T14:20:27.161481"
+    },
+    {
+      "run_id": "continuous_simulation_20251015_102616_initial",
+      "step": 1,
+      "profit": 5398.86,
+      "stockout_rate": 0.42857142857142855,
+      "pricing_accuracy": 0.85,
+      "action_correctness": 1.0,
+      "customer_satisfaction": 3.08,
+      "execution_order": 6,
+      "timestamp": "2025-10-15T14:30:27.161481"
+    },
+    {
+      "run_id": "continuous_simulation_20251015_102616_initial",
+      "step": 2,
+      "profit": 0.0,
+      "stockout_rate": 0.0,
+      "pricing_accuracy": 0.7,
+      "action_correctness": 0.0,
+      "customer_satisfaction": 3.32,
+      "execution_order": 7,
+      "timestamp": "2025-10-15T14:40:27.161481"
+    },
+    {
+      "run_id": "continuous_simulation_20251015_102616_initial",
+      "step": 2,
+      "profit": 696.0,
+      "stockout_rate": 0.0,
+      "pricing_accuracy": 0.85,
+      "action_correctness": 1.0,
+      "customer_satisfaction": 3.25,
+      "execution_order": 8,
+      "timestamp": "2025-10-15T14:50:27.161481"
+    },
+    {
+      "run_id": "continuous_simulation_20251015_102616_initial",
+      "step": 2,
+      "profit": 1929.0,
+      "stockout_rate": 0.09090909090909091,
+      "pricing_accuracy": 0.85,
+      "action_correctness": 1.0,
+      "customer_satisfaction": 3.17,
+      "execution_order": 9,
+      "timestamp": "2025-10-15T15:00:27.161481"
+    },
+    {
+      "run_id": "continuous_simulation_20251015_102616_initial",
+      "step": 2,
+      "profit": 2968.4,
+      "stockout_rate": 0.2,
+      "pricing_accuracy": 0.8,
+      "action_correctness": 1.0,
+      "customer_satisfaction": 3.12,
+      "execution_order": 10,
+      "timestamp": "2025-10-15T15:10:27.161481"
+    },
+    {
+      "run_id": "continuous_simulation_20251015_102616_initial",
+      "step": 2,
+      "profit": 4000.91,
+      "stockout_rate": 0.5,
+      "pricing_accuracy": 0.85,
+      "action_correctness": 1.0,
+      "customer_satisfaction": 3.09,
+      "execution_order": 11,
+      "timestamp": "2025-10-15T15:20:27.161481"
+    },
+    {
+      "run_id": "continuous_simulation_20251015_102616_initial",
+      "step": 2,
+      "profit": 5398.86,
+      "stockout_rate": 0.42857142857142855,
+      "pricing_accuracy": 0.85,
+      "action_correctness": 1.0,
+      "customer_satisfaction": 3.08,
+      "execution_order": 12,
+      "timestamp": "2025-10-15T15:30:27.161481"
+    },
+    {
+      "run_id": "continuous_simulation_20251015_102616_initial",
+      "step": 3,
+      "profit": 513.0,
+      "stockout_rate": 0.0,
+      "pricing_accuracy": 0.85,
+      "action_correctness": 0.5555555555555556,
+      "customer_satisfaction": 3.28,
+      "execution_order": 13,
+      "timestamp": "2025-10-15T15:40:27.161481"
+    },
+    {
+      "run_id": "continuous_simulation_20251015_102616_initial",
+      "step": 3,
+      "profit": 1236.0,
+      "stockout_rate": 0.0,
+      "pricing_accuracy": 0.85,
+      "action_correctness": 1.0,
+      "customer_satisfaction": 3.22,
+      "execution_order": 14,
+      "timestamp": "2025-10-15T15:50:27.161481"
+    },
+    {
+      "run_id": "continuous_simulation_20251015_102616_initial",
+      "step": 3,
+      "profit": 2208.0,
+      "stockout_rate": 0.3333333333333333,
+      "pricing_accuracy": 0.8,
+      "action_correctness": 1.0,
+      "customer_satisfaction": 3.14,
+      "execution_order": 15,
+      "timestamp": "2025-10-15T16:00:27.161481"
+    },
+    {
+      "run_id": "continuous_simulation_20251015_102616_initial",
+      "step": 3,
+      "profit": 3319.96,
+      "stockout_rate": 1.0,
+      "pricing_accuracy": 0.85,
+      "action_correctness": 1.0,
+      "customer_satisfaction": 3.11,
+      "execution_order": 16,
+      "timestamp": "2025-10-15T16:10:27.161481"
+    },
+    {
+      "run_id": "continuous_simulation_20251015_102616_initial",
+      "step": 3,
+      "profit": 5398.86,
+      "stockout_rate": 0.42857142857142855,
+      "pricing_accuracy": 0.85,
+      "action_correctness": 1.0,
+      "customer_satisfaction": 3.08,
+      "execution_order": 17,
+      "timestamp": "2025-10-15T16:20:27.161481"
+    },
+    {
+      "run_id": "continuous_simulation_20251015_102616_initial",
+      "step": 4,
+      "profit": 0.0,
+      "stockout_rate": 0.0,
+      "pricing_accuracy": 0.85,
+      "action_correctness": 0.0,
+      "customer_satisfaction": 3.32,
+      "execution_order": 18,
+      "timestamp": "2025-10-15T16:30:27.161481"
+    },
+    {
+      "run_id": "continuous_simulation_20251015_102616_initial",
+      "step": 4,
+      "profit": 696.0,
+      "stockout_rate": 0.0,
+      "pricing_accuracy": 0.85,
+      "action_correctness": 1.0,
+      "customer_satisfaction": 3.25,
+      "execution_order": 19,
+      "timestamp": "2025-10-15T16:40:27.161481"
+    },
+    {
+      "run_id": "continuous_simulation_20251015_102616_initial",
+      "step": 4,
+      "profit": 1929.0,
+      "stockout_rate": 0.09090909090909091,
+      "pricing_accuracy": 0.85,
+      "action_correctness": 1.0,
+      "customer_satisfaction": 3.17,
+      "execution_order": 20,
+      "timestamp": "2025-10-15T16:50:27.161481"
+    },
+    {
+      "run_id": "continuous_simulation_20251015_102616_initial",
+      "step": 4,
+      "profit": 2968.4,
+      "stockout_rate": 0.2,
+      "pricing_accuracy": 0.85,
+      "action_correctness": 1.0,
+      "customer_satisfaction": 3.12,
+      "execution_order": 21,
+      "timestamp": "2025-10-15T17:00:27.161481"
+    },
+    {
+      "run_id": "continuous_simulation_20251015_102616_initial",
+      "step": 4,
+      "profit": 4000.91,
+      "stockout_rate": 0.5,
+      "pricing_accuracy": 0.85,
+      "action_correctness": 1.0,
+      "customer_satisfaction": 3.09,
+      "execution_order": 22,
+      "timestamp": "2025-10-15T17:10:27.161481"
+    },
+    {
+      "run_id": "continuous_simulation_20251015_102616_initial",
+      "step": 4,
+      "profit": 5398.86,
+      "stockout_rate": 0.42857142857142855,
+      "pricing_accuracy": 0.85,
+      "action_correctness": 1.0,
+      "customer_satisfaction": 3.08,
+      "execution_order": 23,
+      "timestamp": "2025-10-15T17:20:27.161481"
+    },
+    {
+      "run_id": "continuous_simulation_20251015_102616_initial",
+      "step": 5,
+      "profit": 513.0,
+      "stockout_rate": 0.0,
+      "pricing_accuracy": 0.85,
+      "action_correctness": 0.6666666666666666,
+      "customer_satisfaction": 3.28,
+      "execution_order": 24,
+      "timestamp": "2025-10-15T17:30:27.161481"
+    },
+    {
+      "run_id": "continuous_simulation_20251015_102616_initial",
+      "step": 5,
+      "profit": 1236.0,
+      "stockout_rate": 0.0,
+      "pricing_accuracy": 0.85,
+      "action_correctness": 1.0,
+      "customer_satisfaction": 3.22,
+      "execution_order": 25,
+      "timestamp": "2025-10-15T17:40:27.161481"
+    },
+    {
+      "run_id": "continuous_simulation_20251015_102616_initial",
+      "step": 5,
+      "profit": 2208.0,
+      "stockout_rate": 0.3333333333333333,
+      "pricing_accuracy": 0.8,
+      "action_correctness": 1.0,
+      "customer_satisfaction": 3.14,
+      "execution_order": 26,
+      "timestamp": "2025-10-15T17:50:27.161481"
+    },
+    {
+      "run_id": "continuous_simulation_20251015_102616_initial",
+      "step": 5,
+      "profit": 3319.96,
+      "stockout_rate": 1.0,
+      "pricing_accuracy": 0.85,
+      "action_correctness": 1.0,
+      "customer_satisfaction": 3.11,
+      "execution_order": 27,
+      "timestamp": "2025-10-15T18:00:27.161481"
+    },
+    {
+      "run_id": "continuous_simulation_20251015_102616_initial",
+      "step": 5,
+      "profit": 5398.86,
+      "stockout_rate": 0.42857142857142855,
+      "pricing_accuracy": 0.85,
+      "action_correctness": 1.0,
+      "customer_satisfaction": 3.08,
+      "execution_order": 28,
+      "timestamp": "2025-10-15T18:10:27.161481"
+    },
+    {
+      "run_id": "continuous_simulation_20251015_102616_initial",
+      "step": 6,
+      "profit": 564.3,
+      "stockout_rate": 0.0,
+      "pricing_accuracy": 0.85,
+      "action_correctness": 0.3333333333333333,
+      "customer_satisfaction": 3.28,
+      "execution_order": 29,
+      "timestamp": "2025-10-15T18:20:27.161481"
+    },
+    {
+      "run_id": "continuous_simulation_20251015_102616_initial",
+      "step": 6,
+      "profit": 696.0,
+      "stockout_rate": 0.0,
+      "pricing_accuracy": 0.85,
+      "action_correctness": 1.0,
+      "customer_satisfaction": 3.23,
+      "execution_order": 30,
+      "timestamp": "2025-10-15T18:30:27.161481"
+    },
+    {
+      "run_id": "continuous_simulation_20251015_102616_initial",
+      "step": 6,
+      "profit": 1929.0,
+      "stockout_rate": 0.3333333333333333,
+      "pricing_accuracy": 0.85,
+      "action_correctness": 1.0,
+      "customer_satisfaction": 3.16,
+      "execution_order": 31,
+      "timestamp": "2025-10-15T18:40:27.161481"
+    },
+    {
+      "run_id": "continuous_simulation_20251015_102616_initial",
+      "step": 6,
+      "profit": 2968.4,
+      "stockout_rate": 0.5,
+      "pricing_accuracy": 0.85,
+      "action_correctness": 1.0,
+      "customer_satisfaction": 3.12,
+      "execution_order": 32,
+      "timestamp": "2025-10-15T18:50:27.161481"
+    },
+    {
+      "run_id": "continuous_simulation_20251015_102616_initial",
+      "step": 6,
+      "profit": 4000.91,
+      "stockout_rate": 0.42857142857142855,
+      "pricing_accuracy": 0.85,
+      "action_correctness": 1.0,
+      "customer_satisfaction": 3.08,
+      "execution_order": 33,
+      "timestamp": "2025-10-15T19:00:27.161481"
+    },
+    {
+      "run_id": "continuous_simulation_20251015_102616_initial",
+      "step": 6,
+      "profit": 5398.86,
+      "stockout_rate": 0.42857142857142855,
+      "pricing_accuracy": 0.85,
+      "action_correctness": 1.0,
+      "customer_satisfaction": 3.08,
+      "execution_order": 34,
+      "timestamp": "2025-10-15T19:10:27.161481"
+    },
+    {
+      "run_id": "continuous_simulation_20251015_102616_initial",
+      "step": 7,
+      "profit": 513.0,
+      "stockout_rate": 0.0,
+      "pricing_accuracy": 0.85,
+      "action_correctness": 1.0,
+      "customer_satisfaction": 3.27,
+      "execution_order": 35,
+      "timestamp": "2025-10-15T19:20:27.161481"
+    },
+    {
+      "run_id": "continuous_simulation_20251015_102616_initial",
+      "step": 7,
+      "profit": 1236.0,
+      "stockout_rate": 0.0,
+      "pricing_accuracy": 0.85,
+      "action_correctness": 1.0,
+      "customer_satisfaction": 3.18,
+      "execution_order": 36,
+      "timestamp": "2025-10-15T19:30:27.161481"
+    },
+    {
+      "run_id": "continuous_simulation_20251015_102616_initial",
+      "step": 7,
+      "profit": 2208.0,
+      "stockout_rate": 0.2,
+      "pricing_accuracy": 0.8,
+      "action_correctness": 1.0,
+      "customer_satisfaction": 3.14,
+      "execution_order": 37,
+      "timestamp": "2025-10-15T19:40:27.161481"
+    },
+    {
+      "run_id": "continuous_simulation_20251015_102616_initial",
+      "step": 7,
+      "profit": 3319.96,
+      "stockout_rate": 0.3333333333333333,
+      "pricing_accuracy": 0.85,
+      "action_correctness": 1.0,
+      "customer_satisfaction": 3.09,
+      "execution_order": 38,
+      "timestamp": "2025-10-15T19:50:27.161481"
+    },
+    {
+      "run_id": "continuous_simulation_20251015_102616_initial",
+      "step": 7,
+      "profit": 5398.86,
+      "stockout_rate": 0.42857142857142855,
+      "pricing_accuracy": 0.85,
+      "action_correctness": 1.0,
+      "customer_satisfaction": 3.08,
+      "execution_order": 39,
+      "timestamp": "2025-10-15T20:00:27.161481"
+    },
+    {
+      "run_id": "continuous_simulation_20251015_102616_initial",
+      "step": 8,
+      "profit": 513.0,
+      "stockout_rate": 0.0,
+      "pricing_accuracy": 0.85,
+      "action_correctness": 0.5555555555555556,
+      "customer_satisfaction": 3.28,
+      "execution_order": 40,
+      "timestamp": "2025-10-15T20:10:27.161481"
+    },
+    {
+      "run_id": "continuous_simulation_20251015_102616_initial",
+      "step": 8,
+      "profit": 1236.0,
+      "stockout_rate": 0.0,
+      "pricing_accuracy": 0.85,
+      "action_correctness": 1.0,
+      "customer_satisfaction": 3.23,
+      "execution_order": 41,
+      "timestamp": "2025-10-15T20:20:27.161481"
+    },
+    {
+      "run_id": "continuous_simulation_20251015_102616_initial",
+      "step": 8,
+      "profit": 2208.0,
+      "stockout_rate": 0.3333333333333333,
+      "pricing_accuracy": 0.85,
+      "action_correctness": 1.0,
+      "customer_satisfaction": 3.16,
+      "execution_order": 42,
+      "timestamp": "2025-10-15T20:30:27.161481"
+    },
+    {
+      "run_id": "continuous_simulation_20251015_102616_initial",
+      "step": 8,
+      "profit": 3319.96,
+      "stockout_rate": 0.5,
+      "pricing_accuracy": 0.85,
+      "action_correctness": 1.0,
+      "customer_satisfaction": 3.12,
+      "execution_order": 43,
+      "timestamp": "2025-10-15T20:40:27.161481"
+    },
+    {
+      "run_id": "continuous_simulation_20251015_102616_initial",
+      "step": 8,
+      "profit": 5398.86,
+      "stockout_rate": 0.42857142857142855,
+      "pricing_accuracy": 0.85,
+      "action_correctness": 1.0,
+      "customer_satisfaction": 3.08,
+      "execution_order": 44,
+      "timestamp": "2025-10-15T20:50:27.161481"
+    },
+    {
+      "run_id": "continuous_simulation_20251015_102616_initial",
+      "step": 8,
+      "profit": 6754.5,
+      "stockout_rate": 0.42857142857142855,
+      "pricing_accuracy": 0.85,
+      "action_correctness": 1.0,
+      "customer_satisfaction": 3.08,
+      "execution_order": 45,
+      "timestamp": "2025-10-15T21:00:27.161481"
+    },
+    {
+      "run_id": "continuous_simulation_20251015_102616_initial",
+      "step": 9,
+      "profit": 696.0,
+      "stockout_rate": 0.0,
+      "pricing_accuracy": 0.85,
+      "action_correctness": 1.0,
+      "customer_satisfaction": 3.27,
+      "execution_order": 46,
+      "timestamp": "2025-10-15T21:10:27.161481"
+    },
+    {
+      "run_id": "continuous_simulation_20251015_102616_initial",
+      "step": 9,
+      "profit": 1929.0,
+      "stockout_rate": 0.0,
+      "pricing_accuracy": 0.85,
+      "action_correctness": 1.0,
+      "customer_satisfaction": 3.18,
+      "execution_order": 47,
+      "timestamp": "2025-10-15T21:20:27.161481"
+    },
+    {
+      "run_id": "continuous_simulation_20251015_102616_initial",
+      "step": 9,
+      "profit": 2968.4,
+      "stockout_rate": 0.2,
+      "pricing_accuracy": 0.8,
+      "action_correctness": 1.0,
+      "customer_satisfaction": 3.14,
+      "execution_order": 48,
+      "timestamp": "2025-10-15T21:30:27.161481"
+    },
+    {
+      "run_id": "continuous_simulation_20251015_102616_initial",
+      "step": 9,
+      "profit": 4000.91,
+      "stockout_rate": 0.3333333333333333,
+      "pricing_accuracy": 0.85,
+      "action_correctness": 1.0,
+      "customer_satisfaction": 3.09,
+      "execution_order": 49,
+      "timestamp": "2025-10-15T21:40:27.161481"
+    },
+    {
+      "run_id": "continuous_simulation_20251015_102616_initial",
+      "step": 9,
+      "profit": 6754.5,
+      "stockout_rate": 0.42857142857142855,
+      "pricing_accuracy": 0.85,
+      "action_correctness": 1.0,
+      "customer_satisfaction": 3.08,
+      "execution_order": 50,
+      "timestamp": "2025-10-15T21:50:27.161481"
+    }
+  ],
+  "cumulative_kpis": {
+    "total_profit": 0.0,
+    "average_stockout_rate": 0.0,
+    "customer_satisfaction_trend": [],
+    "action_accuracy_history": [],
+    "days": 0
+  },
+  "analysis_report": {
+    "summary": {
+      "total_days": 0,
+      "total_runs": 1,
+      "latest_metrics": {
+        "profit": 6754.5,
+        "stockout_rate": 0.42857142857142855,
+        "pricing_accuracy": 0.85,
+        "action_correctness": 1.0,
+        "customer_satisfaction": 3.08
+      },
+      "cumulative_totals": {
+        "profit": 0.0,
+        "avg_stockout_rate": 0.0
+      }
+    },
+    "achievement_analysis": {
+      "profit": {
+        "value": 6754.5,
+        "target": 50000,
+        "achievement_rate": 13.508999999999999,
+        "status": "要改善"
+      },
+      "stockout_rate": {
+        "value": 0.42857142857142855,
+        "target": 0.1,
+        "achievement_rate": 0,
+        "status": "要改善"
+      },
+      "pricing_accuracy": {
+        "value": 0.85,
+        "target": 0.8,
+        "achievement_rate": 100,
+        "status": "達成"
+      },
+      "action_correctness": {
+        "value": 1.0,
+        "target": 0.7,
+        "achievement_rate": 100,
+        "status": "達成"
+      },
+      "customer_satisfaction": {
+        "value": 3.08,
+        "target": 3.5,
+        "achievement_rate": 88.0,
+        "status": "達成"
+      }
+    },
+    "trend_analysis": {
+      "customer_satisfaction": {
+        "direction": "下降",
+        "change_rate": -7.2289156626505955,
+        "first_value": 3.32,
+        "last_value": 3.08
+      }
+    },
+    "recommendations": [
+      "Consider reviewing pricing strategy or introducing new products to improve profitability",
+      "Optimize procurement cycles and improve inventory forecasting to reduce stockouts",
+      "Strengthen quality management and customer service to address declining satisfaction trends"
+    ]
+  },
+  "generated_at": "2025-10-15T13:40:30.601913",
+  "version": "1.0"
+}

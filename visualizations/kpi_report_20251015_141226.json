@@ -1,0 +1,157 @@
+{
+  "kpi_history": [
+    {
+      "run_id": "procurement_simulation_20251015_141153",
+      "step": 1,
+      "profit": -13324.63,
+      "stockout_rate": 0.0,
+      "pricing_accuracy": 0.7,
+      "action_correctness": 1.0,
+      "customer_satisfaction": 3.5,
+      "execution_order": 1,
+      "timestamp": "2025-10-15T14:12:24.781632"
+    },
+    {
+      "run_id": "procurement_simulation_20251015_141153",
+      "step": 2,
+      "profit": -16397.21,
+      "stockout_rate": 0.0,
+      "pricing_accuracy": 0.7,
+      "action_correctness": 0.8333333333333334,
+      "customer_satisfaction": 3.5,
+      "execution_order": 2,
+      "timestamp": "2025-10-15T14:22:24.781632"
+    },
+    {
+      "run_id": "procurement_simulation_20251015_141153",
+      "step": 3,
+      "profit": -19705.01,
+      "stockout_rate": 0.0,
+      "pricing_accuracy": 0.7,
+      "action_correctness": 0.6666666666666666,
+      "customer_satisfaction": 3.5,
+      "execution_order": 3,
+      "timestamp": "2025-10-15T14:32:24.781632"
+    },
+    {
+      "run_id": "procurement_simulation_20251015_141153",
+      "step": 4,
+      "profit": -19585.01,
+      "stockout_rate": 0.0,
+      "pricing_accuracy": 0.7,
+      "action_correctness": 0.6666666666666666,
+      "customer_satisfaction": 3.5,
+      "execution_order": 4,
+      "timestamp": "2025-10-15T14:42:24.781632"
+    },
+    {
+      "run_id": "procurement_simulation_20251015_141153",
+      "step": 5,
+      "profit": -19075.01,
+      "stockout_rate": 0.0,
+      "pricing_accuracy": 0.7,
+      "action_correctness": 0.6666666666666666,
+      "customer_satisfaction": 3.5,
+      "execution_order": 5,
+      "timestamp": "2025-10-15T14:52:24.781632"
+    },
+    {
+      "run_id": "procurement_simulation_20251015_141153",
+      "step": 6,
+      "profit": -18775.01,
+      "stockout_rate": 0.0,
+      "pricing_accuracy": 0.7,
+      "action_correctness": 0.6666666666666666,
+      "customer_satisfaction": 3.5,
+      "execution_order": 6,
+      "timestamp": "2025-10-15T15:02:24.781632"
+    },
+    {
+      "run_id": "procurement_simulation_20251015_141153",
+      "step": 7,
+      "profit": -18295.01,
+      "stockout_rate": 0.0,
+      "pricing_accuracy": 0.7,
+      "action_correctness": 0.6666666666666666,
+      "customer_satisfaction": 3.5,
+      "execution_order": 7,
+      "timestamp": "2025-10-15T15:12:24.781632"
+    }
+  ],
+  "cumulative_kpis": {
+    "total_profit": 0.0,
+    "average_stockout_rate": 0.0,
+    "customer_satisfaction_trend": [],
+    "action_accuracy_history": [],
+    "days": 0
+  },
+  "analysis_report": {
+    "summary": {
+      "total_days": 0,
+      "total_runs": 1,
+      "latest_metrics": {
+        "profit": -18295.01,
+        "stockout_rate": 0.0,
+        "pricing_accuracy": 0.7,
+        "action_correctness": 0.6666666666666666,
+        "customer_satisfaction": 3.5
+      },
+      "cumulative_totals": {
+        "profit": 0.0,
+        "avg_stockout_rate": 0.0
+      }
+    },
+    "achievement_analysis": {
+      "profit": {
+        "value": -18295.01,
+        "target": 50000,
+        "achievement_rate": 0,
+        "status": "要改善"
+      },
+      "stockout_rate": {
+        "value": 0.0,
+        "target": 0.1,
+        "achievement_rate": 100,
+        "status": "達成"
+      },
+      "pricing_accuracy": {
+        "value": 0.7,
+        "target": 0.8,
+        "achievement_rate": 87.49999999999999,
+        "status": "達成"
+      },
+      "action_correctness": {
+        "value": 0.6666666666666666,
+        "target": 0.7,
+        "achievement_rate": 95.23809523809524,
+        "status": "達成"
+      },
+      "customer_satisfaction": {
+        "value": 3.5,
+        "target": 3.5,
+        "achievement_rate": 100,
+        "status": "達成"
+      }
+    },
+    "trend_analysis": {
+      "profit": {
+        "direction": "下降",
+        "change_rate": -37.30219901040404,
+        "first_value": -13324.63,
+        "last_value": -18295.01
+      },
+      "customer_satisfaction": {
+        "direction": "横ばい",
+        "change_rate": 0.0,
+        "first_value": 3.5,
+        "last_value": 3.5
+      }
+    },
+    "recommendations": [
+      "Consider reviewing pricing strategy or introducing new products to improve profitability",
+      "Implement cost reduction and sales promotion measures to address declining profit trends"
+    ]
+  },
+  "generated_at": "2025-10-15T14:12:26.673239",
+  "version": "1.0"
+}

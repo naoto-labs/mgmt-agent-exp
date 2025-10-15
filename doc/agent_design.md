@@ -181,7 +181,8 @@ Shared Tools は、3-Agentが共有可能なツールを集中管理・実行す
 - **Primary**: Azure OpenAI GPT-4o-mini
 - **Fallback**: Anthropic Claude
 - **LangChainバージョン**: 0.1.0+
-- **メモリ戦略**: ConversationSummaryBufferMemory + VectorStore for learning
+- **メモリ戦略**: ConversationBufferMemory + VectorStore for learning
+- LangGraph統合実装済み（StateGraph + RunnableSequence）
 
 #### 技術スタック
 

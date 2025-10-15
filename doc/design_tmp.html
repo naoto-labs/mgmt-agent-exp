@@ -1,0 +1,897 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>design.md</title>
+    <meta http-equiv="Content-type" content="text/html;charset=UTF-8">
+    
+<style>
+/* https://github.com/microsoft/vscode/blob/master/extensions/markdown-language-features/media/markdown.css */
+/*---------------------------------------------------------------------------------------------
+ *  Copyright (c) Microsoft Corporation. All rights reserved.
+ *  Licensed under the MIT License. See License.txt in the project root for license information.
+ *--------------------------------------------------------------------------------------------*/
+
+body {
+	font-family: var(--vscode-markdown-font-family, -apple-system, BlinkMacSystemFont, "Segoe WPC", "Segoe UI", "Ubuntu", "Droid Sans", sans-serif);
+	font-size: var(--vscode-markdown-font-size, 14px);
+	padding: 0 26px;
+	line-height: var(--vscode-markdown-line-height, 22px);
+	word-wrap: break-word;
+}
+
+html,footer,header{
+	font-family: var(--vscode-markdown-font-family, -apple-system, BlinkMacSystemFont, "Segoe WPC", "Segoe UI", "Ubuntu", "Droid Sans", sans-serif);
+	font-size: var(--vscode-markdown-font-size, 14px);
+}
+
+#code-csp-warning {
+	position: fixed;
+	top: 0;
+	right: 0;
+	color: white;
+	margin: 16px;
+	text-align: center;
+	font-size: 12px;
+	font-family: sans-serif;
+	background-color:#444444;
+	cursor: pointer;
+	padding: 6px;
+	box-shadow: 1px 1px 1px rgba(0,0,0,.25);
+}
+
+#code-csp-warning:hover {
+	text-decoration: none;
+	background-color:#007acc;
+	box-shadow: 2px 2px 2px rgba(0,0,0,.25);
+}
+
+body.scrollBeyondLastLine {
+	margin-bottom: calc(100vh - 22px);
+}
+
+body.showEditorSelection .code-line {
+	position: relative;
+}
+
+body.showEditorSelection .code-active-line:before,
+body.showEditorSelection .code-line:hover:before {
+	content: "";
+	display: block;
+	position: absolute;
+	top: 0;
+	left: -12px;
+	height: 100%;
+}
+
+body.showEditorSelection li.code-active-line:before,
+body.showEditorSelection li.code-line:hover:before {
+	left: -30px;
+}
+
+.vscode-light.showEditorSelection .code-active-line:before {
+	border-left: 3px solid rgba(0, 0, 0, 0.15);
+}
+
+.vscode-light.showEditorSelection .code-line:hover:before {
+	border-left: 3px solid rgba(0, 0, 0, 0.40);
+}
+
+.vscode-light.showEditorSelection .code-line .code-line:hover:before {
+	border-left: none;
+}
+
+.vscode-dark.showEditorSelection .code-active-line:before {
+	border-left: 3px solid rgba(255, 255, 255, 0.4);
+}
+
+.vscode-dark.showEditorSelection .code-line:hover:before {
+	border-left: 3px solid rgba(255, 255, 255, 0.60);
+}
+
+.vscode-dark.showEditorSelection .code-line .code-line:hover:before {
+	border-left: none;
+}
+
+.vscode-high-contrast.showEditorSelection .code-active-line:before {
+	border-left: 3px solid rgba(255, 160, 0, 0.7);
+}
+
+.vscode-high-contrast.showEditorSelection .code-line:hover:before {
+	border-left: 3px solid rgba(255, 160, 0, 1);
+}
+
+.vscode-high-contrast.showEditorSelection .code-line .code-line:hover:before {
+	border-left: none;
+}
+
+img {
+	max-width: 100%;
+	max-height: 100%;
+}
+
+a {
+	text-decoration: none;
+}
+
+a:hover {
+	text-decoration: underline;
+}
+
+a:focus,
+input:focus,
+select:focus,
+textarea:focus {
+	outline: 1px solid -webkit-focus-ring-color;
+	outline-offset: -1px;
+}
+
+hr {
+	border: 0;
+	height: 2px;
+	border-bottom: 2px solid;
+}
+
+h1 {
+	padding-bottom: 0.3em;
+	line-height: 1.2;
+	border-bottom-width: 1px;
+	border-bottom-style: solid;
+}
+
+h1, h2, h3 {
+	font-weight: normal;
+}
+
+table {
+	border-collapse: collapse;
+}
+
+table > thead > tr > th {
+	text-align: left;
+	border-bottom: 1px solid;
+}
+
+table > thead > tr > th,
+table > thead > tr > td,
+table > tbody > tr > th,
+table > tbody > tr > td {
+	padding: 5px 10px;
+}
+
+table > tbody > tr + tr > td {
+	border-top: 1px solid;
+}
+
+blockquote {
+	margin: 0 7px 0 5px;
+	padding: 0 16px 0 10px;
+	border-left-width: 5px;
+	border-left-style: solid;
+}
+
+code {
+	font-family: Menlo, Monaco, Consolas, "Droid Sans Mono", "Courier New", monospace, "Droid Sans Fallback";
+	font-size: 1em;
+	line-height: 1.357em;
+}
+
+body.wordWrap pre {
+	white-space: pre-wrap;
+}
+
+pre:not(.hljs),
+pre.hljs code > div {
+	padding: 16px;
+	border-radius: 3px;
+	overflow: auto;
+}
+
+pre code {
+	color: var(--vscode-editor-foreground);
+	tab-size: 4;
+}
+
+/** Theming */
+
+.vscode-light pre {
+	background-color: rgba(220, 220, 220, 0.4);
+}
+
+.vscode-dark pre {
+	background-color: rgba(10, 10, 10, 0.4);
+}
+
+.vscode-high-contrast pre {
+	background-color: rgb(0, 0, 0);
+}
+
+.vscode-high-contrast h1 {
+	border-color: rgb(0, 0, 0);
+}
+
+.vscode-light table > thead > tr > th {
+	border-color: rgba(0, 0, 0, 0.69);
+}
+
+.vscode-dark table > thead > tr > th {
+	border-color: rgba(255, 255, 255, 0.69);
+}
+
+.vscode-light h1,
+.vscode-light hr,
+.vscode-light table > tbody > tr + tr > td {
+	border-color: rgba(0, 0, 0, 0.18);
+}
+
+.vscode-dark h1,
+.vscode-dark hr,
+.vscode-dark table > tbody > tr + tr > td {
+	border-color: rgba(255, 255, 255, 0.18);
+}
+
+</style>
+
+<style>
+/* Tomorrow Theme */
+/* http://jmblog.github.com/color-themes-for-google-code-highlightjs */
+/* Original theme - https://github.com/chriskempson/tomorrow-theme */
+
+/* Tomorrow Comment */
+.hljs-comment,
+.hljs-quote {
+	color: #8e908c;
+}
+
+/* Tomorrow Red */
+.hljs-variable,
+.hljs-template-variable,
+.hljs-tag,
+.hljs-name,
+.hljs-selector-id,
+.hljs-selector-class,
+.hljs-regexp,
+.hljs-deletion {
+	color: #c82829;
+}
+
+/* Tomorrow Orange */
+.hljs-number,
+.hljs-built_in,
+.hljs-builtin-name,
+.hljs-literal,
+.hljs-type,
+.hljs-params,
+.hljs-meta,
+.hljs-link {
+	color: #f5871f;
+}
+
+/* Tomorrow Yellow */
+.hljs-attribute {
+	color: #eab700;
+}
+
+/* Tomorrow Green */
+.hljs-string,
+.hljs-symbol,
+.hljs-bullet,
+.hljs-addition {
+	color: #718c00;
+}
+
+/* Tomorrow Blue */
+.hljs-title,
+.hljs-section {
+	color: #4271ae;
+}
+
+/* Tomorrow Purple */
+.hljs-keyword,
+.hljs-selector-tag {
+	color: #8959a8;
+}
+
+.hljs {
+	display: block;
+	overflow-x: auto;
+	color: #4d4d4c;
+	padding: 0.5em;
+}
+
+.hljs-emphasis {
+	font-style: italic;
+}
+
+.hljs-strong {
+	font-weight: bold;
+}
+</style>
+
+<style>
+/*
+ * Custom MD PDF CSS
+ */
+html,footer,header{
+	font-family: -apple-system, BlinkMacSystemFont, "Segoe WPC", "Segoe UI", "Ubuntu", "Droid Sans", sans-serif, "Meiryo";
+
+ }
+body {
+	font-family: -apple-system, BlinkMacSystemFont, "Segoe WPC", "Segoe UI", "Ubuntu", "Droid Sans", sans-serif, "Meiryo";
+	padding: 0 12px;
+}
+
+pre {
+	background-color: #f8f8f8;
+	border: 1px solid #cccccc;
+	border-radius: 3px;
+	overflow-x: auto;
+	white-space: pre-wrap;
+	overflow-wrap: break-word;
+}
+
+pre:not(.hljs) {
+	padding: 23px;
+	line-height: 19px;
+}
+
+blockquote {
+	background: rgba(127, 127, 127, 0.1);
+	border-color: rgba(0, 122, 204, 0.5);
+}
+
+.emoji {
+	height: 1.4em;
+}
+
+code {
+	font-size: 14px;
+	line-height: 19px;
+}
+
+/* for inline code */
+:not(pre):not(.hljs) > code {
+	color: #C9AE75; /* Change the old color so it seems less like an error */
+	font-size: inherit;
+}
+
+/* Page Break : use <div class="page"/> to insert page break
+-------------------------------------------------------- */
+.page {
+	page-break-after: always;
+}
+
+</style>
+<link rel="stylesheet" href="file:///r%3A/2.Travail/1.Enseignement/Cours/_1.Outils/2.Developpement/1.SCSS/main.css" type="text/css"><link rel="stylesheet" href="file:///d%3A/rdaros/Cours/_1.Outils/2.Developpement/1.SCSS/main.css" type="text/css">
+</head>
+
+<body>
+    <h1 id="ai-agent-autonomous-vending-machine-system-%E8%A8%AD%E8%A8%88%E6%9B%B8">AI Agent Autonomous Vending Machine System 設計書</h1>
+<h2 id="%E6%A6%82%E8%A6%81">概要</h2>
+<p>AI Agent Autonomous Vending Machine Systemは、3-Agent + XX個-toolのクリーンアーキテクチャによる完全自律型自動販売シミュレーションシステムです。</p>
+<h2 id="%E3%82%A2%E3%83%BC%E3%82%AD%E3%83%86%E3%82%AF%E3%83%81%E3%83%A3%E6%A6%82%E8%A6%81">アーキテクチャ概要</h2>
+<pre class="hljs"><code><div>ai-vending-system/
+├── agents/                      # 🚀 自律Agent（主要3つ + 共有Tool）
+│   ├── management_agent/        # 店長Agent
+│   │   ├── management_tools/    # 経営判断Tool
+│   │   │   ├── plan_agent_operations.py
+│   │   │   ├── plan_sales_strategy.py
+│   │   │   ├── update_pricing.py
+│   │   │   ├── analyze_financial_performance.py
+│   │   │   ├── feedback_engine.py
+│   │   ├── procurement_tools/
+│   │   │   ├── request_procurement.py
+│   │   │   ├── assign_restocking_task.py
+│   │   │   └── coordinate_employee_tasks.py
+│   │   │   └── calculate_optimal_order.py
+│   │   ├── customer_tools/
+│   │   │   ├── respond_to_customer_inquiry.py
+│   │   │   ├── handle_customer_complaint.py
+│   │   └── orchestrator.py
+│   ├── analytics_agent/         # 監査Agent
+│   │   ├── business_monitoring/ # ビジネス監視
+│   │   │   ├── performance_monitor.py
+│   │   │   ├── anomaly_detector.py
+│   │   │   └── compliance_checker.py
+│   │   ├── ai_governance/       # AIガバナンス
+│   │   │   ├── decision_quality_monitor.py
+│   │   │   ├── safety_compliance_checker.py
+│   │   │   └── performance_tracker.py
+│   │   ├── advisory/            # アドバイス業務
+│   │   │   ├── efficiency_analyzer.py
+│   │   │   └── cost_benefit_analyzer.py
+│   │   └── orchestrator.py
+│   ├── recorder_agent/          # 記録Agent
+│   │   ├── learning_tools/
+│   │   │   ├── session_recorder.py
+│   │   │   ├── data_persistence.py
+│   │   │   ├── pattern_analyzer.py
+│   │   └── orchestrator.py
+│   ├── shared_tools/            # 🔧 共有Tool 
+│   │   ├── data_retrieval/
+│   │   │   ├── check_inventory_status.py
+│   │   │   ├── get_business_metrics.py
+│   │   │   └── collect_customer_feedback.py
+│   │   └── market_tools/
+│   │       ├── search_products.py
+│   │       ├── supplier_research.py
+│   └── orchestrator/            # 全Agent協調制御
+├── domain/                      # ビジネスルール・モデル
+├── infrastructure/              # 技術実装・API・DB
+├── application/                 # アプリケーションロジック
+├── shared/                      # 全層共通ユーティリティ
+├── tests/                       # 統合テスト
+├── docs/                        # 設計・API仕様・ガイド
+├── static/                      # Web資産
+├── scripts/                     # ビルド・運用
+└── pyproject.toml               # パッケージ管理
+</div></code></pre>
+<h3 id="3-agent--tool%E5%85%B1%E6%9C%89%E3%82%A2%E3%83%BC%E3%82%AD%E3%83%86%E3%82%AF%E3%83%81%E3%83%A3">3-Agent + tool共有アーキテクチャ</h3>
+<ul>
+<li><strong>定義</strong>: 店長Agent(経営判断)・監査Agent(データ分析)・記録Agent(学習蓄積)の3つの独立Agentが、必要なToolを使用して、業務を遂行</li>
+<li><strong>特徴</strong>: toolは店長Agent主導設計だが、監査Agent・記録Agentもシステム情報取得時に共有Tollからシステムデータへアクセス可能</li>
+<li><strong>目的</strong>: 店長Agentによる自律的運営の実現。記録AgentがAgentの長期タスク実行を補助し、監査Agentは独立して店長Agentを監督</li>
+</ul>
+<h2 id="agent%E5%AE%9A%E7%BE%A9">Agent定義</h2>
+<h3 id="%E5%BA%97%E9%95%B7agent-management-agent">店長Agent (Management Agent)</h3>
+<ul>
+<li><strong>役割</strong>: 経営判断の最終決定者。3つの専用カテゴリと２つの共通カテゴリのtoolを活用して意思決定</li>
+<li><strong>動作形態</strong>: セッション型 時間ごとの業務サイクル)</li>
+<li><strong>責務</strong>: 戦略立案, 人間協働指示, 事業KPI管理</li>
+<li><strong>主な機能</strong>:<br>
+概念的には以下。Langchain,graph nodeで時間を表現
+<ul>
+<li>朝ルーチン: 前日データの分析と今日の業務計画立案</li>
+<li>昼間チェック: 午前実績の分析と昼間戦略調整</li>
+<li>夕方総括: 1日全体の実績評価と改善策立案</li>
+<li>戦略的意思決定: AI分析に基づく経営判断の実行</li>
+</ul>
+</li>
+<li><strong>実装状況</strong>: セッションベースの意思決定システム実装済み</li>
+</ul>
+<h3 id="%E7%9B%A3%E6%9F%BBagent-analytics-agent">監査Agent (Analytics Agent)</h3>
+<ul>
+<li><strong>役割</strong>: データ分析と店長を監査、業務改善提案</li>
+<li><strong>動作形態</strong>: 指定した頻度で稼働</li>
+<li><strong>責務</strong>: KPI算出, 無駄削減提案, 業務監査</li>
+<li><strong>主な機能</strong>:
+<ul>
+<li>リアルタイムKPI監視: 売上・在庫・顧客満足度の継続監視</li>
+<li>パフォーマンス分析: 日次・週次・月次の実績分析・レポート生成</li>
+<li>異常検出: システム異常・業務変動の自動検知</li>
+<li>改善提案: データに基づく効率化・コスト削減の提案</li>
+</ul>
+</li>
+<li><strong>実装状況</strong>: 分析フレームワーク実装済み、実際データ連携機能は作成中</li>
+</ul>
+<h3 id="%E8%A8%98%E9%8C%B2agent-recorder-agent">記録Agent (Recorder Agent)</h3>
+<ul>
+<li><strong>役割</strong>: 全行動の記録と学習データ蓄積</li>
+<li><strong>動作形態</strong>: 常時稼働</li>
+<li><strong>責務</strong>: 店長の行動と在庫、実績の客観的な記録、パターン分析, 成功事例抽出, 失敗学習</li>
+<li><strong>主な機能</strong>:
+<ul>
+<li>セッション記録: Agentの意思決定・行動・結果の詳細ログ化</li>
+<li>パターン学習: 成功・失敗パターンの自動認識・蓄積</li>
+<li>データ永続化: 学習データの長期保存・検索</li>
+</ul>
+</li>
+<li><strong>実装状況</strong>: 記録機能実装済み、学習・分析機能は作成中</li>
+</ul>
+<h2 id="tool%E5%AE%9A%E7%BE%A9">Tool定義</h2>
+<p>以下のTool定義は、アーキテクチャ概要のフォルダ構成と対応しています。各AgentのToolを整理分類して定義します。</p>
+<h3 id="management-agent-tools-%E7%B5%8C%E5%96%B6%E5%88%A4%E6%96%AD%E7%89%B9%E5%8C%96">Management Agent Tools (経営判断特化)</h3>
+<p><strong>management_agent/management_tools/</strong>: 店長Agentの戦略的意思決定を支援するTool群</p>
+<ul>
+<li><strong>plan_agent_operations.py</strong>: ❌ 未完成(拡張案) - 日次・週次業務計画の立案・実行手順策定。</li>
+<li><strong>plan_sales_strategy.py</strong>: ❌ 未完成 - 売上目標設定・プロモーション戦略立案。</li>
+<li><strong>analyze_financial_performance.py</strong>: ✅ 実装済み - 財務データ分析、収益性評価、改善提案。</li>
+<li><strong>update_pricing.py</strong>: ✅ 実装済み - 商品価格の需要変動・在庫状況に基づく最適価格設定。</li>
+<li><strong>feedback_engine.py</strong>: ✅ 実装済み -  一日の業績を総括。翌日への改善点を特定。</li>
+</ul>
+<p><strong>management_agent/customer_tools/</strong>: 顧客対応Tool群 (Management Agentに統合実装)</p>
+<ul>
+<li><strong>respond_to_customer_inquiry.py</strong>: ✅ 実装済み - 顧客問い合わせ対応・AI支援回答生成。</li>
+<li><strong>handle_customer_complaint.py</strong>: ✅ 実装済み - 顧客苦情処理・補償措置実施。</li>
+<li><strong>collect_customer_feedback.py</strong>: ✅ 実装済み - 顧客フィードバック収集・満足度分析。</li>
+<li><strong>recommend_product.py</strong>: ❌ 未完成 - 購入履歴・嗜好分析に基づく商品推薦。パーソナライズ提案・クロスセル機会創出。</li>
+</ul>
+<p><strong>management_agent/procurement_tools/</strong>: 調達・在庫管理Tool群 (Management Agentに統合実装)</p>
+<ul>
+<li><strong>assign_restocking_task.py</strong>: ✅ 実装済み - 従業員に商品補充作業を指示。</li>
+<li><strong>request_procurement.py</strong>: ✅ 実装済み - 商品発注依頼生成・サプライヤ連絡依頼。</li>
+<li><strong>calculate_optimal_order.py</strong>: ❌ 未完成(拡張案) - 在庫回転率・需要予測に基づく最適発注数量計算。過剰/不足在庫防止。</li>
+</ul>
+<h1 id="todo">TODO</h1>
+<p>単一ファイルから各ツールファイルへの転換<br>
+実際の実装では、各階層フォルダにおけるtoolではなく、<code>agent.py</code>に記載の<br>
+9つのノード関数が実装されている：</p>
+<ul>
+<li><code>inventory_check_node()</code> - 在庫確認（LLM統合）</li>
+<li><code>sales_plan_node()</code> - 売上計画（財務・売上分析）</li>
+<li><code>pricing_node()</code> - 価格戦略（LLM駆動ツール活用）</li>
+<li><code>automatic_restock_node()</code> - 在庫補充（LLM戦略分析）</li>
+<li><code>procurement_request_generation_node()</code> - 発注依頼（STORAGE在庫判断）</li>
+<li><code>sales_processing_node()</code> - 売上処理（シミュレーション統合）</li>
+<li><code>customer_interaction_node()</code> - 顧客対応（LLM戦略分析）</li>
+<li><code>profit_calculation_node()</code> - 利益計算（財務分析ツール活用）</li>
+<li><code>feedback_node()</code> - 戦略的フィードバック（包括的LLM分析）</li>
+</ul>
+<h3 id="analytics-agent-tools-%E7%9B%A3%E8%A6%96%E3%83%BB%E5%88%86%E6%9E%90%E3%83%BB%E3%82%AC%E3%83%90%E3%83%8A%E3%83%B3%E3%82%B9%E7%89%B9%E5%8C%96">Analytics Agent Tools (監視・分析・ガバナンス特化)</h3>
+<p><strong>analytics_agent/business_monitoring/</strong>: ビジネスKPIの継続監視Tool群</p>
+<ul>
+<li><strong>performance_monitor.py</strong>: ❌ 未完成 -売上・収益・回転率などの実績データを継続監視、ビジネス継続のポリシーに応じた振る舞いかを定量評価。</li>
+<li><strong>anomaly_detector.py</strong>: ❌ 未完成 -売上急変・在庫異常・顧客苦情急増などの異常を統計的手法で検出。</li>
+<li><strong>compliance_checker.py</strong>: ❌ 未完成 -経費精算・消費税計算・会計基準遵守を確認、顧客対応における法令やモラル順守を評価。</li>
+</ul>
+<p><strong>analytics_agent/ai_governance/</strong>: AI Agentの品質・安全監視Tool群</p>
+<ul>
+<li><strong>decision_quality_monitor.py</strong>: ❌ 未完成 -AI意思決定の正しさ・一貫性・成功率を評価、判断品質スコア算出。管理Agentへの改善フィードバック。</li>
+<li><strong>safety_compliance_checker.py</strong>: ❌ 未完成 -AIガードレールの遵守状況を確認、安全基準逸脱を検知。</li>
+<li><strong>performance_tracker.py</strong>: ❌ 未完成 -AI応答時間・成功率・コストを監視。性能低下をアラート。</li>
+</ul>
+<p><strong>analytics_agent/advisory/</strong>: 業務分析・アドバイスTool群</p>
+<ul>
+<li><strong>cost_benefit_analyzer.py</strong>: ❌ 未完成 -店長（Management）Agentの新施策・改善案の費用対効果を定量評価、ビジネス環境において投資判断が妥当かを評価。</li>
+</ul>
+<h1 id="todo">TODO</h1>
+<p>すべて未設計&amp;未検証。店長Agentのprofit_calculation_nodeを参考に構築。</p>
+<h3 id="recorder-agent-tools-%E5%AD%A6%E7%BF%92%E3%83%BB%E8%A8%98%E9%8C%B2%E8%93%84%E7%A9%8D%E7%89%B9%E5%8C%96">Recorder Agent Tools (学習・記録蓄積特化)</h3>
+<p><strong>recorder_agent/learning_tools/</strong>: データ蓄積・学習パターン生成Tool群</p>
+<ul>
+<li><strong>session_recorder.py</strong>: ❌ 未完成 - Agentの意思決定・行動・結果を時系列で記録、参照用データ蓄積。詳細ログ分析用構造化保存。</li>
+</ul>
+<h1 id="todo">TODO</h1>
+<p>すべて未設計&amp;未検証。店長Agentのfeedback_nodeを参考に構築。そもそも不要な可能性も検討</p>
+<h3 id="shared-tools-%E5%85%A8agent%E5%85%B1%E6%9C%89%E3%83%BB%E4%B8%80%E9%83%A8%E3%81%AFmanagement-agent%E3%81%AB%E7%B5%B1%E5%90%88%E5%AE%9F%E8%A3%85">Shared Tools (全Agent共有・一部はManagement Agentに統合実装)</h3>
+<p><strong>shared_tools/data_retrieval/</strong>: 基本データ取得Tool群</p>
+<ul>
+<li><strong>check_inventory_status.py</strong>: ✅ 実装済み - 在庫レベル・有効期限・補充必要量をリアルタイム確認。補充判断の前提データ収集。定期的に全Agentが参照。</li>
+<li><strong>get_business_metrics.py</strong>: ✅ 実装済み - 売上・在庫・顧客満足度・利益率などのKPIデータを収集・集計。経営判断の基礎データとして使用。定期的に全Agentが参照。</li>
+<li><strong>collect_customer_feedback.py</strong>: ❌ 未完成 - 顧客満足度・要望・クレームを収集・傾向分析。全Agentが利用する顧客データベース更新。</li>
+</ul>
+<p><strong>shared_tools/market_tools/</strong>: 市場・競合情報Tool群</p>
+<ul>
+<li><strong>search_products.py</strong>: ✅ 実装済み - 新商品・競合価格・トレンド情報をweb検索。外部データ統合・価格比較。</li>
+<li><strong>supplier_research.py</strong>: ❌ 未完成 - 仕入れ先情報・信頼性評価・価格比較。発注先選定支援・リスク評価。</li>
+</ul>
+<h1 id="todo">TODO</h1>
+<ul>
+<li>実際の<code>agent.py</code>では<code>create_tool_registry()</code>関数からツールを取得</li>
+</ul>
+<h2 id="%E3%82%B3%E3%83%B3%E3%83%9D%E3%83%BC%E3%83%8D%E3%83%B3%E3%83%88%E5%AE%9F%E8%A3%85%E7%8A%B6%E6%B3%81">コンポーネント実装状況</h2>
+<h3 id="1-ai%E7%B5%B1%E5%90%88%E3%82%B7%E3%82%B9%E3%83%86%E3%83%A0-%E5%AE%9F%E8%A3%85%E6%B8%88%E3%81%BF">1. AI統合システム [実装済み]</h3>
+<h4 id="%E8%87%AA%E5%BE%8B%E5%9E%8Bai%E7%B5%8C%E5%96%B6%E3%82%B7%E3%82%B9%E3%83%86%E3%83%A0---%E4%B8%BB%E8%BB%B8%E6%A9%9F%E8%83%BD">自律型AI経営システム - 主軸機能</h4>
+<ul>
+<li><strong>定義</strong>: 人手干渉を最小限に事業運営を行うシステム</li>
+<li><strong>特徴</strong>: 3-Agent + 17-tool協働による自動意思決定・実行</li>
+<li><strong>動作形態</strong>: セッション型実行 (店長Agentが朝/昼/夕サイクルで業務実行)</li>
+<li><strong>目的</strong>: 効率的・自律的・拡張可能な自動販売機事業運営</li>
+</ul>
+<h4 id="ai%E5%87%A6%E7%90%86%E6%8A%80%E8%A1%93%E3%82%B9%E3%82%BF%E3%83%83%E3%82%AF">AI処理技術スタック</h4>
+<p><strong>Core Framework</strong></p>
+<ul>
+<li>Python 3.9+ | FastAPI 0.104.1 | Uvicorn 0.24.0 | Pydantic 2.5.0</li>
+</ul>
+<pre class="hljs"><code><div>AI Processing Stack
+├── AI Models 
+│   ├── Large Language Models (Azure OpenAI)✅実装済み
+│   ├── Fallback Models (Anthropic 0.5.0)✅実装済み
+│   └── ReAct Execution (Decision Reasoning・Tool Chain)❌ 未完成
+├── Agent Frameworks 
+│   ├── Orchestration (LangChain Tool System)✅実装済み
+│   ├── Memory Management (LangChain・会話履歴・ChromaDB 0.4.22)❌ 未完成
+│   └── Tool Integration (17個Tool連携・Tool Calling)✅実装済み
+├── SaaS External Tools 
+│   ├── Search APIs (Tavily 0.3.0+・バックアップDuckDuckGo)✅実装済み
+│   ├── Payment APIs (Stripe統合検討中・PayPal・Square対応)❌ 未完成
+│   └── Communication APIs (検討中: Mail・Slack・Teams)❌ 未完成
+└── Runtime Infrastructure 
+    ├── Local Development (Python AsyncIO・Concurrent処理)✅実装済み
+    ├── Container Deployment (Docker対応)❌ 未完成
+    ├── Web Framework (FastAPI・Jinja2 Template)❌ 未完成
+    └── Database (SQLite/MongoDB)❌ 未完成
+</div></code></pre>
+<h4 id="ai-models-agent-frameworks---ai%E3%83%A2%E3%83%87%E3%83%AB%E7%B5%B1%E5%90%88%E7%AE%A1%E7%90%86">AI Models Agent Frameworks - AIモデル統合管理</h4>
+<ul>
+<li><strong>目的</strong>: 複数AIモデル統合管理</li>
+<li><strong>実装状況</strong>: Azure OpenAI GPT-4o-mini ・Tavily検索対応</li>
+<li><strong>主機能</strong>: マルチモデル切替・セーフティチェック・APIコスト管理・直列WF・ReAct実行パターン</li>
+</ul>
+<h4 id="%E4%BC%9A%E8%A9%B1%E3%82%B5%E3%83%BC%E3%83%93%E3%82%B9---%E4%BC%9A%E8%A9%B1%E5%B1%A5%E6%AD%B4%E7%AE%A1%E7%90%86%E3%82%B7%E3%82%B9%E3%83%86%E3%83%A0">会話サービス - 会話履歴管理システム</h4>
+<ul>
+<li><strong>目的</strong>: 顧客会話ログ管理・パーソナライズデータ提供・AI学習データ蓄積</li>
+<li><strong>実装状況</strong>: SQLiteベース実装（MongoDB NoSQL拡張検討中）</li>
+<li><strong>主機能</strong>: セッション管理・メッセージ永続化・履歴検索・感情分析統合</li>
+</ul>
+<h4 id="%E3%83%87%E3%83%BC%E3%82%BF%E7%AE%A1%E7%90%86%E5%B1%A4---%E5%A4%9A%E6%A7%98%E3%81%AA%E3%83%87%E3%83%BC%E3%82%BF%E5%87%A6%E7%90%86">データ管理層 - 多様なデータ処理</h4>
+<p><strong>会話履歴データ</strong></p>
+<ul>
+<li><strong>ストレージ</strong>: NoSQL形式 (MongoDB対応検討中)</li>
+<li><strong>用途</strong>: 顧客パーソナライズ・センチメント分析・推薦システム</li>
+</ul>
+<p><strong>学習・アテンション・データ</strong></p>
+<ul>
+<li><strong>タイプ</strong>: Agent意思決定ログ・行動結果・パターン学習データ</li>
+<li><strong>ストレージ</strong>: ChromaベクトルDB・時系列DB・JSON永続化</li>
+<li><strong>用途</strong>: システム改善・振る舞い最適化・振り返り分析</li>
+</ul>
+<p><strong>業務実績データ</strong></p>
+<ul>
+<li><strong>タイプ</strong>: 売上・在庫・顧客・業務KPI・財務指標</li>
+<li><strong>ストレージ</strong>: SQLite</li>
+<li><strong>用途</strong>: リアルタイム監視・トレンド分析・経営判断支援</li>
+</ul>
+<h3 id="2-api%E5%B1%A4-%E9%83%A8%E5%88%86%E5%AE%9F%E8%A3%85">2. API層 [部分実装]</h3>
+<p><strong>主要APIエンドポイント (基礎機能)</strong></p>
+<ul>
+<li><code>vending.py</code> - 販売API [実装済み]: 商品購入・在庫確認</li>
+<li><code>tablet.py</code> - タブレットAPI [実装済み]: 顧客接客インタフェース（AI Agent連携）</li>
+<li><code>procurement.py</code> - 調達API [実装済み]: 商品発注・仕入れ先管理</li>
+<li><code>dashboard.py</code> - ダッシュボードAPI [未実装]: 管理画面・レポート表示・データ分析</li>
+</ul>
+<h3 id="%E3%82%B7%E3%82%B9%E3%83%86%E3%83%A0%E6%80%A7%E8%83%BD%E3%83%BB%E3%82%BB%E3%82%AD%E3%83%A5%E3%83%AA%E3%83%86%E3%82%A3%E4%BB%95%E6%A7%98">システム性能・セキュリティ仕様</h3>
+<p><strong>AI安全性能基準（実装済み）</strong></p>
+<ul>
+<li><strong>レスポンス検証</strong>: API成功/エラーチェック・タイムアウト監視（5.0秒）</li>
+<li><strong>アクション制限</strong>: 禁止パターンマッチング（override_safety, bypass_payment等）</li>
+</ul>
+<p><strong>将来拡張目標（未実装）</strong></p>
+<ul>
+<li>🔄 <strong>信頼性スコアリング</strong>: 決定前LLM信頼性評価体制</li>
+<li>🔄 <strong>ガードレール機能</strong>: 有効（設定でenable_guardrails制御）</li>
+</ul>
+<p><strong>パフォーマンス基準</strong></p>
+<ul>
+<li><strong>API応答時間</strong>: 平均2秒以内 (顧客体験保証)</li>
+<li><strong>並行処理</strong>: AsyncIO対応・同時接続50本以上</li>
+<li><strong>データ処理</strong>: リアルタイムKPI計算・1秒以内</li>
+</ul>
+<h3 id="%E7%92%B0%E5%A2%83%E8%A8%AD%E5%AE%9A%E4%BB%95%E6%A7%98">環境設定仕様</h3>
+<p><strong>必須環境変数 (.env.example準拠)</strong></p>
+<pre class="hljs"><code><div># 基本設定 (必須・現在のシステム動作に必要)
+APP_NAME=AI Agent Autonomous Vending Machine System
+DATABASE_URL=sqlite:///./ai_vending.db
+HOST=0.0.0.0
+PORT=8000
+
+# AI API設定 (ANTHROPIC_API_KEYは必須、他オプション)
+ANTHROPIC_API_KEY=your_anthropic_api_key_here          # 必須
+OPENAI_API_KEY=your_openai_api_key_here                # Azure OpenAI用
+OPENAI_API_BASE=https://your-resource.openai.azure.com/ # Azure OpenAI用
+TAVILY_API_KEY=your_tavily_api_key_here                # 検索API用
+
+
+
+# データ収集・検証設定
+ENABLE_DATA_COLLECTION=True                           # データ収集有効
+DATA_VALIDATION_LEVEL=strict                           # 検証レベル
+LOG_AI_DECISIONS=True                                # AI判定ログ出力
+
+# 決済API設定 (オプション)
+STRIPE_API_KEY=your_stripe_api_key_here
+PAYPAL_CLIENT_ID=your_paypal_client_id_here
+</div></code></pre>
+<p><strong>将来準備設定 (.env.exampleに記載・使用ロジック未実装)</strong></p>
+<pre class="hljs"><code><div>ENABLE_GUARDRAILS=True                               # 🔄 AIガードレール制御 (将来実装)
+ENABLE_DECISION_MONITORING=True                      # 🔄 判定監視 (将来実装)
+# セキュリティ設定 (ENCRYPTION_KEYは暗号化機能で必須)
+JWT_SECRET_KEY=your_jwt_secret_key_here                # 必須 (認証用)
+ENCRYPTION_KEY=your_encryption_key_here               # 必須 (データ暗号化用)
+</div></code></pre>
+<p><strong>Agent目的設定パラメータ</strong></p>
+<pre class="hljs"><code><div>agent_objectives:
+  primary: [&quot;収益最適化&quot;, &quot;顧客満足度向上&quot;]
+  optimization_period:
+    short_term: &quot;今月売上最大化&quot;
+    medium_term: &quot;顧客維持率向上&quot;
+    long_term: &quot;資産価値増加&quot;
+  constraints: [&quot;品質保証&quot;, &quot;法令遵守&quot;, &quot;リスク管理&quot;]
+
+
+# Search Agent追加設定
+real_web_search: True                                 # Web実検索有効
+search_timeout: 30                                    # 検索タイムアウト
+search_max_retries: 3                                 # 検索再試行回数
+</div></code></pre>
+<h3 id="3-%E4%BC%9A%E8%A8%88%E3%82%B7%E3%82%B9%E3%83%86%E3%83%A0-%E5%AE%9F%E8%A3%85%E6%B8%88%E3%81%BF">3. 会計システム [実装済み]</h3>
+<p><strong>Journal Entry</strong> - 仕訳処理</p>
+<ul>
+<li><strong>目的</strong>: 自動販売取引の会計仕訳生成</li>
+<li><strong>実装状況</strong>: 標準会計処理対応（売上・仕入・在庫計上）</li>
+<li><strong>主機能</strong>: 取引自動仕訳・総勘定元帳更新</li>
+</ul>
+<p><strong>Management Accounting</strong> - 管理会計</p>
+<ul>
+<li><strong>目的</strong>: 商品別採算性分析・業務効率評価</li>
+<li><strong>実装状況</strong>: 基本分析機能実装</li>
+<li><strong>主機能</strong>: 商品別利益計算・在庫回転率分析</li>
+</ul>
+<h3 id="4-%E3%83%87%E3%83%BC%E3%82%BF%E3%83%A2%E3%83%87%E3%83%AB-%E5%AE%9F%E8%A3%85%E6%B8%88%E3%81%BF">4. データモデル [実装済み]</h3>
+<p><strong>主要モデルのフィールド定義</strong>:</p>
+<p><strong>Product Model (productsテーブル)</strong></p>
+<pre class="hljs"><code><div>- id: INTEGER PRIMARY KEY (自動採番)
+- name: VARCHAR(100) NOT NULL (商品名)
+- price: DECIMAL(10,2) NOT NULL (単価)
+- category: VARCHAR(50) (カテゴリ: 飲料・食品・雑貨等)
+- description: TEXT (商品説明)
+- image_url: VARCHAR(200) (商品画像URL)
+- is_active: BOOLEAN DEFAULT TRUE (販売中フラグ)
+- created_at: DATETIME (作成日時)
+- updated_at: DATETIME (更新日時)
+</div></code></pre>
+<p><strong>Transaction Model (transactionsテーブル)</strong></p>
+<pre class="hljs"><code><div>- id: INTEGER PRIMARY KEY (自動採番)
+- product_id: INTEGER FOREIGN KEY → products.id
+- machine_id: VARCHAR(20) (自販機ID)
+- quantity: INTEGER NOT NULL (数量)
+- total_amount: DECIMAL(10,2) NOT NULL (合計金額)
+- payment_method: VARCHAR(20) (決済方法: cash/card/mobile)
+- transaction_date: DATETIME NOT NULL (取引日時)
+- session_id: VARCHAR(100) (AIセッションID)
+- customer_feedback: TEXT (顧客フィードバック)
+- metadata: JSON (拡張データ: AI分析結果等)
+</div></code></pre>
+<p><strong>Inventory Model (inventoryテーブル)</strong></p>
+<pre class="hljs"><code><div>- id: INTEGER PRIMARY KEY (自動採番)
+- product_id: INTEGER FOREIGN KEY → products.id
+- machine_id: VARCHAR(20) (自販機ID)
+- current_stock: INTEGER NOT NULL (現在在庫数)
+- min_stock_level: INTEGER DEFAULT 5 (最低在庫水準)
+- max_stock_level: INTEGER DEFAULT 50 (最大在庫水準)
+- last_restock_date: DATETIME (最終補充日時)
+- expiry_date: DATE (賞味期限)
+- location: VARCHAR(50) (商品陳列位置)
+- status: VARCHAR(20) DEFAULT 'active' (現有・廃棄・返品等)
+</div></code></pre>
+<p><strong>Conversation Model (会話履歴 - plansコレクション) [未実装 - 計画中のデータモデル]</strong></p>
+<pre class="hljs"><code><div>- _id: ObjectId (MongoDB自動生成)
+- session_id: String (セッション識別子)
+- messages: Array [
+  {
+    role: String (user/assistant/system)
+    content: String (メッセージ内容)
+    timestamp: DateTime (送信時刻)
+    metadata: Object (感情分析結果・意図分類等)
+  }
+]
+- context: Object {
+  agent_type: String (店長Agent・監査Agent等)
+  tool_used: Array (使用したTool一覧)
+  decision_made: Object (意思決定内容)
+  outcome: String (実行結果)
+}
+- ai_insights: Object {
+  sentiment_score: Float (感情スコア -1.0～1.0)
+  intent_category: String (意図分類)
+  action_needed: Boolean (フォローアップ必要フラグ)
+}
+- created_at: DateTime
+- updated_at: DateTime
+</div></code></pre>
+<h3 id="5-%E3%82%B7%E3%83%9F%E3%83%A5%E3%83%AC%E3%83%BC%E3%82%B7%E3%83%A7%E3%83%B3%E3%82%A8%E3%83%B3%E3%82%B8%E3%83%B3-%E5%AE%9F%E8%A3%85%E6%B8%88%E3%81%BF">5. シミュレーションエンジン [実装済み]</h3>
+<p><strong>Sales Simulation</strong> - 販売イベント生成</p>
+<ul>
+<li><strong>目的</strong>: テスト・検証のための擬似販売データ生成</li>
+<li><strong>実装状況</strong>: 実装済み</li>
+<li><strong>主機能</strong>: 確率ベース取引生成・シナリオ制御</li>
+</ul>
+<h2 id="%E6%9C%AA%E5%AE%9F%E8%A3%85%E9%A0%85%E7%9B%AE%E3%81%A8%E4%BB%8A%E5%BE%8C%E6%96%B9%E9%87%9D">未実装項目と今後方針</h2>
+<h3 id="%E2%9A%A0%EF%B8%8F-%E9%AB%98%E5%84%AA%E5%85%88%E5%BA%A6%E6%9C%AA%E5%AE%9F%E8%A3%85">⚠️ 高優先度未実装</h3>
+<p><strong>データストレージ拡張</strong></p>
+<ul>
+<li><strong>対象</strong>: <code>models/conversation.py</code>, <code>services/conversation_service.py</code></li>
+<li><strong>課題</strong>: カンバンDBのみ。MongoDB対応未実装</li>
+<li><strong>方針</strong>: Motorドライバ導入・NoSQL会話永続化</li>
+<li><strong>期日</strong>: 次フェーズ</li>
+</ul>
+<p><strong>ダッシュボードシステム</strong></p>
+<ul>
+<li><strong>対象</strong>: <code>api/dashboard.py</code>, <code>static/dashboard/</code></li>
+<li><strong>課題</strong>: 管理画面・レポート表示・データ分析レイヤー未実装</li>
+<li><strong>方針</strong>: データAPI提供・既存BIツール連携（Tableau/PowerBI等対応）</li>
+<li><strong>期日</strong>: 次フェーズ</li>
+</ul>
+<p><strong>セキュリティ強化</strong></p>
+<ul>
+<li><strong>対象</strong>: 全API・設定管理</li>
+<li><strong>課題</strong>: 本番向け認証・暗号化未実装</li>
+<li><strong>方針</strong>: JWT認証・暗号化モジュール追加</li>
+<li><strong>期日</strong>: セキュリティ検証後</li>
+</ul>
+<p><strong>Customer Tools拡張</strong></p>
+<ul>
+<li><strong>対象</strong>: <code>shared_tools/customer_tools/</code></li>
+<li><strong>課題</strong>: 感情分析・商品推薦機能を未実装</li>
+<li><strong>方針</strong>: <code>analyze_customer_sentiment()</code>・<code>recommend_product()</code>機能追加</li>
+<li><strong>期日</strong>: 次フェーズ (eコマース拡張時)</li>
+</ul>
+<h3 id="%F0%9F%94%84-%E9%83%A8%E5%88%86%E5%AE%9F%E8%A3%85%E6%94%B9%E5%96%84">🔄 部分実装改善</h3>
+<p><strong>Analytics Agent拡張</strong></p>
+<ul>
+<li><strong>課題</strong>: 基本分析のみ。異常検出・予測分析なし</li>
+<li><strong>方針</strong>: 時系列分析・機械学習モデル追加</li>
+</ul>
+<p><strong>Recorder Agent学習機能</strong></p>
+<ul>
+<li><strong>課題</strong>: 記録のみ。フィードバックサイクルなし</li>
+<li><strong>方針</strong>: 学習データ蓄積・意思決定改善反映</li>
+</ul>
+<h2 id="%E3%83%86%E3%82%B9%E3%83%88%E6%88%A6%E7%95%A5">テスト戦略</h2>
+<h3 id="%E5%8D%98%E4%BD%93%E3%83%86%E3%82%B9%E3%83%88-%E5%AE%9F%E8%A3%85%E6%B8%88%E3%81%BF">単体テスト [実装済み]</h3>
+<ul>
+<li><strong>場所</strong>: <code>tests/</code></li>
+<li><strong>対象</strong>: Agent, Service, Modelクラスの各メソッド</li>
+<li><strong>カバレッジ</strong>: pytest使用・CI統合済み</li>
+</ul>
+<h3 id="%E7%B5%B1%E5%90%88%E3%83%86%E3%82%B9%E3%83%88-%E6%95%B4%E7%90%86%E5%AE%8C%E4%BA%86">統合テスト [整理完了]</h3>
+<ul>
+<li><strong>場所</strong>: <code>tests/test_three_day_integration.py</code>, <code>tests/test_multi_agent_integration.py</code></li>
+<li><strong>対象</strong>: エンドツーエンド業務フロー検証・全Agent協働テスト</li>
+<li><strong>実装状況</strong>: pytest統合・テストアサーション強化</li>
+</ul>
+<h3 id="%E3%82%B7%E3%83%9F%E3%83%A5%E3%83%AC%E3%83%BC%E3%82%B7%E3%83%A7%E3%83%B3%E3%83%86%E3%82%B9%E3%83%88-%E6%95%B4%E7%90%86%E5%AE%8C%E4%BA%86">シミュレーションテスト [整理完了]</h3>
+<ul>
+<li><strong>場所</strong>: <code>src/simulations/</code></li>
+<li><strong>対象</strong>: 販売イベント・Agent動作シミュレーション</li>
+<li><strong>実装状況</strong>: 本番コードと分離・ルート散在スクリプト削除</li>
+</ul>
+<h3 id="%E3%82%B9%E3%82%AF%E3%83%AA%E3%83%97%E3%83%88%E3%83%84%E3%83%BC%E3%83%AB%E7%BE%A4-%E6%95%B4%E7%90%86%E5%AE%8C%E4%BA%86">スクリプトツール群 [整理完了]</h3>
+<ul>
+<li><strong>場所</strong>: <code>scripts/</code></li>
+<li><strong>対象</strong>: ビジネスシミュレーション・データ分析・継続検証スクリプト</li>
+<li><strong>実装状況</strong>: 本番環境検証・長期テスト用スクリプト整理完了</li>
+</ul>
+<p><strong>ビジネスシミュレーションスクリプト</strong></p>
+<ul>
+<li><code>continuous_multi_day_simulation.py</code>: 長期営業サイクル（複数日間）の自律運用シミュレーション・Agent協働検証</li>
+<li><code>continuous_procurement_simulation.py</code>: 自動調達システムの継続的動作テスト・在庫最適化検証</li>
+</ul>
+<p><strong>データ分析・可視化スクリプト</strong></p>
+<ul>
+<li><code>kpi_visualization.py</code>: KPIデータ収集・グラフ生成・パフォーマンスダッシュボード作成</li>
+</ul>
+<p><strong>実行方法と意義</strong></p>
+<ul>
+<li>ビジネスシミュレーション: <code>python scripts/continuous_multi_day_simulation.py</code> で実行、意思決定品質・運用効率の長期検証</li>
+<li>データ分析: <code>python scripts/kpi_visualization.py</code> でKPIレポート生成、経営判断支援・改善策立案</li>
+</ul>
+<p><strong>ビジネス価値</strong></p>
+<ul>
+<li>リスク低減: 本番投入前の包括的システムテスト</li>
+<li>効率化: KPI自動追跡・異常早期検知</li>
+<li>継続改善: シミュレーションデータからの学習反映</li>
+</ul>
+<h2 id="%E9%96%8B%E7%99%BA%E3%83%AF%E3%83%BC%E3%82%AF%E3%83%95%E3%83%AD%E3%83%BC">開発ワークフロー</h2>
+<h3 id="%E9%96%8B%E7%99%BA%E7%92%B0%E5%A2%83%E5%88%B6%E7%B4%84">開発環境制約</h3>
+<ul>
+<li>Windows環境・VSCode</li>
+<li>Python 3.9+・FastAPI 0.104.1</li>
+<li>Azure OpenAI API・Tavily Search API・Anthropic Claude</li>
+</ul>
+<h3 id="%E3%83%87%E3%83%97%E3%83%AD%E3%82%A4%E3%83%A1%E3%83%B3%E3%83%88%E6%A7%8B%E6%88%90">デプロイメント構成</h3>
+<p><strong>ローカル開発環境</strong></p>
+<pre class="hljs"><code><div>Python AsyncIO + Uvicorn
+├── SQLite DB (主DB)
+├── ChromaDB (ベクトル検索)
+├── MongoDB (会話履歴・オプション)
+└── ホットリロード対応
+</div></code></pre>
+<p><strong>本番デプロイメント環境</strong></p>
+<pre class="hljs"><code><div>未定
+</div></code></pre>
+<p><strong>インフラ要件</strong></p>
+<ul>
+<li><strong>CPU</strong>: 4コア以上 (AI処理並行実行)</li>
+<li><strong>RAM</strong>: 8GB以上 (モデルロード・並行処理)</li>
+<li><strong>Storage</strong>: 10GB以上 (ログ・データ蓄積)</li>
+<li><strong>Network</strong>: 安定したインターネット接続 (AI API呼び出し)</li>
+</ul>
+<p><strong>スケーリング戦略</strong><br>
+未定</p>
+<h3 id="cicd%E7%8A%B6%E6%B3%81-%E6%9C%AA%E6%A7%8B%E7%AF%89">CI/CD状況 [未構築]</h3>
+<p>未定</p>
+
+</body>
+
+</html>

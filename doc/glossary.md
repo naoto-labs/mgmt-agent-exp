@@ -6,7 +6,7 @@
 - **意味**: 3つの自律型Agent (店長Agent, 監査Agent, 記録Agent) と17の専門Toolが協働して、自動販売機事業を完全自律的に運営するAIシステム
 - **別名**: 自律型AI経営システム
 - **特徴**: Azure OpenAI + Tavily統合により、高度なAI意思決定と実Web検索を実現
-- **アーキテクチャ**: 3-Agent + 17-tool共有アーキテクチャ
+- **アーキテクチャ**: 3-Agent + tool共有アーキテクチャ
 - **実装技術**: Python 3.9+ | FastAPI | Azure OpenAI GPT-4o-mini | Tavily API
 - **関連**: セッション型実行, AI安全性第一, 拡張可能なデータ基盤
 

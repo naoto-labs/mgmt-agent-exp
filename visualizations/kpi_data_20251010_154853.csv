@@ -1,0 +1,3 @@
+run_id,step,profit,stockout_rate,pricing_accuracy,action_correctness,customer_satisfaction,execution_order,timestamp
+test_run_final,10,100.0,0.0,0.7,0.1111111111111111,3.3,1,2025-10-10 15:48:52.280924
+test_run_final,10,100.0,0.0,0.7,0.1111111111111111,3.3,2,2025-10-10 15:58:52.280924

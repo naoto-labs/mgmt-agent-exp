@@ -31,6 +31,8 @@ anyio==4.11.0
     # via openai
     # via starlette
     # via watchfiles
+asttokens==3.0.0
+    # via stack-data
 attrs==25.3.0
     # via aiohttp
     # via jsonschema
@@ -66,10 +68,13 @@ click==8.3.0
 colorama==0.4.6
     # via build
     # via click
+    # via ipython
     # via tqdm
     # via uvicorn
 coloredlogs==15.0.1
     # via onnxruntime
+comm==0.2.3
+    # via ipykernel
 contourpy==1.3.3
     # via matplotlib
 cryptography==46.0.1
@@ -78,6 +83,10 @@ cycler==0.12.1
     # via matplotlib
 dataclasses-json==0.6.7
     # via langchain-community
+debugpy==1.8.17
+    # via ipykernel
+decorator==5.2.1
+    # via ipython
 distro==1.9.0
     # via anthropic
     # via openai
@@ -88,6 +97,8 @@ docstring-parser==0.17.0
     # via anthropic
 durationpy==0.10
     # via kubernetes
+executing==2.2.1
+    # via stack-data
 fake-useragent==2.2.0
     # via mgmt-agent-exp
 fastapi==0.118.0
@@ -142,6 +153,14 @@ importlib-metadata==8.7.0
     # via opentelemetry-api
 importlib-resources==6.5.2
     # via chromadb
+ipykernel==7.0.1
+    # via mgmt-agent-exp
+ipython==9.6.0
+    # via ipykernel
+ipython-pygments-lexers==1.1.1
+    # via ipython
+jedi==0.19.2
+    # via ipython
 jinja2==3.1.6
     # via mgmt-agent-exp
 jiter==0.11.0
@@ -155,6 +174,11 @@ jsonschema==4.25.1
     # via chromadb
 jsonschema-specifications==2025.9.1
     # via jsonschema
+jupyter-client==8.6.3
+    # via ipykernel
+jupyter-core==5.8.1
+    # via ipykernel
+    # via jupyter-client
 kiwisolver==1.4.9
     # via matplotlib
 kubernetes==34.1.0
@@ -208,6 +232,9 @@ marshmallow==3.26.1
 matplotlib==3.10.6
     # via mgmt-agent-exp
     # via seaborn
+matplotlib-inline==0.1.7
+    # via ipykernel
+    # via ipython
 mdurl==0.1.2
     # via markdown-it-py
 mmh3==5.2.0
@@ -221,6 +248,8 @@ multidict==6.6.4
     # via yarl
 mypy-extensions==1.1.0
     # via typing-inspect
+nest-asyncio==1.6.0
+    # via ipykernel
 numpy==2.3.3
     # via chromadb
     # via contourpy
@@ -265,6 +294,7 @@ overrides==7.7.0
 packaging==25.0
     # via build
     # via huggingface-hub
+    # via ipykernel
     # via langchain-core
     # via langsmith
     # via marshmallow
@@ -272,10 +302,16 @@ packaging==25.0
     # via onnxruntime
 pandas==2.3.3
     # via seaborn
+parso==0.8.5
+    # via jedi
 pillow==11.3.0
     # via matplotlib
+platformdirs==4.5.0
+    # via jupyter-core
 posthog==5.4.0
     # via chromadb
+prompt-toolkit==3.0.52
+    # via ipython
 propcache==0.3.2
     # via aiohttp
     # via yarl
@@ -283,6 +319,10 @@ protobuf==6.32.1
     # via googleapis-common-protos
     # via onnxruntime
     # via opentelemetry-proto
+psutil==7.1.0
+    # via ipykernel
+pure-eval==0.2.3
+    # via stack-data
 pyasn1==0.6.1
     # via pyasn1-modules
     # via rsa
@@ -310,6 +350,8 @@ pydantic-settings==2.11.0
     # via langchain-community
     # via mgmt-agent-exp
 pygments==2.19.2
+    # via ipython
+    # via ipython-pygments-lexers
     # via rich
 pymongo==4.15.1
     # via motor
@@ -322,6 +364,7 @@ pyproject-hooks==1.2.0
 pyreadline3==3.5.4
     # via humanfriendly
 python-dateutil==2.9.0.post0
+    # via jupyter-client
     # via kubernetes
     # via matplotlib
     # via pandas
@@ -334,6 +377,8 @@ python-multipart==0.0.20
     # via mgmt-agent-exp
 pytz==2025.2
     # via pandas
+pywin32==311
+    # via jupyter-core
 pyyaml==6.0.3
     # via chromadb
     # via huggingface-hub
@@ -342,6 +387,9 @@ pyyaml==6.0.3
     # via langchain-community
     # via langchain-core
     # via uvicorn
+pyzmq==27.1.0
+    # via ipykernel
+    # via jupyter-client
 referencing==0.36.2
     # via jsonschema
     # via jsonschema-specifications
@@ -389,6 +437,8 @@ sqlalchemy==2.0.43
     # via langchain
     # via langchain-community
     # via mgmt-agent-exp
+stack-data==0.6.3
+    # via ipython
 starlette==0.48.0
     # via fastapi
 sympy==1.14.0
@@ -405,10 +455,19 @@ tiktoken==0.11.0
     # via tavily-python
 tokenizers==0.22.1
     # via chromadb
+tornado==6.5.2
+    # via ipykernel
+    # via jupyter-client
 tqdm==4.67.1
     # via chromadb
     # via huggingface-hub
     # via openai
+traitlets==5.14.3
+    # via ipykernel
+    # via ipython
+    # via jupyter-client
+    # via jupyter-core
+    # via matplotlib-inline
 typer==0.19.2
     # via chromadb
 typing-extensions==4.15.0
@@ -421,6 +480,7 @@ typing-extensions==4.15.0
     # via fastapi
     # via grpcio
     # via huggingface-hub
+    # via ipython
     # via langchain-core
     # via openai
     # via opentelemetry-api
@@ -450,6 +510,8 @@ uvicorn==0.37.0
     # via mgmt-agent-exp
 watchfiles==1.1.0
     # via uvicorn
+wcwidth==0.2.14
+    # via prompt-toolkit
 websocket-client==1.8.0
     # via kubernetes
 websockets==15.0.1

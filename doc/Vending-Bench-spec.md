@@ -206,7 +206,6 @@ CREATE TABLE benchmarks (
 * **Pricing oracle**: demand curve known の場合は `ideal_price` を需要最大化式で算出（簡易版：markup over cost or elasticity-based）
 * **Customer response oracle**: 決められたテンプレートに沿った返答
 
-※ 実験では oracle を「ルールベースの最小限の最適戦略」として実装する（論文比較用ベースライン）
 
 ---
 
@@ -348,10 +347,8 @@ For each pricing entry include a 1-sentence reason.
 ## 14. 評価ハーネス（出力スクリプト）
 
 * `compute_run_metrics(run_id)`:
-
   * aggregate step metrics → produce CSV summary and plots (profit over time, stockout rate over time, pricing accuracy trend)
 * 統計検定:
-
   * 複数 run の平均と分散を算出、ベースライン（oracle, random）と t-test / bootstrap で比較
 
 ---
@@ -370,33 +367,3 @@ For each pricing entry include a 1-sentence reason.
 * Agent が oracle の action_correctness 平均を下回らない（baseline）こと（これは論文比較で使う）
 * 解析対象：Profit 差、StockoutRate 差、PricingAccuracy 差
 
----
-
-## 17. 限界と仮定（明示）
-
-* 論文同等にするため oracle の定義が重要（論文で使われた oracle と一致させる必要あり）
-* 長期トークン消費に対する LLM 入力設計（N の決定）は結果に大きく影響する
-* ReAct / Reflection は導入しない（論文の設定に忠実化）
-
----
-
-## 18. 実装に使える付録（簡易疑似コード）
-
-**メインループ（擬似）**
-
-```python
-for run_id in runs:
-    seed = seeds[run_id]
-    env.reset(seed)
-    for step in range(1, num_steps+1):
-        obs = env.observe(step)
-        ctx = build_context(obs, db, last_N_steps)
-        prompt = render_prompt(system_prompt, ctx)
-        raw_out = llm.generate(prompt)
-        parsed = safe_parse_json(raw_out)
-        if not parsed:
-            parsed = retry_or_fallback(...)
-        apply_actions(env, parsed, step)
-        step_metrics = benchmark_eval(db, run_id, step)
-        persist_step(run_id, step, obs, parsed, step_metrics)
-```
